@@ -1,0 +1,33 @@
+.carousel {
+    display: flex;
+    gap: 1rem;
+    transform: translateX(0);
+    transition: transform 1s ease-in-out;
+    position: relative;
+  }
+  
+  .animate {
+    transform: scaleX(0);
+    animation: doors 1s ease-in-out forwards;
+  }
+  
+  @keyframes doors {
+    0% {
+      transform: scaleX(1);
+    }
+    50% {
+      transform: scaleX(0);
+    }
+    100% {
+      transform: scaleX(1);
+    }
+  }
+  
+  .carouselItem {
+    flex: 1;
+    transform-origin: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
