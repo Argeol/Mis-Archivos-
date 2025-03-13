@@ -26,5 +26,7 @@ namespace bienesoft.Models
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         public int RoleId { get; set; }
         public Role Role { get; set; }
+
+        public ICollection<PermissionApproval>PermissionApprovals {get; set;}
     }
 }

@@ -69,7 +69,7 @@ namespace bienesoft.Models
                 .WithOne(a => a.Municipality) // Un aprendiz tiene un municipio
                 .HasForeignKey(a => a.Id_Municipality)
                 .OnDelete(DeleteBehavior.Restrict);
-                
+
             modelBuilder.Entity<Apprentice>()
                 .HasOne(a => a.File)
                 .WithMany(f => f.Apprentice)
@@ -86,6 +86,25 @@ namespace bienesoft.Models
                 .HasOne(p => p.Area)
                 .WithMany(a => a.Programs)
                 .HasForeignKey(p => p.Area_Id);
+
+            modelBuilder.Entity<PermissionGN>()
+                .HasOne(p => p.Apprentice)  // Un aprendiz tiene muchos permisos
+                .WithMany(a => a.permissionGN)     // Un permiso pertenece a un aprendiz
+                .HasForeignKey(p => p.Id_Apprentice)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PermissionApproval>()
+                .HasOne(pa => pa.Permission)       // Una aprobación pertenece a un permiso
+                .WithMany(p => p.Approvals)        // Un permiso puede tener muchas aprobaciones
+                .HasForeignKey(pa => pa.PermissionId) // Clave foránea en PermissionApproval
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PermissionApproval>()
+                .HasOne(pa => pa.Responsible)       // Una aprobación pertenece a un responsable
+                .WithMany(r => r.PermissionApprovals) // Un responsable puede aprobar muchas solicitudes
+                .HasForeignKey(pa => pa.ResponsibleId) // Clave foránea en PermissionApproval
+                .OnDelete(DeleteBehavior.Restrict);
+
 
 
             base.OnModelCreating(modelBuilder);

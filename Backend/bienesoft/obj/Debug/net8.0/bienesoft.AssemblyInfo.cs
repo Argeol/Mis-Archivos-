@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("bienesoft")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fee414a5b2ab57c9439f6a95216d9d368210e5cd")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5d42503f6ea15bffb3e7d4e6f4b24e8a81a6047d")]
 [assembly: System.Reflection.AssemblyProductAttribute("bienesoft")]
 [assembly: System.Reflection.AssemblyTitleAttribute("bienesoft")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -22,12 +22,14 @@ namespace bienesoft.Models
         public int File_Id { get; set; }
         public string Tip_Apprentice { get; set; } = "interno";
 
+        public ICollection<PermissionGN>permissionGN { get; set;}
         // Relación con File (Ficha)
         [ForeignKey("File_Id")]
         public FileModel? File { get; set;}
 
         [ForeignKey("Id_Municipality")]
         public Municipality? Municipality {get;set;} 
+
     }
 
 }

@@ -9,14 +9,6 @@ namespace bienesoft.Models
         public int Permission_Id { get; set; }
 
 
-
-        [DisplayName("Id del Aprendiz")]
-        [Required(ErrorMessage = "Se requiere este campo")]
-
-        public long Apprentice_Id { get; set; }
-
-
-
         [DisplayName("Fecha de Salida")]
         [Required(ErrorMessage = "Se requiere este campo")]
         public DateTime Departure_Date { get; set; }
@@ -67,7 +59,8 @@ namespace bienesoft.Models
         
 
         [DisplayName("Id de ResponsableAutorizacion")]
-        [Required(ErrorMessage = "Se requiere este campo")]
         public int PermissionRespon_Id { get; set; }
+
+
     }
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace bienesoft.Models
 {
@@ -7,7 +8,6 @@ namespace bienesoft.Models
         
         [Key]
         public int PermissionId { get; set; }
-        public int ApprenticeId { get; set; }
         public DateTime DepartureDate { get; set; }
         public DateTime EntryDate { get; set; }
         public DateTime ApplicationDate { get; set; } = DateTime.Now;
@@ -20,6 +20,13 @@ namespace bienesoft.Models
         public string Status { get; set; } = "Pending";
 
         public ICollection<PermissionApproval> Approvals { get; set; }
+
+        public int Id_Apprentice { get; set; }
+
+        [ForeignKey("Id_Apprentice")]
+        public Apprentice? Apprentice {get; set;}
+
+        
     }
 
 

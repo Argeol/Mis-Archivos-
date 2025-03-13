@@ -4416,11 +4416,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/argeol/proyecto/BIENESOFT/Backend/bienesoft/bienesoft.csproj",
+      "projectUniqueName": "/home/argeol/proyec mio/hello-github-actions/Mis-Archivos-/Backend/bienesoft/bienesoft.csproj",
       "projectName": "bienesoft",
-      "projectPath": "/home/argeol/proyecto/BIENESOFT/Backend/bienesoft/bienesoft.csproj",
+      "projectPath": "/home/argeol/proyec mio/hello-github-actions/Mis-Archivos-/Backend/bienesoft/bienesoft.csproj",
       "packagesPath": "/home/argeol/.nuget/packages/",
-      "outputPath": "/home/argeol/proyecto/BIENESOFT/Backend/bienesoft/obj/",
+      "outputPath": "/home/argeol/proyec mio/hello-github-actions/Mis-Archivos-/Backend/bienesoft/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/argeol/.nuget/NuGet/NuGet.Config"

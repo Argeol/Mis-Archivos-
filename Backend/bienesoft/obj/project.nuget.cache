@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "7ESmvmwAso89Vyvaxuf4/TfxT2VYR2gizBoinHCI+w7c8JHViJTGqZAJFyXJ0cxvOvAk05mIDx1Z8rTSY/7e4A==",
+  "dgSpecHash": "zAwGBDvyyYUMlNeu041s+4QXCYwLsjITCfMs4vMKt4kTwOac8LxyR35Dob+g/dKJomZ7xZnxRj4ExrNxPmzWuA==",
   "success": true,
-  "projectFilePath": "/home/argeol/proyecto/BIENESOFT/Backend/bienesoft/bienesoft.csproj",
+  "projectFilePath": "/home/argeol/proyec mio/hello-github-actions/Mis-Archivos-/Backend/bienesoft/bienesoft.csproj",
   "expectedPackageFiles": [
     "/home/argeol/.nuget/packages/azure.core/1.35.0/azure.core.1.35.0.nupkg.sha512",
     "/home/argeol/.nuget/packages/azure.identity/1.10.3/azure.identity.1.10.3.nupkg.sha512",

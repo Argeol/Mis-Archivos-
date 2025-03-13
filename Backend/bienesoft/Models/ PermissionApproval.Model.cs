@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace bienesoft.Models
 {
@@ -11,7 +12,10 @@ namespace bienesoft.Models
         public bool IsApproved { get; set; }
         public DateTime ApprovalDate { get; set; } = DateTime.Now;
 
+        [ForeignKey("PermissionId")]
         public PermissionGN Permission { get; set; }
+
+        [ForeignKey("ResponsibleId")]
         public Responsible Responsible { get; set; }
     }
 }

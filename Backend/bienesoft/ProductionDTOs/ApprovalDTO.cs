@@ -1,17 +1,20 @@
 namespace Bienesoft.ProductionDTOs
 {
-    public class ApprovalDto
-    {
-        public int Id { get; set; }
-        public string ApprovalDate { get; set; }
-        public List<PermissionDto> Permissions { get; set; }
-    }
 
-    public class PermissionDto
+    public class ApprovalDTO
     {
-        public int Id { get; set; }  // Se renombra para mantener consistencia con la entidad
-        public string Name { get; set; }  
-        
-        public string Status {get;set;}// Se añade el nombre correctamente
+
+        public string First_Name_Apprentice { get; set; }
+
+        public string Tip_Apprentice { get; set; }
+
+        public string Nom_Responsible { get; set; }
+
+        public string Name_role { get; set; }
+        public bool Authorization { get; set; }
+        public string Motive { get; set; }
+        public DateTime EntryDate { get; set; }
+        public DateTime DepartureDate { get; set; }
+
     }
 }
