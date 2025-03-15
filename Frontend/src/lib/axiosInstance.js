@@ -4,8 +4,11 @@ import axios from 'axios';
      baseURL: 'http://localhost:5158/',
      Headers:{
          'acept': '*/*',
-         'Content-Type': 'application/json'
+         'Content-Type': 'application/json',
          // Autorizer 
+
+         'Authorize': 'Bearer: '
+
      }
  });
 

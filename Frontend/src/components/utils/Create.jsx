@@ -35,7 +35,11 @@ const CreateButton = ({ createUrl, initialData, onRegister, fieldLabels}) => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
+            
             const response = await axiosInstance.post(createUrl, formData);
+            console.log(formData)
+            console.log(response)
+
             if (response.status === 200) {
                 alert("Registro creado con éxito");
                 setFormData(initialData || {}); // Reinicia el formulario
@@ -48,7 +52,7 @@ const CreateButton = ({ createUrl, initialData, onRegister, fieldLabels}) => {
             setIsSubmitting(false);
         }
     };
-
+    console.log(formData)
     return (
         <>
             <Button onClick={() => setIsOpen(true)}>Nuevo Registro</Button>

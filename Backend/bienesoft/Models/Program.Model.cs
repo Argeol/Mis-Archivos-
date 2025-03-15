@@ -18,7 +18,7 @@ namespace Bienesoft.Models
 
         public Area? Area { get; set; }
 
-        public ICollection<FileModel> FileModels { get; set; } = new List<FileModel>();
+        public ICollection<FileModel> ?FileModels { get; set; } = new List<FileModel>();
 
     }
     public class UpdateModelProgram

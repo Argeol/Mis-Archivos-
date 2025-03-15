@@ -1,3 +1,3 @@
 ﻿<Project>
-  <Import Project="../buildMultiTargeting/bienesoft.props" />
+  <Import Project="..\buildMultiTargeting\bienesoft.props" />
 </Project>

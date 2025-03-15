@@ -62,9 +62,9 @@
 // //     public class ApprenticeController : Controller
 
 // //     {
-// //         public IConfiguration _Configuration { get; set; }
-// //         public GeneralFunction GeneralFunction;
-// //         private readonly ApprenticeServices _ApprenticeServices;
+//// //         public IConfiguration _Configuration { get; set; }
+//// //         public GeneralFunction GeneralFunction;
+//// //         private readonly ApprenticeServices _ApprenticeServices;
 
 
 // //         public ApprenticeController(IConfiguration configuration, ApprenticeServices apprenticeServices)
@@ -209,6 +209,7 @@ using Bienesoft.Models;
 using Bienesoft.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using bienesoft.Funcions;
 
 namespace Bienesoft.Controllers
 {
@@ -217,6 +218,9 @@ namespace Bienesoft.Controllers
     public class ApprenticeController : ControllerBase
     {
         private readonly ApprenticeService _apprenticeService;
+        public IConfiguration _Configuration { get; set; }
+        public GeneralFunction GeneralFunction;
+
 
         public ApprenticeController(ApprenticeService apprenticeService)
         {
@@ -226,21 +230,52 @@ namespace Bienesoft.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetApprenticeById(int id)
         {
-            var apprentice = await _apprenticeService.GetApprenticeByIdAsync(id);
-
-            if (apprentice == null)
+            try
             {
-                return NotFound(new { message = "Aprendiz no encontrado" });
+                var apprentice = await _apprenticeService.GetApprenticeByIdAsync(id);
+
+                if (apprentice == null)
+                {
+                    return NotFound(new { message = "Aprendiz no encontrado" });
+                }
+
+                return Ok(apprentice);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                GeneralFunction.Addlog(ex.Message);
+                return StatusCode(500, ex.ToString());
             }
 
-            return Ok(apprentice);
+            
         }
         [HttpGet("apprentice")]
         public async Task<ActionResult<apprenticeDTO>> GetPermissionById(int id)
         {
-            var permission = await _apprenticeService.GetPermissionById(id);
-            if (permission == null) return NotFound();
-            return Ok(permission);
+            try
+            {
+                var permission = await _apprenticeService.GetPermissionById(id);
+
+            if (permission == null)
+                {
+                    return NotFound(new { message = "Aprendiz no encontrado" });
+                }
+
+                return Ok(permission);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                GeneralFunction.Addlog(ex.Message);
+                return StatusCode(500, ex.ToString());
+            }
         }
         [HttpPost("CreateApprentice")]
         public async Task<IActionResult> CreateApprentice([FromBody] ApprenticeCreateDTO apprenticeDTO)
@@ -248,6 +283,10 @@ namespace Bienesoft.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+            if (CreateApprentice == null)
+            {
+                return NotFound(new { message = "El aprendiz no se pudo crear." });
             }
 
             try
@@ -259,6 +298,11 @@ namespace Bienesoft.Controllers
             {
                 return BadRequest(ex.Message);
             }
+            catch (Exception ex)
+            {
+                GeneralFunction.Addlog(ex.Message);
+                return StatusCode(500, ex.ToString());
+            }
         }
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateApprentice(int id, [FromBody] ApprenticeUpdateDTO apprenticeDTO)
@@ -268,14 +312,30 @@ namespace Bienesoft.Controllers
                 return BadRequest(ModelState);
             }
 
-            var updatedApprentice = await _apprenticeService.UpdateApprenticeAsync(id, apprenticeDTO);
-
-            if (updatedApprentice == null)
+            try
             {
-                return NotFound(new { message = "El aprendiz no fue encontrado." });
-            }
+                var updatedApprentice = await _apprenticeService.UpdateApprenticeAsync(id, apprenticeDTO);
 
-            return NoContent(); // Indica que se actualizó correctamente
+                if (updatedApprentice == null)
+                {
+                    return NotFound(new { message = "El aprendiz no fue encontrado." });
+                }
+
+                return Ok(new { message = "Apprentice actualizado exitosamente" });
+            }
+            catch (ArgumentNullException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                GeneralFunction.Addlog(ex.Message);
+                return StatusCode(500, ex.ToString());
+            }
         }
 
     }
