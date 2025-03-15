@@ -48,24 +48,15 @@ namespace bienesoft.Controllers
         }
 
         [HttpGet("GetProgram")]
-        public IActionResult GetProgram(int id)
+        public async Task <IActionResult>GetProgram()
         {
-            try
-            {
-                var program= _ProgramServices.GetPrograms().Select(p=> new ProgramDTO 
-                {
-                    Program_Id = p.Program_Id,
-                    Program_Name = p.Program_Name,
-                    Area_Name = p.Area.Area_Name
-                }).ToList();
+             var program = await _ProgramServices.Getallprograms();
 
-                return Ok(program);
-            }
-            catch (Exception ex)
+            if (program == null || program.Count == 0) 
             {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
+                return BadRequest(new { message = "No hay programas registrados" });
             }
+            return Ok(program);
         }
 
         [HttpPut("UpdateProgram")]

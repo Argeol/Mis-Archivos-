@@ -19,18 +19,22 @@ function Registeruser() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [userType, setUserType] = useState("");
-  const [alertMessage, setAlertMessage] = useState(null); // Estado para manejar la alerta
+  const [alertMessage, setAlertMessage] = useState(null);
+  const [loading, setLoading] = useState(false); // Estado de carga
 
   async function handlerSubmit(event) {
     event.preventDefault();
+    setLoading(true); // Activar estado de carga
 
     if (!email || !password || !userType || !confirmPassword) {
       setAlertMessage({ type: "error", text: "Todos los campos son requeridos" });
+      setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
       setAlertMessage({ type: "error", text: "La contraseña y la confirmación no coinciden." });
+      setLoading(false);
       return;
     }
 
@@ -53,6 +57,8 @@ function Registeruser() {
       } else {
         setAlertMessage({ type: "error", text: "Error al procesar la solicitud. Inténtalo más tarde." });
       }
+    } finally {
+      setLoading(false); // Desactivar estado de carga
     }
   }
 
@@ -163,8 +169,12 @@ function Registeruser() {
             className="mt-4"
           />
 
-          <Button type="submit" className="mt-4 w-full bg-blue-500 text-white hover:bg-gray-400">
-            Registrar
+          <Button
+            type="submit"
+            className="mt-4 w-full bg-blue-500 text-white hover:bg-gray-400"
+            disabled={loading}
+          >
+            {loading ? "Registrando..." : "Registrar"}
           </Button>
 
           <div className="links-container mt-4 text-center">

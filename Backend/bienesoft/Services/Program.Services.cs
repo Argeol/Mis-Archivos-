@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using bienesoft.ProductionDTOs;
 
 namespace bienesoft.Models
 {
@@ -20,6 +21,14 @@ namespace bienesoft.Models
         public IEnumerable<ProgramModel> GetPrograms()
         {
             return _context.program.Include(p => p.Area).ToList(); // Asegúrate de que 'program' es el DbSet correcto en tu contexto.
+        }
+        public async Task<List<ProgramDTO>> Getallprograms()
+        {
+            return await _context.program.Select(p => new ProgramDTO {
+            Program_Id = p.Program_Id,
+            Program_Name = p.Program_Name,
+            Area_Name = p.Area.Area_Name
+            }).ToListAsync();
         }
 
         // Obtener un programa por ID

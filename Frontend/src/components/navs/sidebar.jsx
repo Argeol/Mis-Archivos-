@@ -14,12 +14,7 @@ function Sidebar() {
     <div className={`flex ${isOpen ? "w-64" : "w-20"} h-screen bg-slate-100 flex-col transition-all duration-300`}>
       
       {/* Logo */}
-      <div className="flex justify-center items-center p-4">
-        <img 
-          src="/logo.png" 
-          alt="Logo" 
-          className={`transition-all duration-300 ${isOpen ? "w-32" : "w-10"}`} 
-        />
+      <div className="flex justify-center items-center p-1">
       </div>
 
       {/* Botón de abrir/cerrar */}

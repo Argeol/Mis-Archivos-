@@ -4411,24 +4411,32 @@
     ]
   },
   "packageFolders": {
-    "/home/argeol/.nuget/packages/": {}
+    "C:\\Users\\SENA\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/argeol/proyec mio/hello-github-actions/Mis-Archivos-/Backend/bienesoft/bienesoft.csproj",
+      "projectUniqueName": "C:\\Users\\SENA\\Documents\\Proyecto Bienesoft\\bienesoft\\Backend\\bienesoft\\bienesoft.csproj",
       "projectName": "bienesoft",
-      "projectPath": "/home/argeol/proyec mio/hello-github-actions/Mis-Archivos-/Backend/bienesoft/bienesoft.csproj",
-      "packagesPath": "/home/argeol/.nuget/packages/",
-      "outputPath": "/home/argeol/proyec mio/hello-github-actions/Mis-Archivos-/Backend/bienesoft/obj/",
+      "projectPath": "C:\\Users\\SENA\\Documents\\Proyecto Bienesoft\\bienesoft\\Backend\\bienesoft\\bienesoft.csproj",
+      "packagesPath": "C:\\Users\\SENA\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\SENA\\Documents\\Proyecto Bienesoft\\bienesoft\\Backend\\bienesoft\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "/home/argeol/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\SENA\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -4441,6 +4449,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -4505,7 +4518,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.112/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
