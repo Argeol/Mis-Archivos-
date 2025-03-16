@@ -28,6 +28,7 @@ namespace bienesoft.Models
             Program_Id = p.Program_Id,
             Program_Name = p.Program_Name,
             Area_Name = p.Area.Area_Name
+            
             }).ToListAsync();
         }
 
