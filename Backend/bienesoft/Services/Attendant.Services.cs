@@ -1,5 +1,6 @@
 ﻿using bienesoft.Models;
 using Bienesoft.Models;
+using Microsoft.EntityFrameworkCore; // Necesario para Include()
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,16 +16,30 @@ namespace Bienesoft.Services
             _context = context;
         }
 
-        // Obtener todos los asistentes
-        public IEnumerable<Attendant> GetAttendants()
+        // Obtener todos los asistentes con su municipio
+        public IEnumerable<object> GetAttendants()
         {
-            return _context.attendant.ToList(); // Asegúrate de que 'attendants' es el DbSet correcto en tu contexto.
+            return _context.attendant
+                .Include(a => a.Municipality)
+                    .ThenInclude(m => m.Department)
+                .Select(a => new
+                {
+                    Attendant_Name = a.Attendant_Name,
+                    Municipality_Name = a.Municipality.municipality,
+                    Department_Name = a.Municipality.Department.Name_department
+
+                })
+                // Incluye la relación con Municipio
+                .ToList();
         }
 
-        // Obtener un asistente por ID
+        // Obtener un asistente por ID con su municipio
         public Attendant GetById(int id)
         {
-            var attendant = _context.attendant.FirstOrDefault(a => a.Attendant_Id == id);
+            var attendant = _context.attendant
+                .Include(a => a.Municipality) // Incluye el municipio
+                .FirstOrDefault(a => a.Attendant_Id == id);
+
             if (attendant == null)
             {
                 throw new KeyNotFoundException($"El asistente con el ID {id} no se encontró en la base de datos.");
@@ -38,12 +53,12 @@ namespace Bienesoft.Services
             var attendant = _context.attendant.FirstOrDefault(a => a.Attendant_Id == id);
             if (attendant == null)
             {
-                throw new KeyNotFoundException($"El asistente con el ID {id} no se pudo encontrar.");
+                throw new KeyNotFoundException($"El asistente con el ID {id} no se encontró.");
             }
 
             try
             {
-                _context.attendant.Remove(attendant); // Asegúrate de que 'attendants' es el DbSet correcto.
+                _context.attendant.Remove(attendant);
                 _context.SaveChanges();
             }
             catch (Exception ex)
@@ -72,6 +87,8 @@ namespace Bienesoft.Services
             existingAttendant.Attendant_Phone = attendant.Attendant_Phone;
             existingAttendant.Attendant_Address = attendant.Attendant_Address;
             existingAttendant.Attendant_Email = attendant.Attendant_Email;
+            existingAttendant.Id_Municipality = attendant.Id_Municipality; // Asegurar relación con Municipio
+
             try
             {
                 _context.SaveChanges();
@@ -92,15 +109,14 @@ namespace Bienesoft.Services
 
             try
             {
-                // Verificar si el ID ya existe
-                var existingAttendant = _context.attendant.FirstOrDefault(a => a.Attendant_Id == attendant.Attendant_Id);
-                if (existingAttendant != null)
+                // Verificar si el municipio existe antes de asignarlo
+                var municipalityExists = _context.municipality.Any(m => m.Id_municipality == attendant.Id_Municipality);
+                if (!municipalityExists)
                 {
-                    throw new ArgumentException($"El asistente con el ID {attendant.Attendant_Id} ya existe.");
+                    throw new ArgumentException($"El Municipio con el ID {attendant.Id_Municipality} no existe.");
                 }
 
-                // Agregar el nuevo asistente
-                _context.attendant.Add(attendant); // Usa el nombre correcto del DbSet.
+                _context.attendant.Add(attendant);
                 _context.SaveChanges();
             }
             catch (ArgumentException argEx)

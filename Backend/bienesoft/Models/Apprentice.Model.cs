@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using bienesoft.Models;
+using Bienesoft.Models;
 namespace bienesoft.Models
 {
     public class Apprentice
@@ -21,6 +22,8 @@ namespace bienesoft.Models
         public int Id_Municipality { get; set; }
         public int File_Id { get; set; }
         public string Tip_Apprentice { get; set; } = "interno";
+        
+        public int Attendant_Id {get; set;}
 
         public ICollection<PermissionGN>permissionGN { get; set;}
         // Relación con File (Ficha)
@@ -29,6 +32,8 @@ namespace bienesoft.Models
 
         [ForeignKey("Id_Municipality")]
         public Municipality? Municipality {get;set;} 
+
+        public Attendant? Attendant {get; set;}
 
     }
 

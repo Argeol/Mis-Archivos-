@@ -17,16 +17,7 @@ namespace Bienesoft.Services
             _context = context;
         }
 
-        public async Task<Apprentice> GetApprenticeByIdAsync(int id)
-        {
-            return await _context.apprentice
-        .Where(a => a.Id_Apprentice == id)
-        .Include(a => a.File)
-            .ThenInclude(f => f.program)
-                .ThenInclude(p => p.Area)
-        .Include(a => a.Municipality) // Aquí no se usa FirstOrDefaultAsync()
-        .FirstOrDefaultAsync();
-        }
+
         public async Task<apprenticeDTO> GetPermissionById(int id)
         {
             var apprentice = await _context.apprentice
@@ -43,6 +34,7 @@ namespace Bienesoft.Services
                     ProgramName = p.File.program.Program_Name,
                     AreaName = p.File.program.Area.Area_Name,
                     nom_department = p.Municipality.Department.Name_department
+
                 })
                 .FirstOrDefaultAsync();
 
@@ -83,57 +75,118 @@ namespace Bienesoft.Services
 
             return apprentice;
         }
-    public async Task<Apprentice?> UpdateApprenticeAsync(int id, ApprenticeUpdateDTO apprenticeDTO)
-{
-    var apprentice = await _context.apprentice.FindAsync(id);
+        public async Task<Apprentice?> UpdateApprenticeAsync(int id, ApprenticeUpdateDTO apprenticeDTO)
+        {
+            var apprentice = await _context.apprentice.FindAsync(id);
 
-    if (apprentice == null)
-    {
-        return null; // No se encontró el aprendiz
+            if (apprentice == null)
+            {
+                return null; // No se encontró el aprendiz
+            }
+
+            // Solo actualiza los campos si el usuario los envía en la petición
+            if (!string.IsNullOrEmpty(apprenticeDTO.First_Name_Apprentice))
+                apprentice.First_Name_Apprentice = apprenticeDTO.First_Name_Apprentice;
+
+            if (!string.IsNullOrEmpty(apprenticeDTO.Last_Name_Apprentice))
+                apprentice.Last_Name_Apprentice = apprenticeDTO.Last_Name_Apprentice;
+
+            if (apprenticeDTO.Birth_Date_Apprentice.HasValue)
+                apprentice.Birth_Date_Apprentice = apprenticeDTO.Birth_Date_Apprentice.Value;
+
+            if (!string.IsNullOrEmpty(apprenticeDTO.Gender_Apprentice))
+                apprentice.Gender_Apprentice = apprenticeDTO.Gender_Apprentice;
+
+            if (!string.IsNullOrEmpty(apprenticeDTO.Email_Apprentice))
+                apprentice.Email_Apprentice = apprenticeDTO.Email_Apprentice;
+
+            if (!string.IsNullOrEmpty(apprenticeDTO.Address_Apprentice))
+                apprentice.Address_Apprentice = apprenticeDTO.Address_Apprentice;
+
+            if (!string.IsNullOrEmpty(apprenticeDTO.Address_Type_Apprentice))
+                apprentice.Address_Type_Apprentice = apprenticeDTO.Address_Type_Apprentice;
+
+            if (!string.IsNullOrEmpty(apprenticeDTO.Phone_Apprentice))
+                apprentice.Phone_Apprentice = apprenticeDTO.Phone_Apprentice;
+
+            if (!string.IsNullOrEmpty(apprenticeDTO.Status_Apprentice))
+                apprentice.Status_Apprentice = apprenticeDTO.Status_Apprentice;
+
+            if (apprenticeDTO.Id_Municipality.HasValue)
+                apprentice.Id_Municipality = apprenticeDTO.Id_Municipality.Value;
+
+            // 🔹 Forzar a EF Core a detectar cambios
+            _context.Entry(apprentice).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+            return apprentice;
+        }
+
+
+        public IEnumerable<object> Getapprentice()
+        {
+            return _context.apprentice
+            .Include(a => a.Attendant)
+            .Include(a => a.Municipality)
+                .ThenInclude(m => m.Department)
+            .Include(a => a.File)
+                .ThenInclude(f => f.program)
+                    .ThenInclude(p => p.Area)
+            .Select(a => new
+            {
+                a.Id_Apprentice,
+                a.First_Name_Apprentice,
+                a.Last_Name_Apprentice,
+                a.Address_Type_Apprentice,
+                a.Email_Apprentice,
+                a.Birth_Date_Apprentice,
+                a.Phone_Apprentice,
+                a.Gender_Apprentice,
+                a.Tip_Apprentice,
+                a.Attendant.Attendant_Name,
+                a.Attendant.Attendant_Phone,
+                a.Municipality.municipality,
+                a.Municipality.Department.Name_department,
+                a.File.File_Id,
+                a.File.program.Program_Name,
+                a.File.program.Area.Area_Name
+            }).ToList();
+        }
+
+        public async Task<bool> DeleteApprenticeAsync(int id)
+        {
+            try
+            {
+                var apprentice = await _context.apprentice.FindAsync(id);
+
+                if (apprentice == null)
+                {
+                    return false; // No se encontró el aprendiz
+                }
+
+                _context.apprentice.Remove(apprentice);
+                await _context.SaveChangesAsync();
+
+                return true; // Eliminación exitosa
+            }
+            catch (Exception ex)
+            {
+                // Registra el error en los logs (puedes cambiar esto según tu sistema de logging)
+                Console.WriteLine($"Error al eliminar el aprendiz: {ex.Message}");
+                throw new Exception("Ocurrió un error al intentar eliminar el aprendiz.");
+            }
+        }
+
+
+
     }
-
-    // Solo actualiza los campos si el usuario los envía en la petición
-    if (!string.IsNullOrEmpty(apprenticeDTO.First_Name_Apprentice))
-        apprentice.First_Name_Apprentice = apprenticeDTO.First_Name_Apprentice;
-
-    if (!string.IsNullOrEmpty(apprenticeDTO.Last_Name_Apprentice))
-        apprentice.Last_Name_Apprentice = apprenticeDTO.Last_Name_Apprentice;
-
-    if (apprenticeDTO.Birth_Date_Apprentice.HasValue)
-        apprentice.Birth_Date_Apprentice = apprenticeDTO.Birth_Date_Apprentice.Value;
-
-    if (!string.IsNullOrEmpty(apprenticeDTO.Gender_Apprentice))
-        apprentice.Gender_Apprentice = apprenticeDTO.Gender_Apprentice;
-
-    if (!string.IsNullOrEmpty(apprenticeDTO.Email_Apprentice))
-        apprentice.Email_Apprentice = apprenticeDTO.Email_Apprentice;
-
-    if (!string.IsNullOrEmpty(apprenticeDTO.Address_Apprentice))
-        apprentice.Address_Apprentice = apprenticeDTO.Address_Apprentice;
-
-    if (!string.IsNullOrEmpty(apprenticeDTO.Address_Type_Apprentice))
-        apprentice.Address_Type_Apprentice = apprenticeDTO.Address_Type_Apprentice;
-
-    if (!string.IsNullOrEmpty(apprenticeDTO.Phone_Apprentice))
-        apprentice.Phone_Apprentice = apprenticeDTO.Phone_Apprentice;
-
-    if (!string.IsNullOrEmpty(apprenticeDTO.Status_Apprentice))
-        apprentice.Status_Apprentice = apprenticeDTO.Status_Apprentice;
-
-    if (apprenticeDTO.Id_Municipality.HasValue)
-        apprentice.Id_Municipality = apprenticeDTO.Id_Municipality.Value;
-
-    // 🔹 Forzar a EF Core a detectar cambios
-    _context.Entry(apprentice).State = EntityState.Modified;
-
-    await _context.SaveChangesAsync();
-    return apprentice;
+    //         {
+    //             return await _context.apprentice.ToListAsync();
+    //         }
 }
 
-    }
 
 
-}
 
 
 // using bienesoft.models;
@@ -154,10 +207,7 @@ namespace Bienesoft.Services
 //         }
 
 //         // Obtener todos los aprendices
-//         public async Task<List<Apprentice>> GetApprenticesAsync()
-//         {
-//             return await _context.apprentice.ToListAsync();
-//         }
+//       
 
 //         // Registrar un nuevo aprendiz
 //         public async Task<bool> RegisterApprenticeAsync(Apprentice apprentice)

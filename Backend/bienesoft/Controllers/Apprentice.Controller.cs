@@ -227,40 +227,15 @@ namespace Bienesoft.Controllers
             _apprenticeService = apprenticeService;
         }
 
+
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetApprenticeById(int id)
-        {
-            try
-            {
-                var apprentice = await _apprenticeService.GetApprenticeByIdAsync(id);
-
-                if (apprentice == null)
-                {
-                    return NotFound(new { message = "Aprendiz no encontrado" });
-                }
-
-                return Ok(apprentice);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
-            }
-
-            
-        }
-        [HttpGet("apprentice")]
         public async Task<ActionResult<apprenticeDTO>> GetPermissionById(int id)
         {
             try
             {
                 var permission = await _apprenticeService.GetPermissionById(id);
 
-            if (permission == null)
+                if (permission == null)
                 {
                     return NotFound(new { message = "Aprendiz no encontrado" });
                 }
@@ -292,7 +267,7 @@ namespace Bienesoft.Controllers
             try
             {
                 var apprentice = await _apprenticeService.CreateApprenticeAsync(apprenticeDTO);
-                return CreatedAtAction(nameof(GetApprenticeById), new { id = apprentice.Id_Apprentice }, apprentice);
+                return CreatedAtAction(nameof(GetPermissionById), new { id = apprentice.Id_Apprentice }, apprentice);
             }
             catch (ArgumentException ex)
             {
@@ -335,6 +310,31 @@ namespace Bienesoft.Controllers
             {
                 GeneralFunction.Addlog(ex.Message);
                 return StatusCode(500, ex.ToString());
+            }
+        }
+        [HttpGet("GetApprentices")]
+        public ActionResult<IEnumerable<Attendant>> GetApprentices()
+        {
+            return Ok(_apprenticeService.Getapprentice());
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteApprentice(int id)
+        {
+            try
+            {
+                var deleted = await _apprenticeService.DeleteApprenticeAsync(id);
+
+                if (!deleted)
+                {
+                    return NotFound(new { message = "Aprendiz no encontrado" });
+                }
+
+                return Ok(new { message = "Aprendiz eliminado correctamente" });
+            }
+            catch (Exception ex)
+            {
+                GeneralFunction.Addlog(ex.Message);
+                return StatusCode(500, new { message = "Error interno al eliminar el aprendiz" });
             }
         }
 

@@ -105,6 +105,18 @@ namespace bienesoft.Models
                 .HasForeignKey(pa => pa.ResponsibleId) // Clave foránea en PermissionApproval
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Attendant>()
+                .HasOne(a => a.Municipality)  // Un Acudiente tiene un solo Municipio
+                .WithMany(m => m.Attendants)  // Un Municipio tiene muchos Acudientes
+                .HasForeignKey(a => a.Id_Municipality)  // Clave foránea en Attendant
+                .OnDelete(DeleteBehavior.Cascade); // Opcional: elimina en cascada
+
+            modelBuilder.Entity<Apprentice>()
+                .HasOne(a=>a.Attendant)
+                .WithMany(att=> att.Apprentices)
+                .HasForeignKey(a=>a.Attendant_Id)
+                .OnDelete(DeleteBehavior.Cascade)
+            ;
 
 
             base.OnModelCreating(modelBuilder);
