@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import PrivateNav from "@/components/navs/PrivateNav";
 import ContecPage from "@/components/utils/ContectPage";
 import axiosInstance from "@/lib/axiosInstance";
+import { string } from "zod";
 
 export default function Dashboard() {
     const [dataProgram, setDataProgram] = useState([]); // Lista de programas
@@ -19,7 +20,7 @@ export default function Dashboard() {
         const fetchDataProgram = async () => {
             try {
                 const response = await axiosInstance.get("/api/Program/GetProgram");
-
+    
                 if (response.status !== 200) {
                     throw new Error("Error al cargar los programas");
                 }
@@ -47,6 +48,7 @@ export default function Dashboard() {
         fetchDataProgram();
     }, []);
     
+
     return (
         <PrivateNav>
             <ContecPage
@@ -58,34 +60,17 @@ export default function Dashboard() {
                 setData={setDataProgram}
                 updateUrl="api/Program/UpdateProgram"
                 createUrl="api/Program/CreateProgram"
-                initialData={{ program_Id: "", program_Name: "", Area_name: "" }}
-                onRegister={(newData) => {
-                    setDataProgram((prev) => {
-                        // Buscar si el programa ya existe en la lista
-                        const existingIndex = prev.findIndex(p => p.program_Id === String(newData.program_Id));
-
-                        if (existingIndex !== -1) {
-                            // Si existe, actualizarlo
-                            const updatedData = [...prev];
-                            updatedData[existingIndex] = {
-                                program_Id: String(newData.program_Id),
-                                program_Name: String(newData.program_Name),
-                                Area_name: String(newData.area_Name || "Sin Área")
-                            };
-                            return updatedData;
-                        } else {
-                            // Si no existe, agregarlo
-                            return [
-                                ...prev,
-                                {
-                                    program_Id: String(newData.program_Id),
-                                    program_Name: String(newData.program_Name),
-                                    Area_name: String(newData.area_Name || "Sin Área")
-                                }
-                            ];
+                initialData={{ program_Id: "", program_Name: "", Area_Id: "" }}
+                onRegister={(newData) =>
+                    setDataProgram((prev) => [
+                        ...prev,
+                        {
+                            program_Id: String(newData.program_Id),
+                            program_Name: String(newData.program_Name),
+                            Area_name: string(newData.area_Name || "Sin Área")
                         }
-                    });
-                }}
+                    ])
+                }
                 fieldLabels={fieldLabels}
             />
         </PrivateNav>
