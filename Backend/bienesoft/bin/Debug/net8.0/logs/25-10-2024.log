@@ -1,9 +1,0 @@
-25/10/2024 7:53:33 a. m.-System.InvalidCastException: Unable to cast object of type 'System.DateTime' to type 'System.String'.
-   at MySqlConnector.Core.Row.GetString(Int32 ordinal) in /_/src/MySqlConnector/Core/Row.cs:line 355
-   at MySqlConnector.MySqlDataReader.GetString(Int32 ordinal) in /_/src/MySqlConnector/MySqlDataReader.cs:line 293
-   at lambda_method19(Closure, QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator)
-   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
-   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
-   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
-   at bienesoft.Services.UserServices.GetByEmailAsync(String email) in C:\Bienesoft\bienesoft\Backend\bienesoft\Services\User.Services.cs:line 89
-   at bienesoft.Controllers.UserController.Login(LoginUser login) in C:\Bienesoft\bienesoft\Backend\bienesoft\Controllers\User.Controller.cs:line 38
