@@ -11,10 +11,10 @@ namespace bienesoft.Models
 
         // [DisplayName("Nombre del Area")]
         [Required(ErrorMessage = "Campo {0} es requerido")]
-        [StringLength(100, ErrorMessage = "El campo {0} tiene un limite de caracteres de {1}")]
+        [StringLength(45, ErrorMessage = "El campo {0} tiene un limite de caracteres de {1}")]
         public string Area_Name { get; set; }
 
-        public ICollection<ProgramModel> Programs { get; set; } = new List<ProgramModel>();
+        public ICollection<ProgramModel>? Programs { get; set; }
     }
 
 }

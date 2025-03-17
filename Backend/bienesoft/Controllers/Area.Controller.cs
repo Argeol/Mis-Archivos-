@@ -11,7 +11,7 @@ namespace Bienesoft.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    
+
     public class AreaController : Controller
     {
         public IConfiguration _Configuration { get; set; }
@@ -24,22 +24,23 @@ namespace Bienesoft.Controllers
             _AreaServices = areaServices;
         }
         [HttpPost("CreateArea")]
-        public IActionResult AddArea(Area area)
+        public IActionResult AddArea([FromBody] Area area) // Asegura que se reciba desde el cuerpo del request
         {
+            if (area == null)
+            {
+                return BadRequest("El objeto Area no puede ser nulo.");
+            }
+
             try
             {
                 _AreaServices.AddArea(area);
-                return Ok(new
-                {
-                    message = "Area creado con exito"
-                });
+                return Ok(new { message = "Área creada con éxito" });
             }
             catch (Exception ex)
             {
-                GeneralFunction.Addlog(ex.ToString());
+                GeneralFunction?.Addlog(ex.ToString()); // Evita llamar a un objeto nulo
                 return StatusCode(500, ex.ToString());
             }
-
         }
 
         [HttpGet("GetArea")]
@@ -50,7 +51,7 @@ namespace Bienesoft.Controllers
                 var area = _AreaServices.GetById(id);
                 if (area == null)
                 {
-                    return NotFound("No Se Encontr� El Area");
+                    return NotFound("No Se Encontr� El Area");
                 }
                 return Ok(area);
             }
