@@ -19,8 +19,10 @@ export default function Dashboard() {
     useEffect(() => {
         const fetchDataProgram = async () => {
             try {
+                
                 const response = await axiosInstance.get("/api/Program/GetProgram");
-    
+                
+                consolelong (response)
                 if (response.status !== 200) {
                     throw new Error("Error al cargar los programas");
                 }

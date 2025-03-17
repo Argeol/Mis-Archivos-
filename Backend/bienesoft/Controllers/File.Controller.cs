@@ -34,7 +34,7 @@ namespace bienesoft.Controllers
                 _FileServices.AddFile(file);
                 return Ok(new
                 {
-                    message = "File creado con exito"
+                    message = "Ficha registrada con exito"
                 });
             }
             catch (Exception ex)
@@ -44,30 +44,19 @@ namespace bienesoft.Controllers
             }
         }
 
-        [HttpGet("GetFile")]
-        public IActionResult GetFile(int id)
+        [HttpGet("{id}")]
+        public IActionResult GetFileById(int id)
         {
-            try
-            {
-                var file = _FileServices.Getfile().Select(p=> new FileDTO
-                {
-                    File_Id = p.File_Id,
-                    Apprentice_count = p.Apprentice_count,
-                    Start_Date = p.Start_Date,
-                    End_Date = p.End_Date,
-                    Program_Name = p.program.Program_Name,
-                });
-                return Ok(file);
-                
-            }
-            catch (Exception ex)
-            {
+            var file = _FileServices.GetFileById(id);
 
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
-
+            if (file == null)
+            {
+                return NotFound();
             }
+
+            return Ok(file);
         }
+
 
         [HttpPost("UpdateFile")]
         public IActionResult Update(int Id, FileModel file)
@@ -87,7 +76,7 @@ namespace bienesoft.Controllers
         {
             try
             {
-                var file = _FileServices.GetById(id);
+                var file = _FileServices.GetFileById(id);
                 if (file == null)
                 {
                     return NotFound("La File Con El Id" + id + "No Se Pudo Encontrar");
@@ -105,39 +94,57 @@ namespace bienesoft.Controllers
                 return StatusCode(500, ex.ToString());
             }
         }
-        [HttpGet("AllFile")]
-        public ActionResult<IEnumerable<FileModel>> Getfile()
+        [HttpGet("Getfiles")]
+        public ActionResult<IEnumerable<FileModel>> Getfiles()
         {
-            return Ok(_FileServices.Getfile());
+            return Ok(_FileServices.Getfiles());
         }
-        [HttpPut("UpdateFile")]
-        public IActionResult Update(FileModel file)
+        //[HttpPut("UpdateFile")]
+        //public IActionResult Update(int id , FileModel file)
+
+        //{
+        //    if (file == null)
+        //    {
+        //        return BadRequest("El modelo de File es nulo");
+        //    }
+
+        //    try
+        //    {
+        //        _FileServices.UpdateFileAsync(file);
+        //        return Ok("File actualizado exitosamente");
+        //    }
+        //    catch (ArgumentNullException ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //    catch (ArgumentException ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        GeneralFunction.Addlog(ex.Message);
+        //        return StatusCode(500, ex.ToString());
+
+        //    }
+        //}
+        [HttpPut]
+    public async Task<IActionResult> UpdateFile([FromBody] FileModel updatedFile)
+    {
+        if (updatedFile == null || updatedFile.File_Id == 0)
         {
-            if (file == null)
-            {
-                return BadRequest("El modelo de File es nulo");
-            }
-
-            try
-            {
-                _FileServices.UpdateFile(file);
-                return Ok("File actualizado exitosamente");
-            }
-            catch (ArgumentNullException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
-
-            }
+            return BadRequest("Datos inválidos.");
         }
+
+        var result = await _FileServices.UpdateFileAsync(updatedFile);
+
+        if (result == null)
+        {
+            return NotFound($"No se encontró el archivo con ID {updatedFile.File_Id}.");
+        }
+
+        return Ok(result);
+    }
 
     }
 }

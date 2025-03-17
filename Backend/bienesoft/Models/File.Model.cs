@@ -22,15 +22,15 @@ namespace bienesoft.Models
         public DateTime Start_Date { get; set; }
 
         [Required(ErrorMessage = "Se requiere este campo")]
-        [DataType(DataType.Date, ErrorMessage = "El formato de la fecha no es válido")]
+        [DataType(DataType.Date, ErrorMessage = "El formato de la fecha no es válido")] 
         public DateTime End_Date { get; set; }
 
-        [Required(ErrorMessage = "Se requiere este campo")]
+        
 
         public int Program_Id { get; set; }
         [ForeignKey("Program_Id")]
-        public  ProgramModel program {get; set;}
+        public  ProgramModel ?program {get; set;}
 
-        public ICollection<Apprentice>Apprentice {get; set;}
+        public ICollection<Apprentice>?Apprentice {get; set;}
     }
 }
