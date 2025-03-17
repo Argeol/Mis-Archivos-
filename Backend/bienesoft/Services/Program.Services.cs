@@ -88,6 +88,7 @@ namespace bienesoft.Models
             {
                 throw new Exception("No se pudo actualizar el programa: " + ex.Message);
             }
+
         }
 
         // Agregar un nuevo programa

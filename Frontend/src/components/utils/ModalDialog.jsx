@@ -15,12 +15,13 @@ function ModalDialog({TitlePage, RegisterComponets }) {
     return ( 
         <>
             <Button onClick={handleOpen}>
-                Ayuda  {TitlePage}
+                registrar  {TitlePage}
             </Button>
             <Dialog open={isOpen} onOpenChange={handleCloseForm}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Agrega {TitlePage}</DialogTitle>
+                        <RegisterComponets></RegisterComponets>
                     </DialogHeader>           
                 </DialogContent>
             </Dialog>

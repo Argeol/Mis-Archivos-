@@ -253,6 +253,7 @@ import {
 import DeleteButton from "./Delete";
 import UpdateButton from "./Update";
 import CreateButton from "./Create";
+import ModalDialog from "./ModalDialog";
 
 export default function DataTable({
   Data,
@@ -268,6 +269,8 @@ export default function DataTable({
   initialData,
   onRegister,
   fieldLabels,
+  RegisterComponets,
+  TitlePage,
 }) {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -315,12 +318,9 @@ export default function DataTable({
           Tabla de Datos
         </CardTitle>
         <div className="flex justify-end">
-          <CreateButton
-            createUrl={createUrl}
-            initialData={initialData}
-            onRegister={onRegister}
-            fieldLabels={fieldLabels}
-          />
+       
+         <ModalDialog RegisterComponets={RegisterComponets} TitlePage={TitlePage}/>
+          
         </div>
       </CardHeader>
       <CardContent>
