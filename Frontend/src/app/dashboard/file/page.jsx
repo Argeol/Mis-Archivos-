@@ -1,17 +1,3 @@
-// "use client"
-
-// import PrivateNav from "@/components/navs/PrivateNav";
-// import RegisterFile from "./registerFile";
-
-// export default function Dashboard({children}) {
-//     return(
-//     <>
-//         <PrivateNav>
-//            <RegisterFile/>
-//         </PrivateNav>    
-//     </>
-//     )
-// }
 "use client";
 
 import { useEffect, useState } from "react";
@@ -35,7 +21,7 @@ export default function Dashboard() {
     useEffect(() => {
         const fetchDataFile = async () => {
             try {
-                const response = await axiosInstance.get("api/File/AllFile");
+                const response = await axiosInstance.get("/Api/File/GetFiles");
     
                 if (response.status !== 200) {
                     throw new Error("Error al cargar los archivos");
@@ -53,6 +39,7 @@ export default function Dashboard() {
                     area_Name: file.program && file.program.area ? String(file.program.area.area_Name) : "Sin Área"
                 }));
 
+                
                 console.log("Datos transformados:", formattedData); // 🔍 Depuración
 
                 setDataFile(formattedData);

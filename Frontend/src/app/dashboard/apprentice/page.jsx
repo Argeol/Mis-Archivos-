@@ -12,7 +12,7 @@ export default function ApprenticeDashboard() {
     useEffect(() => {
         const fetchDataApprentice = async () => {
             try {
-                const response = await axiosInstance.get("api/Apprentice/AllApp");
+                const response = await axiosInstance.get("api/Apprentice/GetApprentices");
                 if (response.status !== 200) {
                     throw new Error("Error al cargar los aprendices");
                 }
