@@ -23,7 +23,7 @@ function ContecPage({
 ) {
   return(
     <>
-      {/* <ModalDialog RegisterComponets={registerComponets} TitlePage={titlesPage} />  */}
+      <ModalDialog RegisterComponets={registerComponets} TitlePage={titlesPage} />
       <DataTable
           titlesData={titlesData} 
           idKey={idKey} 
@@ -36,6 +36,8 @@ function ContecPage({
           initialData={initialData}
           onRegister={onRegister}
           fieldLabels={fieldLabels}
+          RegisterComponets={registerComponets}
+          TitlePage={titlesPage}
       />
     </>
   )
