@@ -89,7 +89,7 @@ namespace bienesoft.Models
 
             modelBuilder.Entity<PermissionGN>()
                 .HasOne(p => p.Apprentice)  // Un aprendiz tiene muchos permisos
-                .WithMany(a => a.permissionGN)     // Un permiso pertenece a un aprendiz
+                .WithMany(a => a.PermissionGN)     // Un permiso pertenece a un aprendiz
                 .HasForeignKey(p => p.Id_Apprentice)
                 .OnDelete(DeleteBehavior.Restrict);
 

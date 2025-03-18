@@ -67,7 +67,8 @@ namespace Bienesoft.Services
                 Status_Apprentice = apprenticeDTO.Status_Apprentice,
                 Permission_Count_Apprentice = apprenticeDTO.Permission_Count_Apprentice,
                 Id_Municipality = apprenticeDTO.Municipality_Id,
-                File_Id = apprenticeDTO.File_id
+                File_Id = apprenticeDTO.File_id,
+                Attendant_Id = apprenticeDTO.Attendant_Id
             };
 
             _context.apprentice.Add(apprentice);

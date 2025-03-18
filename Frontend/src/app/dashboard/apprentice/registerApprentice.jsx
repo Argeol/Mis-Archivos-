@@ -1,20 +1,19 @@
-"use client"; 
 import { useEffect, useState } from "react";
-import axiosInstance from "@/lib/axiosInstance"; // Asegúrate de importar correctamente tu instancia de Axios
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Select, SelectItem } from "@/components/ui/select";
+import axiosInstance from "@/lib/axiosInstance";
 
-export default function RegisterApprentice({ open, onClose }) {
+export default function RegisterApprentice() {
   const [departments, setDepartments] = useState([]);
   const [municipalities, setMunicipalities] = useState([]);
+  const [attendants, setAttendants] = useState([]);
+  const [areas, setAreas] = useState([]);
+  const [programs, setPrograms] = useState([]);
+  const [files, setFiles] = useState([]);
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedArea, setSelectedArea] = useState("");
+  const [selectedProgram, setSelectedProgram] = useState("");
   const [formData, setFormData] = useState({
     first_Name_Apprentice: "",
     last_Name_Apprentice: "",
@@ -25,152 +24,90 @@ export default function RegisterApprentice({ open, onClose }) {
     address_Type_Apprentice: "",
     phone_Apprentice: "",
     status_Apprentice: "Active",
-    id_Municipality: "",
+    permission_Count_Apprentice: 0,
+    tip_Apprentice: "Regular",
+    attendant_Id: "",
+    file_id: "",
+    municipality_Id: "",
   });
 
   useEffect(() => {
-    axiosInstance.get("/api/department")
-      .then(response => setDepartments(response.data))
-      .catch(error => console.error("Error fetching departments:", error));
+    axiosInstance.get("/api/Department").then((res) => setDepartments(res.data));
+    axiosInstance.get("/api/Attendant/AllAttendants").then((res) => setAttendants(res.data));
+    axiosInstance.get("/api/Area/AllArea").then((res) => setAreas(res.data));
   }, []);
 
-  const handleDepartmentChange = async (departmentId) => {
-    setFormData({ ...formData, id_Municipality: "" }); // Reiniciar municipio al cambiar departamento
-    try {
-      const response = await axiosInstance.get(`/api/municipality/byDepartment/${departmentId}`);
-      setMunicipalities(response.data);
-    } catch (error) {
-      console.error("Error fetching municipalities:", error);
+  useEffect(() => {
+    if (selectedDepartment) {
+      axiosInstance
+        .get(`/api/Municipality/byDepartment/{departmentId}`)
+        .then((res) => setMunicipalities(res.data));
     }
+  }, [selectedDepartment]);
+
+  useEffect(() => {
+    if (selectedArea) {
+      axiosInstance.get(`/api/programs?areaId=${selectedArea}`).then((res) => setPrograms(res.data));
+    }
+  }, [selectedArea]);
+
+  useEffect(() => {
+    if (selectedProgram) {
+      axiosInstance.get(`/Api/File/Id_Program?programId=${selectedProgram}`).then((res) => setFiles(res.data));
+    }
+  }, [selectedProgram]);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axiosInstance.post("/api/apprentice", formData);
-      alert("Aprendiz registrado correctamente");
-      onClose();
+      await axiosInstance.post("/api/apprentices", formData);
+      alert("Aprendiz registrado exitosamente");
     } catch (error) {
-      console.error("Error al registrar aprendiz:", error);
+      alert("Error registrando aprendiz");
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Registrar Aprendiz</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Nombre</Label>
-              <Input
-                type="text"
-                value={formData.first_Name_Apprentice}
-                onChange={(e) => setFormData({ ...formData, first_Name_Apprentice: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <Label>Apellido</Label>
-              <Input
-                type="text"
-                value={formData.last_Name_Apprentice}
-                onChange={(e) => setFormData({ ...formData, last_Name_Apprentice: e.target.value })}
-                required
-              />
-            </div>
-          </div>
-
-          <div>
-            <Label>Fecha de nacimiento</Label>
-            <Input
-              type="date"
-              value={formData.birth_Date_Apprentice}
-              onChange={(e) => setFormData({ ...formData, birth_Date_Apprentice: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <Label>Género</Label>
-            <Select onValueChange={(value) => setFormData({ ...formData, gender_Apprentice: value })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona un género" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Male">Masculino</SelectItem>
-                <SelectItem value="Female">Femenino</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label>Email</Label>
-            <Input
-              type="email"
-              value={formData.email_Apprentice}
-              onChange={(e) => setFormData({ ...formData, email_Apprentice: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <Label>Teléfono</Label>
-            <Input
-              type="text"
-              value={formData.phone_Apprentice}
-              onChange={(e) => setFormData({ ...formData, phone_Apprentice: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <Label>Dirección</Label>
-            <Input
-              type="text"
-              value={formData.address_Apprentice}
-              onChange={(e) => setFormData({ ...formData, address_Apprentice: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <Label>Departamento</Label>
-            <Select onValueChange={handleDepartmentChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona un departamento" />
-              </SelectTrigger>
-              <SelectContent>
-                {departments.map((dept) => (
-                  <SelectItem key={dept.id_department} value={dept.id_department}>
-                    {dept.name_department}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label>Municipio</Label>
-            <Select onValueChange={(value) => setFormData({ ...formData, id_Municipality: value })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona un municipio" />
-              </SelectTrigger>
-              <SelectContent>
-                {municipalities.map((mun) => (
-                  <SelectItem key={mun.id_municipality} value={mun.id_municipality}>
-                    {mun.municipality}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <Button type="submit" className="w-full">Registrar</Button>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <Input name="first_Name_Apprentice" placeholder="Nombre" onChange={handleChange} required />
+      <Input name="last_Name_Apprentice" placeholder="Apellido" onChange={handleChange} required />
+      <Input name="birth_Date_Apprentice" type="date" onChange={handleChange} required />
+      <Input name="email_Apprentice" placeholder="Email" type="email" onChange={handleChange} required />
+      <Select onValueChange={setSelectedDepartment} placeholder="Seleccione un departamento">
+        {departments.map((dep) => (
+          <SelectItem key={dep.id} value={dep.id}>{dep.name}</SelectItem>
+        ))}
+      </Select>
+      <Select name="municipality_Id" onValueChange={(val) => setFormData({ ...formData, municipality_Id: val })} placeholder="Seleccione un municipio">
+        {municipalities.map((mun) => (
+          <SelectItem key={mun.id} value={mun.id}>{mun.name}</SelectItem>
+        ))}
+      </Select>
+      <Select onValueChange={setSelectedArea} placeholder="Seleccione un área">
+        {areas.map((area) => (
+          <SelectItem key={area.id} value={area.id}>{area.name}</SelectItem>
+        ))}
+      </Select>
+      <Select onValueChange={setSelectedProgram} placeholder="Seleccione un programa">
+        {programs.map((prog) => (
+          <SelectItem key={prog.id} value={prog.id}>{prog.name}</SelectItem>
+        ))}
+      </Select>
+      <Select name="file_id" onValueChange={(val) => setFormData({ ...formData, file_id: val })} placeholder="Seleccione una ficha">
+        {files.map((file) => (
+          <SelectItem key={file.id} value={file.id}>{file.name}</SelectItem>
+        ))}
+      </Select>
+      <Select name="attendant_Id" onValueChange={(val) => setFormData({ ...formData, attendant_Id: val })} placeholder="Seleccione un acudiente">
+        {attendants.map((att) => (
+          <SelectItem key={att.id} value={att.id}>{att.name}</SelectItem>
+        ))}
+      </Select>
+      <Button type="submit">Registrar</Button>
+    </form>
   );
 }

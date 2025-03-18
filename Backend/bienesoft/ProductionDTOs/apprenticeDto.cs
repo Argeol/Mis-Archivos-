@@ -36,6 +36,9 @@ namespace bienesoft.Models
         public int Permission_Count_Apprentice { get; set; }
         public string Tip_Apprentice { get; set; } = string.Empty;
 
+        public int Attendant_Id {get; set;}
+
+
         // Claves foráneas, solo IDs
         public int File_id { get; set; }
         public int Municipality_Id { get; set; }
