@@ -20,6 +20,7 @@ export default function Dashboard() {
     useEffect(() => {
         const fetchDataProgram = async () => {
             try {
+                
                 const response = await axiosInstance.get("/api/Program/GetProgram");
 
                 if (response.status !== 200) {
