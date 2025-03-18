@@ -75,6 +75,7 @@ builder.Services.AddScoped<ReasonServices>();
 // builder.Services.AddScoped<PermissionService>();
 builder.Services.AddScoped<MunicipalityService>();
 builder.Services.AddScoped<ApprovalService>();
+
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
