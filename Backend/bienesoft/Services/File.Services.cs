@@ -17,6 +17,7 @@ namespace bienesoft.Services
         //}
         public IEnumerable<object> Getfiles()
         {
+<<<<<<< Updated upstream
             return _context.file.Include(f => f.program).Select(a => new
             {
                 a.File_Id,
@@ -27,6 +28,9 @@ namespace bienesoft.Services
 
   
             }).ToList();
+=======
+            return _context.file.Include(p => p.program).ToList();
+>>>>>>> Stashed changes
         }
         public void AddFile(FileModel file)
         {
@@ -116,6 +120,15 @@ namespace bienesoft.Services
 
             return existingFile;
         }
+<<<<<<< Updated upstream
 
+=======
+        public async Task<List<FileModel>> GetFilesByProgramAsync(int programId)
+        {
+            return await _context.file
+                .Where(f => f.Program_Id == programId)
+                .ToListAsync();
+        }
+>>>>>>> Stashed changes
     }
 }

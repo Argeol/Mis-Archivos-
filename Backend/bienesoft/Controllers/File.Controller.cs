@@ -47,7 +47,28 @@ namespace bienesoft.Controllers
         [HttpGet("{id}")]
         public IActionResult GetFileById(int id)
         {
+<<<<<<< Updated upstream
             var file = _FileServices.GetFileById(id);
+=======
+            try
+            {
+                var file = _FileServices.Getfile().Select(p => new FileDTO
+                {
+                    File_Id = p.File_Id,
+                    Apprentice_count = p.Apprentice_count,
+                    Start_Date = p.Start_Date,
+                    End_Date = p.End_Date,
+                    Program_Name = p.program.Program_Name,
+                });
+                return Ok(file);
+
+            }
+            catch (Exception ex)
+            {
+
+                GeneralFunction.Addlog(ex.Message);
+                return StatusCode(500, ex.ToString());
+>>>>>>> Stashed changes
 
             if (file == null)
             {
@@ -135,7 +156,15 @@ namespace bienesoft.Controllers
         {
             return BadRequest("Datos inválidos.");
         }
+        [HttpGet("Id_Program")]
+        public async Task<ActionResult<IEnumerable<FileModel>>> GetFiles([FromQuery] int programId)
+        {
+            if (programId <= 0)
+            {
+                return BadRequest("El ID del programa es inválido.");
+            }
 
+<<<<<<< Updated upstream
         var result = await _FileServices.UpdateFileAsync(updatedFile);
 
         if (result == null)
@@ -146,5 +175,16 @@ namespace bienesoft.Controllers
         return Ok(result);
     }
 
+=======
+            var files = await _FileServices.GetFilesByProgramAsync(programId);
+
+            if (files == null || files.Count == 0)
+            {
+                return NotFound("No se encontraron fichas para el programa especificado.");
+            }
+
+            return Ok(files);
+        }
+>>>>>>> Stashed changes
     }
 }
