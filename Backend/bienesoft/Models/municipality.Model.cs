@@ -3,7 +3,6 @@ using System.ComponentModel;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.ComponentModel.DataAnnotations.Schema;
 using Bienesoft.Models;
-   
 
 namespace bienesoft.Models
 {
@@ -28,7 +27,6 @@ namespace bienesoft.Models
 
         public ICollection<Apprentice> apprentice { get; set; }
 
-        public ICollection<Attendant>Attendants { get; set; }
     }
 }
 

@@ -47,6 +47,7 @@ export default function ApprenticeDashboard() {
         <>
             <PrivateNav>
                 <ContecPage
+                    
                     titlesPage="Aprendices"
                     titlesData={[
                         "ID", "Nombre", "Apellido", "Tipo Dirección", "Correo", 

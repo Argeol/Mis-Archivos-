@@ -44,11 +44,6 @@ namespace bienesoft.Models
         public int Id_Municipality { get; set; }
         public Municipality? Municipality { get; set; }
 
-        // Relación con Attendant (Acompañante)
-        [ForeignKey("Attendant")]
-        public int Attendant_Id { get; set; }
-        public Attendant? Attendant { get; set; }
-
         // Relación con permisos
         public ICollection<PermissionGN>? PermissionGN { get; set; }
     }

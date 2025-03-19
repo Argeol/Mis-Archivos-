@@ -34,7 +34,6 @@ namespace Bienesoft.Services
                     ProgramName = p.File.program.Program_Name,
                     AreaName = p.File.program.Area.Area_Name,
                     nom_department = p.Municipality.Department.Name_department
-
                 })
                 .FirstOrDefaultAsync();
 
@@ -68,7 +67,7 @@ namespace Bienesoft.Services
                 Permission_Count_Apprentice = apprenticeDTO.Permission_Count_Apprentice,
                 Id_Municipality = apprenticeDTO.Municipality_Id,
                 File_Id = apprenticeDTO.File_id,
-                Attendant_Id = apprenticeDTO.Attendant_Id
+           
             };
 
             _context.apprentice.Add(apprentice);
@@ -127,7 +126,7 @@ namespace Bienesoft.Services
         public IEnumerable<object> Getapprentice()
         {
             return _context.apprentice
-            .Include(a => a.Attendant)
+
             .Include(a => a.Municipality)
                 .ThenInclude(m => m.Department)
             .Include(a => a.File)
@@ -144,8 +143,6 @@ namespace Bienesoft.Services
                 a.Phone_Apprentice,
                 a.Gender_Apprentice,
                 a.Tip_Apprentice,
-                a.Attendant.Attendant_Name,
-                a.Attendant.Attendant_Phone,
                 a.Municipality.municipality,
                 a.Municipality.Department.Name_department,
                 a.File.File_Id,

@@ -63,7 +63,6 @@ builder.Services.AddScoped<ApprenticeService>();
 builder.Services.AddScoped<FileServices>();
 builder.Services.AddScoped<AreaServices>();
 // builder.Services.AddScoped<PermissionServices>();
-builder.Services.AddScoped<AttendantServices>();
 builder.Services.AddScoped<UserServices>();
 builder.Services.AddScoped<ProgramServices>();
 builder.Services.AddScoped<DepartmentService>();
