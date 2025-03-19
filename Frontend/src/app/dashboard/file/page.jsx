@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import PrivateNav from "@/components/navs/PrivateNav";
 import ContecPage from "@/components/utils/ContectPage";
 import axiosInstance from "@/lib/axiosInstance";
+import RegisterFile from "./registerComponet";
+import UpdateFile from "./UpdateComponet";
 
 export default function Dashboard() {
     const [dataFile, setDataFile] = useState([]); // Lista de archivos
@@ -35,8 +37,8 @@ export default function Dashboard() {
                     apprentice_count: String(file.apprentice_count), 
                     start_Date: String(file.start_Date), 
                     end_Date: String(file.end_Date),
-                    program_Name: file.program ? String(file.program.program_Name) : "Sin Programa",
-                    area_Name: file.program && file.program.area ? String(file.program.area.area_Name) : "Sin Área"
+                    program_Name: String(file.program_Name  || "Sin Programa"),
+                    area_Name: String(file.area_Name)|| "Sin Área"
                 }));
 
                 
@@ -55,7 +57,9 @@ export default function Dashboard() {
     return (
         <PrivateNav>
             <ContecPage
-                titlesPage="archivos"
+                registerComponets={RegisterFile}
+                updateComponet={UpdateFile}
+                titlesPage="Ficha"
                 titlesData={["ID", "Cantidad de Aprendices", "Fecha Inicio", "Fecha Fin", "Programa", "Área"]}
                 idKey="file_Id"
                 Data={dataFile}

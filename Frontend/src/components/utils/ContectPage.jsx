@@ -1,5 +1,6 @@
 "use client";
 
+import UpdateFile from "@/app/dashboard/file/UpdateComponet";
 import DataTable from "./Datatable";
 import ModalDialog from "./ModalDialog";
 
@@ -17,13 +18,14 @@ function ContecPage({
   createUrl,
   initialData,
   onRegister,
-  fieldLabels
+  fieldLabels,
+  updateComponets
 }
 
 ) {
   return(
     <>
-      <ModalDialog RegisterComponets={registerComponets} TitlePage={titlesPage} />
+      <ModalDialog RegisterComponets={registerComponets} TitlePage={titlesPage} updateComponet={updateComponets}/>
       <DataTable
           titlesData={titlesData} 
           idKey={idKey} 
@@ -38,6 +40,7 @@ function ContecPage({
           fieldLabels={fieldLabels}
           RegisterComponets={registerComponets}
           TitlePage={titlesPage}
+          updateComponet={updateComponets}
       />
     </>
   )
