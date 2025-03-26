@@ -5,7 +5,7 @@ import PrivateNav from "@/components/navs/PrivateNav";
 import ContecPage from "@/components/utils/ContectPage";
 import axiosInstance from "@/lib/axiosInstance";
 import RegisterProgram from "./registerComponet";
-import UpdateProgram from "./UpdateComponent"; // 🔹 Importar el nuevo componente
+import UpdateProgram from "./UpdateComponet"; // 🔹 Importar el nuevo componente
 
 export default function Dashboard() {
     const [dataProgram, setDataProgram] = useState([]); // Lista de programas

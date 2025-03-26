@@ -23,7 +23,8 @@ namespace bienesoft.Services
                 a.Apprentice_count,
                 a.End_Date,
                 a.Start_Date,
-                a.program.Program_Name
+                a.program.Program_Name,
+                a.program.Area.Area_Name
 
   
             }).ToList();
@@ -44,7 +45,8 @@ namespace bienesoft.Services
                     a.Apprentice_count,
                     a.End_Date,
                     a.Start_Date,
-                    a.program.Program_Name
+                    a.program.Program_Name,
+                    a.program.Area.Area_Name
                 })
                 .FirstOrDefault();
 
