@@ -17,27 +17,33 @@ function ContecPage({
   createUrl,
   initialData,
   onRegister,
-  fieldLabels
+  fieldLabels,
+  updateComponets,
+  campo1,
+  tableCell,
+  translations
 }
 
 ) {
   return(
     <>
-      <ModalDialog RegisterComponets={registerComponets} TitlePage={titlesPage} />
+      {/* <ModalDialog RegisterComponets={registerComponets} TitlePage={titlesPage} /> */}
       <DataTable
-          titlesData={titlesData} 
-          idKey={idKey} 
           Data={Data}
+          idKey={idKey} 
           deleteUrl={deleteUrl}
           idField={idKey}
           setData={setData}
-          updateUrl={updateUrl}
-          createUrl={createUrl}
-          initialData={initialData}
-          onRegister={onRegister}
-          fieldLabels={fieldLabels}
-          RegisterComponets={registerComponets}
+          updateComponets={updateComponets}
+          titlesData={titlesData} 
+          tableCell={tableCell}
           TitlePage={titlesPage}
+          translations={translations}
+          // createUrl={createUrl}
+          // initialData={initialData}
+          // onRegister={onRegister}
+          // fieldLabels={fieldLabels}
+          RegisterComponets={registerComponets}
       />
     </>
   )

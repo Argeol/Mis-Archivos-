@@ -139,7 +139,7 @@ namespace Bienesoft.Services
                 a.Last_Name_Apprentice,
                 a.Address_Type_Apprentice,
                 a.Email_Apprentice,
-                a.Birth_Date_Apprentice,
+                Birth_Date_Apprentice_Formatted = a.Birth_Date_Apprentice.ToString("yyyy-MM-dd"),
                 a.Phone_Apprentice,
                 a.Gender_Apprentice,
                 a.Tip_Apprentice,

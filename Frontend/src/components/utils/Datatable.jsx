@@ -19,37 +19,31 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import DeleteButton from "./Delete";
-import UpdateButton from "./Update";
-import CreateButton from "./Create";
+import ModalDialogUpdate from "./UpdateModalDialog";
 import ModalDialog from "./ModalDialog";
 
 export default function DataTable({
   Data,
-  titlesData,
   idKey,
-  handleDelete,
-  handleSave,
   deleteUrl,
   idField,
   setData,
-  updateUrl,
-  createUrl,
-  initialData,
-  onRegister,
-  fieldLabels,
-  RegisterComponets,
+  updateComponets,
+  titlesData,
+  tableCell,
   TitlePage,
+  translations,
+  RegisterComponets
 }) {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
-  const [formData, setFormData] = useState({});
   const itemsPerPage = 10;
 
   const filteredData = Data.filter((item) =>
     Object.values(item).some((value) =>
-      value.toString().toLowerCase().includes(search.toLowerCase())
+      value?.toString().toLowerCase().includes(search.toLowerCase())
     )
   );
 
@@ -60,7 +54,6 @@ export default function DataTable({
 
   const handleOpen = (row) => {
     setSelectedRow(row);
-    setFormData(row);
     setIsOpen(true);
   };
 
@@ -69,30 +62,13 @@ export default function DataTable({
     setSelectedRow(null);
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleUpdate = () => {
-    handleSave(selectedRow[idKey], formData);
-    handleClose();
-  };
-
   return (
     <Card className="w-full max-w-5xl mx-auto p-4">
       <CardHeader>
         <CardTitle className="text-center text-xl font-semibold">
-          Tabla de Datos
+          Lista de Aprendices
         </CardTitle>
-        <div className="flex justify-end">
-       
-         <ModalDialog RegisterComponets={RegisterComponets} TitlePage={TitlePage}/>
-          
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-4 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
+        <div className="mb-4 flex justify-end">
           <Input
             placeholder="Buscar..."
             value={search}
@@ -100,14 +76,15 @@ export default function DataTable({
             className="sm:max-w-xs"
           />
         </div>
+        <ModalDialog RegisterComponets={RegisterComponets} TitlePage={TitlePage} />
 
+      </CardHeader>
+      <CardContent>
         <Table className="w-full">
           <TableHeader>
             <TableRow>
               {titlesData.map((title, index) => (
-                <TableHead key={index} className="text-left">
-                  {title}
-                </TableHead>
+                <TableHead key={index}>{title}</TableHead>
               ))}
               <TableHead className="text-center">Acciones</TableHead>
             </TableRow>
@@ -119,22 +96,19 @@ export default function DataTable({
                   key={index}
                   className="hover:bg-gray-100 transition-colors"
                 >
-                  {Object.keys(row).map((key, i) => (
-                    <TableCell key={i} className="px-4 py-2">
-                    {row[key] !== null && typeof row[key] === "object"
-                      ? JSON.stringify(row[key]) // Convierte cualquier objeto a texto
-                      : String(row[key])} 
-                  </TableCell>
+                  {tableCell.map((cell, index) => (
+                    <TableCell key={index}>{row[cell]}</TableCell>
                   ))}
-                  <TableCell className="px-4 py-2 text-center space-x-2">
-                    <UpdateButton
+
+                  <TableCell className="text-center space-x-2">
+                    <ModalDialogUpdate
+                      TitlePage={TitlePage}
+                      UpdateComponent={updateComponets}
                       id={row[idKey]}
-                      updateUrl={updateUrl}
-                      setData={setData}
-                      idField={idField}
-                      initialData={row}
-                      fieldLabels={fieldLabels}
                     />
+                    <Button onClick={() => handleOpen(row)}>
+                      Más Info del {TitlePage}
+                    </Button>
                     <DeleteButton
                       id={row[idKey]}
                       deleteUrl={deleteUrl}
@@ -146,10 +120,7 @@ export default function DataTable({
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={titlesData.length + 1}
-                  className="text-center text-gray-500"
-                >
+                <TableCell colSpan={5} className="text-center text-gray-500">
                   No se encontraron datos.
                 </TableCell>
               </TableRow>
@@ -157,7 +128,7 @@ export default function DataTable({
           </TableBody>
         </Table>
 
-        <div className="mt-4 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
+        <div className="mt-4 flex justify-between items-center">
           <Button
             variant="outline"
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -165,7 +136,7 @@ export default function DataTable({
           >
             Anterior
           </Button>
-          <span className="text-gray-700">
+          <span>
             Página {currentPage} de {totalPages}
           </span>
           <Button
@@ -179,7 +150,24 @@ export default function DataTable({
           </Button>
         </div>
       </CardContent>
-        
+
+      {/* Modal de Más Info */}
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Información Completa del {TitlePage}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            {selectedRow &&
+              Object.entries(selectedRow).map(([key, value]) => (
+                <p key={key}>
+                  <strong>{translations[key] || key}:</strong>{" "}
+                  {value?.toString()}
+                </p>
+              ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

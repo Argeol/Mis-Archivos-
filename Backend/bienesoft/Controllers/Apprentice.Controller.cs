@@ -4,6 +4,8 @@ using Bienesoft.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using bienesoft.Funcions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Bienesoft.Controllers
 {
@@ -29,6 +31,7 @@ namespace Bienesoft.Controllers
             {
                 var permission = await _apprenticeService.GetPermissionById(id);
 
+
                 if (permission == null)
                 {
                     return NotFound(new { message = "Aprendiz no encontrado" });
@@ -53,27 +56,43 @@ namespace Bienesoft.Controllers
             {
                 return BadRequest(ModelState);
             }
-            if (CreateApprentice == null)
-            {
-                return NotFound(new { message = "El aprendiz no se pudo crear." });
-            }
 
+            if (apprenticeDTO == null)
+            {
+                return BadRequest(new { message = "Los datos del aprendiz son inválidos." });
+            }
             try
             {
                 var apprentice = await _apprenticeService.CreateApprenticeAsync(apprenticeDTO);
-                return CreatedAtAction(nameof(GetPermissionById), new { id = apprentice.Id_Apprentice }, apprentice);
+                var response = new
+                {
+                    message = "Aprendiz creado con éxito",
+                    apprentice
+                };
+                return CreatedAtAction(nameof(GetPermissionById), new { id = apprentice.Id_Apprentice }, response);
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (DbUpdateException ex)
+            {
+                // Capturar errores de MySQL por duplicado
+                if (ex.InnerException is MySqlConnector.MySqlException sqlEx &&
+                    sqlEx.Message.Contains("Duplicate entry"))
+                {
+                    return Conflict(new { message = "El correo electrónico ya está registrado. Por favor, utiliza otro." });
+                }
+                return StatusCode(500, new { message = "Error al guardar en la base de datos.", details = ex.Message });
             }
             catch (Exception ex)
             {
                 GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
+                return StatusCode(500, new { message = "Error interno del servidor.", details = ex.Message });
             }
         }
-        [HttpPut("{id}")]
+
+        [HttpPut("UpdateApprentice")]
         public async Task<IActionResult> UpdateApprentice(int id, [FromBody] ApprenticeUpdateDTO apprenticeDTO)
         {
             if (!ModelState.IsValid)
@@ -111,7 +130,7 @@ namespace Bienesoft.Controllers
         {
             return Ok(_apprenticeService.Getapprentice());
         }
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteApprentice")]
         public async Task<IActionResult> DeleteApprentice(int id)
         {
             try

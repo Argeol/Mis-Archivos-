@@ -39,16 +39,13 @@ CREATE TABLE `apprentice` (
   `id_municipality` int unsigned NOT NULL,
   `File_Id` int DEFAULT NULL,
   `Tip_apprentice` enum('interno','externo') DEFAULT NULL,
-  `Attendant_Id` int DEFAULT NULL,
   PRIMARY KEY (`id_apprentice`),
   UNIQUE KEY `email_apprentice` (`email_apprentice`),
   KEY `fk_apprentice_municipality` (`id_municipality`),
   KEY `fk_apprentice_1_idx` (`File_Id`),
-  KEY `fk_apprentice_2_idx` (`Attendant_Id`),
   CONSTRAINT `fk_apprentice_1` FOREIGN KEY (`File_Id`) REFERENCES `file` (`File_Id`),
-  CONSTRAINT `fk_apprentice_2` FOREIGN KEY (`Attendant_Id`) REFERENCES `attendant` (`Attendant_Id`),
   CONSTRAINT `fk_apprentice_municipality` FOREIGN KEY (`id_municipality`) REFERENCES `municipality` (`Id_municipality`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -57,7 +54,7 @@ CREATE TABLE `apprentice` (
 
 LOCK TABLES `apprentice` WRITE;
 /*!40000 ALTER TABLE `apprentice` DISABLE KEYS */;
-INSERT INTO `apprentice` VALUES (1,'argeol','guio','2024-05-12','masculino','guio@gmail.com','ruta 16','Vereda','324579675','Active',1,57,1,'interno',22);
+INSERT INTO `apprentice` VALUES (1,'argeol','guio','2024-05-12','masculino','guio@gmail.com','ruta 16','Vereda','324579675','Active',1,1,1,'interno'),(5,'Carlos','Gómez','2004-08-12','masculino','carlos.gomez@example.com','Carrera 45 #12-34','Comuna','3001234567','Active',0,101,1,'interno');
 /*!40000 ALTER TABLE `apprentice` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -81,41 +78,8 @@ CREATE TABLE `area` (
 
 LOCK TABLES `area` WRITE;
 /*!40000 ALTER TABLE `area` DISABLE KEYS */;
-INSERT INTO `area` VALUES (1,'Pecuria');
+INSERT INTO `area` VALUES (1,'Pecuria'),(2,'argeol'),(55,'argeol');
 /*!40000 ALTER TABLE `area` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `attendant`
---
-
-DROP TABLE IF EXISTS `attendant`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `attendant` (
-  `Attendant_Id` int NOT NULL AUTO_INCREMENT,
-  `Attendant_Name` varchar(45) NOT NULL,
-  `Attendant_Surname` varchar(45) NOT NULL,
-  `Attendant_Address` varchar(45) NOT NULL,
-  `Attendant_Phone` varchar(12) NOT NULL,
-  `Attendant_Email` varchar(45) NOT NULL,
-  `Date_Birth` date NOT NULL,
-  `Id_Municipality` int unsigned NOT NULL,
-  PRIMARY KEY (`Attendant_Id`),
-  UNIQUE KEY `Attendant_Email` (`Attendant_Email`),
-  KEY `fk_attendant_municipality` (`Id_Municipality`),
-  CONSTRAINT `fk_attendant_municipality` FOREIGN KEY (`Id_Municipality`) REFERENCES `municipality` (`Id_municipality`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `attendant`
---
-
-LOCK TABLES `attendant` WRITE;
-/*!40000 ALTER TABLE `attendant` DISABLE KEYS */;
-INSERT INTO `attendant` VALUES (22,'string','string','string','string','user@example.com','2025-03-16',18);
-/*!40000 ALTER TABLE `attendant` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -482,4 +446,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-03-16 17:48:05
+-- Dump completed on 2025-03-23 10:15:12
