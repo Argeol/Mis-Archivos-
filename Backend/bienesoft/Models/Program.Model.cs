@@ -23,7 +23,8 @@ namespace Bienesoft.Models
     }
     public class UpdateModelProgram
     {
-        public string Program_Name { get; set; }
+        public string? Program_Name { get; set; }
+        public int? Area_Id { get; set; } = null;
     }
     public class ResgisterProgram
     {
