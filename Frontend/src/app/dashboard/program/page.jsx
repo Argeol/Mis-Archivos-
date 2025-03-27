@@ -9,13 +9,7 @@ import UpdateProgram from "./UpdateComponet"; // 🔹 Importar el nuevo componen
 
 export default function Dashboard() {
     const [dataProgram, setDataProgram] = useState([]); // Lista de programas
-    
-    const fieldLabels = {
-        program_Id: "Número Ficha",
-        program_Name: "Nombre Programa",
-        area_Name: "Nombre Área" // Asegurar que coincide con la API
-    };
-
+ 
     // Obtener programas desde el backend
     useEffect(() => {
         const fetchDataProgram = async () => {
@@ -50,32 +44,40 @@ export default function Dashboard() {
         fetchDataProgram();
     }, []);
 
+    const translations = {
+        program_Id: "Número Ficha",
+        program_Name: "Nombre Programa",
+        area_Name: "Nombre Área" 
+    }
+    const fieldLabels = ["Id programa", "Programa", "Area"];
+    const TableCell = [
+        "program_Id",
+        "program_Name",
+        "area_Name",
+      ];
+
     return (
         <PrivateNav>
             <ContecPage
                 registerComponets={RegisterProgram}
-                updateComponets={UpdateProgram} // 🔹 Agregar el componente de actualización
-                titlesPage="programas"
-                titlesData={["ID", "Nombre", "Área"]}
-                idKey="program_Id"
+                titlesPage="Programas"
+                titlesData={fieldLabels}
                 Data={dataProgram}
-                deleteUrl="api/Program/DeleteProgram"
+                idKey="program_Id"
+                deleteUrl="/api/Program/DeleteProgram"
                 setData={setDataProgram}
-                updateUrl="api/Program/UpdateProgram"
-                createUrl="api/Program/CreateProgram"
-                initialData={{ program_Id: "", program_Name: "", area_Id: "" }}
-                onRegister={(newData) =>
-                    setDataProgram((prev) => [
-                        ...prev,
-                        {
-                            program_Id: String(newData.program_Id),
-                            program_Name: String(newData.program_Name),
-                            area_Name: String(newData.area_Name || "Sin Área") // Coincide con API
-                        }
-                    ])
-                }
-                fieldLabels={fieldLabels}
-            />
+                updateComponets={UpdateProgram}
+                tableCell={TableCell}
+                translations={translations}
+
+
+
+
+
+
+
+
+              />
         </PrivateNav>
     );
 }

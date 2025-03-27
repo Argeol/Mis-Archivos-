@@ -1,147 +1,86 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import axiosInstance from "@/lib/axiosInstance";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import axiosInstance from "@/lib/axiosInstance";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
-export default function UpdateProgram() {
-    const [programs, setPrograms] = useState([]); // Lista de programas
-    const [programId, setProgramId] = useState(""); // ID del programa a actualizar
-    const [programName, setProgramName] = useState(""); 
-    const [selectedAreaId, setSelectedAreaId] = useState(""); 
-    const [areas, setAreas] = useState([]); 
-    const [loading, setLoading] = useState(false); 
+export default function UpdateProgram({ id }) {
+    const [formData, setFormData] = useState({ program_Name: "", area_Id: 0 });
+    const [areas, setAreas] = useState([]);
 
-    // Obtener programas y áreas al cargar el componente
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [programsRes, areasRes] = await Promise.all([
-                    axiosInstance.get("/api/Program/AllPrograms"), 
-                    axiosInstance.get("/api/Area/AllArea")
-                ]);
+        // Obtener datos del programa
+        axiosInstance.get(`/api/Program/${id}`).then((res) => {
+            setFormData(res.data);
+        });
 
-                setPrograms(programsRes.data || []);
-                setAreas(areasRes.data || []);
-            } catch (error) {
-                console.error("Error al obtener datos:", error);
-            }
-        };
-        fetchData();
-    }, []);
+        // Obtener lista de áreas
+        axiosInstance.get("/api/Area/AllArea").then((res) => {
+            setAreas(res.data);
+        });
+    }, [id]);
 
-    // Cargar datos cuando el usuario seleccione un programa
-    const handleProgramSelect = (id) => {
-        setProgramId(id);
-        const selectedProgram = programs.find((p) => p.program_Id === Number(id));
-        if (selectedProgram) {
-            setProgramName(selectedProgram.program_Name);
-            setSelectedAreaId(String(selectedProgram.area_Id));
-        }
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    // Manejo del envío del formulario
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (!programId || !programName.trim() || !selectedAreaId) {
-            alert("Todos los campos son obligatorios.");
-            return;
-        }
-
-        const updatedProgram = {
-            program_Id: Number(programId),
-            program_Name: programName.trim(),
-            area_Id: Number(selectedAreaId),
-        };
-
-        setLoading(true); 
         try {
-            const response = await axiosInstance.put(`/api/Program/UpdateProgram/${programId}`, updatedProgram);
-            if (response.status === 200) {
-                alert("Programa actualizado exitosamente");
+            const payload = {};
+
+            if (formData.program_Name.trim()) {
+                payload.program_Name = formData.program_Name;
             }
+            if (formData.area_Id !== 0) {
+                payload.area_Id = formData.area_Id;
+            }
+
+            const response = await axiosInstance.put(
+                `/api/Program/UpdateProgram/${id}`,
+                payload
+            );
+            alert(response.data.message);
         } catch (error) {
-            console.error("Error al actualizar el programa:", error);
-            alert("Error al actualizar el programa.");
-        } finally {
-            setLoading(false);
+            const errorMessage = error.response?.data?.message || "Error desconocido.";
+            alert(errorMessage);
         }
     };
 
     return (
-        <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Actualizar Programa</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Selección de programa a actualizar */}
-                <div>
-                    <Label htmlFor="selectProgram">Seleccionar Programa</Label>
-                    <Select value={programId} onValueChange={handleProgramSelect}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Seleccione un programa" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {programs.map((program) => (
-                                <SelectItem key={program.program_Id} value={String(program.program_Id)}>
-                                    {program.program_Name} {/* SOLO el nombre */}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                {/* Mostrar solo el ID del programa seleccionado */}
-                {programId && (
-                    <div>
-                        <Label htmlFor="programId">ID del Programa</Label>
-                        <Input
-                            id="programId"
-                            type="text"
-                            value={programId}
-                            disabled
-                            className="bg-gray-100"
-                        />
-                    </div>
-                )}
-
-                {/* Nombre del programa */}
-                <div>
-                    <Label htmlFor="programName">Nombre del Programa</Label>
-                    <Input
-                        id="programName"
-                        type="text"
-                        value={programName}
-                        onChange={(e) => setProgramName(e.target.value)}
-                        required
-                        disabled={loading}
-                    />
-                </div>
-
-                {/* Área asociada */}
-                <div>
-                    <Label htmlFor="area">Área</Label>
-                    <Select value={selectedAreaId} onValueChange={setSelectedAreaId} disabled={loading}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Seleccione un área" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {areas.map((area) => (
-                                <SelectItem key={area.area_Id} value={String(area.area_Id)}>
-                                    {area.area_Name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                {/* Botón de actualizar */}
-                <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Actualizando..." : "Actualizar Programa"}
-                </Button>
-            </form>
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
+            <Input
+                name="program_Name"
+                value={formData.program_Name || ""}
+                placeholder="Nombre del programa"
+                onChange={handleChange}
+                required
+            />
+            <Select
+                value={formData.area_Id ? formData.area_Id.toString() : ""}
+                onValueChange={(value) => setFormData({ ...formData, area_Id: Number(value) })}
+            >
+                <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar Área" />
+                </SelectTrigger>
+                <SelectContent>
+                    {areas.map((area) => (
+                        <SelectItem key={area.area_Id} value={area.area_Id.toString()}>
+                            {area.area_Name}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+            <Button type="submit">Actualizar</Button>
+        </form>
     );
 }

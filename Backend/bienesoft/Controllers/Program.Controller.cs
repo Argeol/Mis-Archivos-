@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Bienesoft.Models;
 using bienesoft.Funcions;
@@ -7,6 +6,7 @@ using bienesoft.Services;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using bienesoft.Models;
 using Microsoft.AspNetCore.Authorization;
 using bienesoft.ProductionDTOs;
@@ -16,7 +16,7 @@ namespace bienesoft.Controllers
     [ApiController]
     [Route("api/[controller]")]
     //[Authorize]
-    public class ProgramController : Controller
+    public class ProgramController : ControllerBase
     {
         public IConfiguration _Configuration { get; set; }
         public GeneralFunction GeneralFunction;
@@ -26,82 +26,46 @@ namespace bienesoft.Controllers
         {
             _Configuration = configuration;
             _ProgramServices = programServices;
-            GeneralFunction = new GeneralFunction(_Configuration); // Asegúrate de inicializar GeneralFunction si es necesario.
+            GeneralFunction = new GeneralFunction(_Configuration);
         }
 
         [HttpPost("CreateProgram")]
-        public IActionResult AddProgram(ProgramModel program)
+        public IActionResult AddProgram([FromBody] ProgramModel program)
         {
             try
             {
                 _ProgramServices.AddProgram(program);
-                return Ok(new
-                {
-                    message = "Programa creado con éxito"
-                });
+                return Ok(new { message = "Programa creado con éxito" });
             }
             catch (Exception ex)
             {
                 GeneralFunction.Addlog(ex.ToString());
-                return StatusCode(500, ex.ToString());
+                return StatusCode(500, ex.Message);
             }
         }
 
         [HttpGet("GetProgram")]
-        public async Task <IActionResult>GetProgram()
+        public async Task<IActionResult> GetProgram()
         {
-             var program = await _ProgramServices.Getallprograms();
-
-            if (program == null || program.Count == 0) 
-            {
-                return BadRequest(new { message = "No hay programas registrados" });
-            }
-            return Ok(program);
-        }
-
-        [HttpPut("UpdateProgram")]
-        public IActionResult UpdateProgram(int id, UpdateModelProgram updateModel)
-        {
-            if (updateModel == null)
-            {
-                return BadRequest("El modelo de actualización es nulo.");
-            }
-
             try
             {
-                // Obtener el programa existente desde la base de datos
-                var existingProgram = _ProgramServices.GetById(id);
+                var program = await _ProgramServices.Getallprograms();
 
-                if (existingProgram == null)
+                if (program == null || program.Count == 0)
                 {
-                    return NotFound($"No se encontró un programa con el ID {id}.");
+                    return NotFound(new { message = "No hay programas registrados" });
                 }
-
-                // Actualizar solo el campo necesario
-                existingProgram.Program_Name = updateModel.Program_Name;
-
-                // Guardar los cambios
-                _ProgramServices.UpdateProgram(existingProgram);
-
-                return Ok("Programa actualizado exitosamente.");
-            }
-            catch (ArgumentNullException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
+                return Ok(program);
             }
             catch (Exception ex)
             {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
+                return StatusCode(500, ex.Message);
             }
         }
 
 
-        [HttpDelete("DeleteProgram")]
+
+        [HttpDelete("DeleteProgram/{id}")]
         public IActionResult Delete(int id)
         {
             try
@@ -109,26 +73,63 @@ namespace bienesoft.Controllers
                 var program = _ProgramServices.GetById(id);
                 if (program == null)
                 {
-                    return NotFound("El programa con el ID " + id + " no se pudo encontrar");
+                    return NotFound($"El programa con el ID {id} no se encontró.");
                 }
                 _ProgramServices.Delete(id);
-                return Ok("Programa eliminado con éxito");
+                return Ok("Programa eliminado con éxito.");
             }
-            catch (KeyNotFoundException knFEx)
+            catch (KeyNotFoundException ex)
             {
-                return NotFound(knFEx.Message);
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
                 GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
+                return StatusCode(500, ex.Message);
             }
         }
 
-        [HttpGet("AllPrograms")]
-        public ActionResult<IEnumerable<ProgramModel>> GetAllPrograms()
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)
         {
-            return Ok(_ProgramServices.GetPrograms());
+            try
+            {
+                var program = _ProgramServices.GetById(id);
+                if (program == null)
+                {
+                    return NotFound($"El programa con el ID {id} no se encontró.");
+                }
+                return Ok(program);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocurrió un error al obtener el programa: {ex.Message}");
+            }
         }
+        [HttpPut("UpdateProgram/{id}")]
+        public IActionResult UpdateProgram(int id, [FromBody] UpdateModelProgram updateModel)
+        {
+            if (updateModel == null)
+            {
+                return BadRequest(new { message = "El modelo de actualización es nulo." });
+            }
+
+            try
+            {
+                _ProgramServices.UpdateProgram(id, updateModel);
+                return Ok(new { message = "Programa actualizado exitosamente." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                GeneralFunction.Addlog(ex.Message);
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+
     }
 }

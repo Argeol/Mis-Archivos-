@@ -37,7 +37,7 @@ namespace bienesoft.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseMySql("Server=localhost;Database=Bienesoft;User=root;Password=murcia21;Port=3306",
+                optionsBuilder.UseMySql("Server=localhost;Database=Bienesoft;User=root;Password=elzurdojrprom2019;Port=3306",
                     new MySqlServerVersion(new Version(8, 0, 23)));
             }
 
