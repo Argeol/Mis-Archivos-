@@ -1,6 +1,7 @@
 ﻿using bienesoft.Models;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Bienesoft.Models;
 
 namespace bienesoft.ProductionDTOs
 {
@@ -10,6 +11,7 @@ namespace bienesoft.ProductionDTOs
         public string Program_Name { get; set; }
 
         public string Area_Name { get; set; }
-        
+        public string State { get; set; } = ProgramState.Activo.ToString();
+
     }
 }

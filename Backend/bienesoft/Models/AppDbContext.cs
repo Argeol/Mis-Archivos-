@@ -19,7 +19,6 @@ namespace bienesoft.Models
         public DbSet<Locality> locality { get; set; }
         // public DbSet<AuthorizationResponsible> authorizationResponsible { get; set; }
         public DbSet<PermissionFS> permissionFS { get; set; }
-        public DbSet<Reason> reason { get; set; }
         // public DbSet<Responsible> responsible { get; set; }
         public DbSet<PermissionGN> permissionGN { get; set; }
         public DbSet<PermissionApproval> permissionApproval { get; set; }

@@ -26,7 +26,8 @@ namespace bienesoft.Services
                 {
                     p.Program_Id,
                     p.Program_Name,
-                    p.Area_Id
+                    p.Area_Id,
+                    p.State
                 })
                 .ToList();
         }
@@ -39,7 +40,8 @@ namespace bienesoft.Services
                 {
                     Program_Id = p.Program_Id,
                     Program_Name = p.Program_Name,
-                    Area_Name = p.Area.Area_Name
+                    Area_Name = p.Area.Area_Name,
+                    State = p.State
                 })
                 .ToListAsync();
         }
@@ -52,7 +54,8 @@ namespace bienesoft.Services
                 {
                     Program_Id = p.Program_Id,
                     Program_Name = p.Program_Name,
-                    Area_Name = p.Area.Area_Name
+                    Area_Name = p.Area.Area_Name,
+                    State = p.State
                 })
                 .FirstOrDefault();
 
@@ -64,19 +67,6 @@ namespace bienesoft.Services
             return program;
         }
 
-        public void Delete(int id)
-        {
-            var program = _context.program.FirstOrDefault(p => p.Program_Id == id);
-            if (program == null)
-            {
-                throw new KeyNotFoundException($"El programa con el ID {id} no se encontró.");
-            }
-
-            _context.program.Remove(program);
-            _context.SaveChanges();
-        }
-
-        // Nuevo método para obtener el modelo real (ProgramModel)
         public ProgramModel GetProgramById(int id)
         {
             return _context.program.FirstOrDefault(p => p.Program_Id == id);
@@ -84,7 +74,15 @@ namespace bienesoft.Services
 
         public void AddProgram(ProgramModel program)
         {
-            _context.program.Add(program);
+            var newProgram = new ProgramModel
+            {
+                Program_Name = program.Program_Name,
+                Area_Id = program.Area_Id,
+                State = program.State,
+                FileModels = program.FileModels
+            };
+
+            _context.program.Add(newProgram);
             _context.SaveChanges();
         }
 
@@ -96,7 +94,6 @@ namespace bienesoft.Services
                 throw new KeyNotFoundException($"El programa con el ID {id} no se encontró.");
             }
 
-            // Solo actualiza los valores si el usuario los envía en la solicitud
             if (!string.IsNullOrWhiteSpace(updateModel.Program_Name))
             {
                 existingProgram.Program_Name = updateModel.Program_Name;
@@ -107,8 +104,12 @@ namespace bienesoft.Services
                 existingProgram.Area_Id = updateModel.Area_Id.Value;
             }
 
+            if (!string.IsNullOrWhiteSpace(updateModel.State))
+            {
+                existingProgram.State = updateModel.State;
+            }
+
             _context.SaveChanges();
         }
-
     }
 }

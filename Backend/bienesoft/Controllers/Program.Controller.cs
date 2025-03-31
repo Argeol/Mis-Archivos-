@@ -39,9 +39,11 @@ namespace bienesoft.Controllers
             }
             catch (Exception ex)
             {
-                GeneralFunction.Addlog(ex.ToString());
-                return StatusCode(500, ex.Message);
+                var innerMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                GeneralFunction.Addlog(innerMessage);
+                return StatusCode(500, new { error = innerMessage });
             }
+
         }
 
         [HttpGet("GetProgram")]
@@ -59,33 +61,7 @@ namespace bienesoft.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-
-
-        [HttpDelete("DeleteProgram/{id}")]
-        public IActionResult Delete(int id)
-        {
-            try
-            {
-                var program = _ProgramServices.GetById(id);
-                if (program == null)
-                {
-                    return NotFound($"El programa con el ID {id} no se encontró.");
-                }
-                _ProgramServices.Delete(id);
-                return Ok("Programa eliminado con éxito.");
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new { error = ex.Message });
             }
         }
 
@@ -97,15 +73,16 @@ namespace bienesoft.Controllers
                 var program = _ProgramServices.GetById(id);
                 if (program == null)
                 {
-                    return NotFound($"El programa con el ID {id} no se encontró.");
+                    return NotFound(new { message = $"El programa con el ID {id} no se encontró." });
                 }
                 return Ok(program);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Ocurrió un error al obtener el programa: {ex.Message}");
+                return StatusCode(500, new { error = $"Ocurrió un error al obtener el programa: {ex.Message}" });
             }
         }
+
         [HttpPut("UpdateProgram/{id}")]
         public IActionResult UpdateProgram(int id, [FromBody] UpdateModelProgram updateModel)
         {
@@ -129,7 +106,5 @@ namespace bienesoft.Controllers
                 return StatusCode(500, new { error = ex.Message });
             }
         }
-
-
     }
 }
