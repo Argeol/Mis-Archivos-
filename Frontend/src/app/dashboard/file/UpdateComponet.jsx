@@ -1,141 +1,90 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import axiosInstance from "@/lib/axiosInstance";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import axiosInstance from "@/lib/axiosInstance";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"; // Cambio aquí
 
-export default function UpdateFile({ initialData, onUpdateSuccess , id}) {
-    const [fileId, setFileId] = useState(initialData.file_Id || "");
-    const [apprenticeCount, setApprenticeCount] = useState(initialData.apprentice_count || "");
-    const [startDate, setStartDate] = useState(initialData.start_Date || "");
-    const [endDate, setEndDate] = useState(initialData.end_Date || "");
-    const [selectedProgramId, setSelectedProgramId] = useState(initialData.program_Id || "");
-    const [programs, setPrograms] = useState([]);
-    const [loading, setLoading] = useState(false);
+export default function UpdateFile({ id }) {
+  const [formData, setFormData] = useState({});
+  const [programs, setPrograms] = useState([]); // Lista de programas
 
-    useEffect(() => {
-        const fetchPrograms = async () => {
-            try {
-                const response = await axiosInstance.get("/api/Program/AllPrograms");
-                if (response.status === 200) {
-                    setPrograms(response.data || []);
-                }
-            } catch (error) {
-                console.error("Error al obtener programas:", error);
-            }
-        };
-        fetchPrograms();
-    }, []);
+  useEffect(() => {
+    // Obtener los datos de la ficha
+    axiosInstance.get(`/Api/File/${id}`)
+      .then((res) => setFormData(res.data))
+      .catch((error) => console.error("Error al obtener los datos de la ficha:", error));
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    // Obtener la lista de programas
+    axiosInstance.get("/api/Program/GetProgram")
+      .then((res) => setPrograms(res.data))
+      .catch((error) => console.error("Error al obtener los programas:", error));
+  }, [id]);
 
-        if (!fileId.trim() || isNaN(Number(fileId)) || !apprenticeCount.trim() || isNaN(Number(apprenticeCount)) || !startDate || !endDate || !selectedProgramId) {
-            alert("Todos los campos son obligatorios y deben tener valores válidos.");
-            return;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axiosInstance.put(
+        `/Api/File/UpdateFile/${id}`,
+        formData
+      );
+      alert(response.data.message);
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Error desconocido.";
+      alert(errorMessage);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
+      <Input
+        name="apprentice_count"
+        type="number"
+        value={formData.apprentice_count || ""}
+        placeholder="Cantidad de aprendices"
+        onChange={handleChange}
+        required
+      />
+      <Input
+        name="start_Date"
+        type="date"
+        value={formData.start_Date?.split("T")[0] || ""}
+        onChange={handleChange}
+        required
+      />
+      <Input
+        name="end_Date"
+        type="date"
+        value={formData.end_Date?.split("T")[0] || ""}
+        onChange={handleChange}
+        required
+      />
+      
+      <Select
+        value={formData.program_Id?.toString() || ""}
+        onValueChange={(value) => 
+          setFormData((prev) => ({ ...prev, program_Id: Number(value) }))
         }
+      >
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Seleccionar Programa" />
+        </SelectTrigger>
+        <SelectContent>
+          {programs.map((program) => (
+            <SelectItem key={program.program_Id} value={program.program_Id.toString()}>
+              {program.program_Name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-        const updatedFile = {
-            file_Id: Number(fileId),
-            apprentice_count: Number(apprenticeCount),
-            start_Date: startDate,
-            end_Date: endDate,
-            program_Id: Number(selectedProgramId),
-        };
-
-        setLoading(true);
-        try {
-            const response = await axiosInstance.put("/api/File/UpdateFile", updatedFile);
-            if (response.status === 200) {
-                alert("Archivo actualizado exitosamente");
-                if (onUpdateSuccess) {
-                    onUpdateSuccess(updatedFile); // Actualizar en UI si es necesario
-                }
-            } else {
-                alert("Actualización completada, pero hubo un problema.");
-            }
-        } catch (error) {
-            console.error("Error al actualizar el archivo:", error);
-            alert("Error al actualizar el archivo.");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return (
-        <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Actualizar Archivo</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <Label htmlFor="fileId">ID del Archivo</Label>
-                    <Input
-                        id="fileId"
-                        type="number"
-                        value={fileId}
-                        onChange={(e) => setFileId(e.target.value)}
-                        disabled
-                    />
-                </div>
-
-                <div>
-                    <Label htmlFor="apprenticeCount">Cantidad de Aprendices</Label>
-                    <Input
-                        id="apprenticeCount"
-                        type="number"
-                        value={apprenticeCount}
-                        onChange={(e) => setApprenticeCount(e.target.value)}
-                        required
-                        disabled={loading}
-                    />
-                </div>
-
-                <div>
-                    <Label htmlFor="startDate">Fecha de Inicio</Label>
-                    <Input
-                        id="startDate"
-                        type="date"
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        required
-                        disabled={loading}
-                    />
-                </div>
-
-                <div>
-                    <Label htmlFor="endDate">Fecha de Fin</Label>
-                    <Input
-                        id="endDate"
-                        type="date"
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        required
-                        disabled={loading}
-                    />
-                </div>
-
-                <div>
-                    <Label htmlFor="program">Programa</Label>
-                    <Select value={selectedProgramId} onValueChange={setSelectedProgramId} disabled={loading}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Seleccione un programa" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {programs.map((program) => (
-                                <SelectItem key={program.program_Id} value={String(program.program_Id)}>
-                                    {program.program_Name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Actualizando..." : "Actualizar Archivo"}
-                </Button>
-            </form>
-        </div>
-    );
+      <Button type="submit" className="right-3">Actualizar Ficha</Button>
+    </form>
+  );
 }

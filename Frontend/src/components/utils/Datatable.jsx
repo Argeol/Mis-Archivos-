@@ -33,7 +33,8 @@ export default function DataTable({
   tableCell,
   TitlePage,
   translations,
-  RegisterComponets
+  RegisterComponets,
+  isDisabled = () => false,
 }) {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -76,8 +77,10 @@ export default function DataTable({
             className="sm:max-w-xs"
           />
         </div>
-        <ModalDialog RegisterComponets={RegisterComponets} TitlePage={TitlePage} />
-
+        <ModalDialog
+          RegisterComponets={RegisterComponets}
+          TitlePage={TitlePage}
+        />
       </CardHeader>
       <CardContent>
         <Table className="w-full">
@@ -91,33 +94,44 @@ export default function DataTable({
           </TableHeader>
           <TableBody>
             {currentItems.length > 0 ? (
-              currentItems.map((row, index) => (
-                <TableRow
-                  key={index}
-                  className="hover:bg-gray-100 transition-colors"
-                >
-                  {tableCell.map((cell, index) => (
-                    <TableCell key={index}>{row[cell]}</TableCell>
-                  ))}
+              currentItems.map((row, index) => {
+                const disabled = isDisabled(row);
 
-                  <TableCell className="text-center space-x-2">
-                    <ModalDialogUpdate
-                      TitlePage={TitlePage}
-                      UpdateComponent={updateComponets}
-                      id={row[idKey]}
-                    />
-                    <Button onClick={() => handleOpen(row)}>
-                      Más Info del {TitlePage}
-                    </Button>
-                    <DeleteButton
-                      id={row[idKey]}
-                      deleteUrl={deleteUrl}
-                      idField={idField}
-                      setData={setData}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))
+                return (
+                  <TableRow
+                    key={index}
+                    className={`hover:bg-gray-100 transition-colors ${
+                      disabled ? "opacity-50 pointer-events-none" : ""
+                    }`}
+                  >
+                    {tableCell.map((cell, index) => (
+                      <TableCell key={index}>{row[cell]}</TableCell>
+                    ))}
+
+                    <TableCell className="text-center space-x-2 !pointer-events-auto relative">
+                      <ModalDialogUpdate
+                        TitlePage={TitlePage}
+                        UpdateComponent={updateComponets}
+                        id={row[idKey]}
+                        disabled={disabled}
+                      />
+                      <Button
+                        onClick={() => handleOpen(row)}
+                        className="!bg-black !text-white !hover:bg-gray-900 !opacity-100 !pointer-events-auto"
+                      >
+                        Informacion de {TitlePage}
+                      </Button>
+                      <DeleteButton
+                        id={row[idKey]}
+                        deleteUrl={deleteUrl}
+                        idField={idField}
+                        setData={setData}
+                        disabled={disabled}
+                      />
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell colSpan={5} className="text-center text-gray-500">

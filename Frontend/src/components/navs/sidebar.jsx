@@ -33,12 +33,6 @@ function Sidebar() {
 
       <ul className="flex flex-col p-4 space-y-4">
         <li>
-          <a href="/dashboard/attendant" className="text-gray-500 flex items-center space-x-3 p-2 rounded-md hover:bg-[#218EED] hover:text-white">
-            <FaUsers className="text-xl text-gray-500 hover:text-white" />
-            {isOpen && <span>Acudiente</span>}
-          </a>
-        </li>
-        <li>
           <a href="/dashboard/apprentice" className="flex items-center text-gray-500 space-x-3 p-2 rounded-md hover:bg-[#218EED] hover:text-white">
             <FaHouseUser className="text-xl text-gray-500 hover:text-white" />
             {isOpen && <span>Aprendiz</span>}
