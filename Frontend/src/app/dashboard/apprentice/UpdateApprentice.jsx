@@ -24,7 +24,7 @@ export default function UpdateApprentice({ id }) {
 
   useEffect(() => {
     axiosInstance.get(`/api/Apprentice/${id}`)
-      .then((res) => setFormData(res.data));
+      .then((res) => setFormData(res.data.permission));
     axiosInstance.get("/api/Department").then((res) => setDepartments(res.data));
     axiosInstance.get("/Api/File/Getfiles").then((res) => setFiles(res.data));
   }, [id]);

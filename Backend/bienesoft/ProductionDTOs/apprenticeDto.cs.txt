@@ -4,7 +4,6 @@ namespace bienesoft.Models
 
     public class apprenticeDTO
     {
-
         public string First_Name_Apprentice { get; set; } = string.Empty;
         public string Last_Name_Apprentice { get; set; } = string.Empty;
         public DateTime Birth_Date_Apprentice { get; set; }
@@ -19,6 +18,10 @@ namespace bienesoft.Models
         public string ProgramName { get; set; }
         public string AreaName { get; set; }
         public string nom_department { get; set; }
+        public string doc_apprentice {get;set;}
+        public string ape_responsible {get;set;}
+        public string tel_responsible {get;set;}
+        public string email_responsible {get;set;}
 
     }
 

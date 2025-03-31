@@ -1,5 +1,4 @@
 ﻿using bienesoft.Models;
-using Bienesoft.Models;
 using Bienesoft.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -17,59 +16,49 @@ namespace Bienesoft.Controllers
         public IConfiguration _Configuration { get; set; }
         public GeneralFunction GeneralFunction;
 
-
         public ApprenticeController(ApprenticeService apprenticeService)
         {
             _apprenticeService = apprenticeService;
         }
 
-
         [HttpGet("{id}")]
-        public async Task<ActionResult<apprenticeDTO>> GetPermissionById(int id)
+        public async Task<ActionResult<object>> GetApprenticeById(int id)
         {
             try
             {
-                var permission = await _apprenticeService.GetPermissionById(id);
-
-
-                if (permission == null)
+                var apprentice = _apprenticeService.GetApprenticeById(id);
+                if (apprentice == null)
                 {
                     return NotFound(new { message = "Aprendiz no encontrado" });
                 }
-
-                return Ok(permission);
+                return Ok(new { message = "Consulta exitosa", apprentice });
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
                 GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
+                return StatusCode(500, new { message = "Error interno del servidor", details = ex.ToString() });
             }
         }
         [HttpPost("CreateApprentice")]
-        public async Task<IActionResult> CreateApprentice([FromBody] ApprenticeCreateDTO apprenticeDTO)
+        public async Task<IActionResult> CreateApprentice([FromBody] Apprentice apprentice)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (apprenticeDTO == null)
+            if (apprentice == null)
             {
                 return BadRequest(new { message = "Los datos del aprendiz son inválidos." });
             }
             try
             {
-                var apprentice = await _apprenticeService.CreateApprenticeAsync(apprenticeDTO);
-                var response = new
-                {
-                    message = "Aprendiz creado con éxito",
-                    apprentice
-                };
-                return CreatedAtAction(nameof(GetPermissionById), new { id = apprentice.Id_Apprentice }, response);
+                var createdApprentice = await _apprenticeService.CreateApprenticeAsync(apprentice);
+                return CreatedAtAction(nameof(GetApprenticeById), new { id = createdApprentice.Id_Apprentice }, new { message = "Aprendiz creado con éxito", createdApprentice });
             }
             catch (ArgumentException ex)
             {
@@ -77,9 +66,7 @@ namespace Bienesoft.Controllers
             }
             catch (DbUpdateException ex)
             {
-                // Capturar errores de MySQL por duplicado
-                if (ex.InnerException is MySqlConnector.MySqlException sqlEx &&
-                    sqlEx.Message.Contains("Duplicate entry"))
+                if (ex.InnerException is MySqlConnector.MySqlException sqlEx && sqlEx.Message.Contains("Duplicate entry"))
                 {
                     return Conflict(new { message = "El correo electrónico ya está registrado. Por favor, utiliza otro." });
                 }
@@ -92,56 +79,53 @@ namespace Bienesoft.Controllers
             }
         }
 
-        [HttpPut("UpdateApprentice")]
-        public async Task<IActionResult> UpdateApprentice(int id, [FromBody] ApprenticeUpdateDTO apprenticeDTO)
+        [HttpPut("UpdateApprentice/{id}")]
+        public async Task<IActionResult> UpdateApprentice(int id, [FromBody] Apprentice apprentice)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-
             try
             {
-                var updatedApprentice = await _apprenticeService.UpdateApprenticeAsync(id, apprenticeDTO);
-
+                var updatedApprentice = await _apprenticeService.UpdateApprenticeAsync(id, apprentice);
                 if (updatedApprentice == null)
                 {
                     return NotFound(new { message = "El aprendiz no fue encontrado." });
                 }
-
-                return Ok(new { message = "Apprentice actualizado exitosamente" });
-            }
-            catch (ArgumentNullException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
+                return Ok(new { message = "Aprendiz actualizado exitosamente", updatedApprentice });
             }
             catch (Exception ex)
             {
                 GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
+                return StatusCode(500, new { message = "Error interno del servidor.", details = ex.Message });
             }
         }
+
         [HttpGet("GetApprentices")]
-        public ActionResult<IEnumerable<Apprentice>> GetApprentices()
+        public async Task<ActionResult<IEnumerable<object>>> GetApprentices()
         {
-            return Ok(_apprenticeService.Getapprentice());
+            try
+            {
+                var apprentices = _apprenticeService.GetApprentices();
+                return Ok(apprentices);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener los aprendices", error = ex.Message });
+            }
         }
-        [HttpDelete("DeleteApprentice")]
+
+        [HttpDelete("DeleteApprentice/{id}")]
         public async Task<IActionResult> DeleteApprentice(int id)
         {
             try
             {
                 var deleted = await _apprenticeService.DeleteApprenticeAsync(id);
-
                 if (!deleted)
                 {
                     return NotFound(new { message = "Aprendiz no encontrado" });
                 }
-
                 return Ok(new { message = "Aprendiz eliminado correctamente" });
             }
             catch (Exception ex)
@@ -150,6 +134,5 @@ namespace Bienesoft.Controllers
                 return StatusCode(500, new { message = "Error interno al eliminar el aprendiz" });
             }
         }
-
     }
 }
