@@ -12,7 +12,7 @@ function ModalDialogUpdate({ TitlePage, UpdateComponent, id }) {
     <>
       <Button onClick={handleOpen}>Actualizar {TitlePage}</Button>
       <Dialog open={isOpen} onOpenChange={handleCloseForm}>
-        <DialogContent>
+      <DialogContent className="max-h-[80vh] overflow-auto">
           <DialogHeader>
             <DialogTitle>Actualizar {TitlePage}</DialogTitle>
           </DialogHeader>

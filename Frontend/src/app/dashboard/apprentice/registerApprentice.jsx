@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+"use client";
+
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,13 +12,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 const genders = ["masculino", "femenino", "otro"];
-// const statuses = ["Active", "Inactive"];
 const addressTypes = ["Barrio", "Vereda", "Corregimiento", "Comuna"];
 const tips = ["interno", "externo"];
+
 export default function RegisterApprentice() {
+  const queryClient = useQueryClient();
+
   const [formData, setFormData] = useState({
+    id_Apprentice: 0,
     first_Name_Apprentice: "",
     last_Name_Apprentice: "",
     birth_Date_Apprentice: "",
@@ -24,60 +31,93 @@ export default function RegisterApprentice() {
     address_Apprentice: "",
     address_Type_Apprentice: "",
     phone_Apprentice: "",
-    status_Apprentice: "active",
+    status_Apprentice: "Active",
     permission_Count_Apprentice: 0,
     tip_Apprentice: "",
     file_id: 0,
-    municipality_Id: 0,
+    Id_municipality: 0,
+    doc_apprentice: "",
+    nom_responsible: "",
+    ape_responsible: "",
+    tel_responsible: "",
+    email_responsible: "",
+  });
+  
+  
+
+  const [id_department, setDepartmentId] = useState(null); // Estado del departamento seleccionado
+
+  // ✅ Obtener Departamentos
+  const { data: departments = [] } = useQuery({
+    queryKey: ["departments"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/api/Department");
+      return res.data;
+    },
   });
 
-  const [departments, setDepartments] = useState([]);
-  const [municipalities, setMunicipalities] = useState([]);
-  const [files, setFiles] = useState([]);
+  // ✅ Obtener Fichas
+  const { data: files = [] } = useQuery({
+    queryKey: ["files"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/Api/File/Getfiles");
+      return res.data;
+    },
+  });
 
-  useEffect(() => {
-    axiosInstance
-      .get("/api/Department")
-      .then((res) => setDepartments(res.data));
-    axiosInstance.get("/Api/File/Getfiles").then((res) => setFiles(res.data));
-  }, []);
-
-  const handleDepartmentChange = async (departmentId) => {
-    try {
+  // ✅ Obtener Municipios por Departamento
+  const { data: municipalities = [] } = useQuery({
+    queryKey: ["municipalities", id_department],
+    queryFn: async () => {
+      if (!id_department) return []; // Evita llamadas innecesarias
       const res = await axiosInstance.get(
-        `/api/Municipality/byDepartment/${departmentId}`
+        `/api/Municipality/byDepartment/${id_department}`
       );
-      setMunicipalities(res.data);
-    } catch (error) {
-      console.error("Error al cargar municipios:", error);
-    }
-  };
+      console.log("Municipios obtenidos:", res.data);
+      return res.data;
+    },
+    enabled: !!id_department, // 🔥 Ahora sí carga al seleccionar un departamento
+  });
 
+  // ✅ Mutación para Registrar Aprendiz
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const res = await axiosInstance.post(
+        "/api/Apprentice/CreateApprentice",
+        formData,
+        console.log(formData)
+      );
+      return res.data;
+    },
+    onSuccess: (data) => {
+      alert(data.message);
+      queryClient.invalidateQueries(["apprentices"]); // 🔄 Refrescar lista de aprendices
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.response?.data?.message || "Error desconocido.";
+      alert(errorMessage);
+    },
+  });
+
+  // ✅ Manejo de Cambios en el Formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    const newValue =
-      name === "birth_Date_Apprentice" ? new Date(value).toISOString() : value;
-
-    setFormData((prev) => ({ ...prev, [name]: newValue }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // ✅ Cambiar Departamento y Cargar Municipios
+  const handleDepartmentChange = (value) => {
+    const departmentId = parseInt(value);
+    setDepartmentId(departmentId); // Guarda el ID para consulta
+    setFormData((prev) => ({ ...prev, municipality_Id: 0 })); // Reinicia municipio
+  };
+
+  // ✅ Enviar Formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
-      try {
-        const response = await axiosInstance.post("/api/Apprentice/CreateApprentice", formData);
-        alert(response.data.message);
-      } catch (error) {
-        if (error.response) {
-          // Mostrar el mensaje personalizado del backend
-          const errorMessage = error.response.data.message || "Error desconocido.";
-          alert(errorMessage);
-        } else {
-          alert("Error inesperado, por favor intenta nuevamente.");
-        }
-      }
-    };    
-
+    mutation.mutate(); // Ejecutar la mutación
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
@@ -130,25 +170,6 @@ export default function RegisterApprentice() {
           ))}
         </SelectContent>
       </Select>
-
-      {/* Estado */}
-      {/* <Select
-        onValueChange={(value) =>
-          setFormData({ ...formData, status_Apprentice: value })
-        }
-      > */}
-        {/* <SelectTrigger>
-          <SelectValue placeholder="Seleccionar Estado" />
-        </SelectTrigger>
-        <SelectContent>
-          {statuses.map((status) => (
-            <SelectItem key={status} value={status}>
-              {status}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select> */}
-
       {/* Tipo de Dirección */}
       <Select
         onValueChange={(value) =>
@@ -166,6 +187,13 @@ export default function RegisterApprentice() {
           ))}
         </SelectContent>
       </Select>
+      
+      <Input
+        name="address_Apprentice"
+        placeholder="Cr4 #10-15"
+        onChange={handleChange}
+        required
+      />
 
       {/* Tipo de Aprendiz */}
       <Select
@@ -184,8 +212,9 @@ export default function RegisterApprentice() {
           ))}
         </SelectContent>
       </Select>
+
       {/* Departamentos */}
-      <Select onValueChange={(value) => handleDepartmentChange(value)}>
+      <Select onValueChange={handleDepartmentChange}>
         <SelectTrigger>
           <SelectValue placeholder="Seleccionar Departamento" />
         </SelectTrigger>
@@ -204,13 +233,16 @@ export default function RegisterApprentice() {
       {/* Municipios */}
       <Select
         onValueChange={(value) =>
-          setFormData({ ...formData, municipality_Id: parseInt(value) })
+          setFormData({ ...formData,Id_municipality : parseInt(value) })
         }
       >
         <SelectTrigger>
           <SelectValue placeholder="Seleccionar Municipio" />
         </SelectTrigger>
         <SelectContent>
+          {municipalities.length === 0 && (
+            <p className="text-gray-500">No hay municipios disponibles.</p>
+          )}
           {municipalities.map((municipality) => (
             <SelectItem
               key={municipality.id_municipality}
@@ -239,8 +271,42 @@ export default function RegisterApprentice() {
           ))}
         </SelectContent>
       </Select>
-
-      <Button type="submit">Registrar</Button>
+      <Label>Correo acudiente</Label>
+      <Input
+        name="email_responsible"
+        placeholder="Correo acudiente"
+        type="email"
+        onChange={handleChange}
+        required
+      />
+       <Input
+        name="doc_apprentice"
+        placeholder="documento"
+        onChange={handleChange}
+        required
+      />
+      <Input
+        name="nom_responsible"
+        placeholder="nombre del acudiente"
+        onChange={handleChange}
+        required
+      />
+      <Input
+        name="ape_responsible"
+        placeholder="apellidos del acudiente"
+        onChange={handleChange}
+        required
+      />
+       <Input
+        name="tel_responsible"
+        placeholder="telefono del acudiente"
+        onChange={handleChange}
+        required
+      />
+      
+      <Button type="submit" disabled={mutation.isLoading}>
+        {mutation.isLoading ? "Registrando..." : "Registrar"}
+      </Button>
     </form>
   );
 }

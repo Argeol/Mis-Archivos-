@@ -19,7 +19,6 @@ namespace bienesoft.Models
         public DbSet<Locality> locality { get; set; }
         // public DbSet<AuthorizationResponsible> authorizationResponsible { get; set; }
         public DbSet<PermissionFS> permissionFS { get; set; }
-        public DbSet<Reason> reason { get; set; }
         // public DbSet<Responsible> responsible { get; set; }
         public DbSet<PermissionGN> permissionGN { get; set; }
         public DbSet<PermissionApproval> permissionApproval { get; set; }
@@ -37,7 +36,7 @@ namespace bienesoft.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseMySql("Server=localhost;Database=Bienesoft;User=root;Password=murcia21;Port=3306",
+                optionsBuilder.UseMySql("Server=localhost;Database=Bienesoft;User=root;Password=elzurdojrprom2019;Port=3306",
                     new MySqlServerVersion(new Version(8, 0, 23)));
             }
 

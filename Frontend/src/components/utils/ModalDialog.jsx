@@ -18,7 +18,7 @@ function ModalDialog({TitlePage, RegisterComponets}) {
                 registrar  {TitlePage}
             </Button>
             <Dialog open={isOpen} onOpenChange={handleCloseForm}>
-                <DialogContent>
+            <DialogContent className="max-h-[95vh] overflow-auto">
                     <DialogHeader>
                         <DialogTitle>Agrega {TitlePage}</DialogTitle>
                         <RegisterComponets></RegisterComponets>

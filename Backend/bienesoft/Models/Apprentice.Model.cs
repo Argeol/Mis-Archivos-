@@ -11,28 +11,23 @@ namespace bienesoft.Models
         [Key]
         public int Id_Apprentice { get; set; }
 
-        [Required]
         public string First_Name_Apprentice { get; set; } = string.Empty;
-
-        [Required]
         public string Last_Name_Apprentice { get; set; } = string.Empty;
-
-        [Required]
-        public DateTime Birth_Date_Apprentice { get; set; }
-
-        [Required]
+        public DateTime birth_date_apprentice { get; set; }
         public string Gender_Apprentice { get; set; } = string.Empty;
-
-        [Required, EmailAddress]
         public string Email_Apprentice { get; set; } = string.Empty;
-
         public string Address_Apprentice { get; set; } = string.Empty;
         public string Address_Type_Apprentice { get; set; } = string.Empty;
         public string Phone_Apprentice { get; set; } = string.Empty;
         public string Status_Apprentice { get; set; } = "Active";
         public int Permission_Count_Apprentice { get; set; }
-
         public string Tip_Apprentice { get; set; } = "interno";
+        public string doc_apprentice { get; set; } = string.Empty;
+        public string nom_responsible { get; set; } = string.Empty;
+        public string ape_responsible { get; set; } = string.Empty;
+        public string tel_responsible { get; set; } = string.Empty;
+        public string email_responsible { get; set; } = string.Empty;
+
 
         // Relación con File (Ficha)
         [ForeignKey("File")]
