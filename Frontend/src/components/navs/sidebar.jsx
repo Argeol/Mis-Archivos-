@@ -1,15 +1,7 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import {
-  FaHouseUser,
-  FaCheckCircle,
-  FaUsersCog,
-  FaListAlt,
-} from "react-icons/fa";
+import { FaHouseUser, FaCheckCircle, FaUsersCog, FaListAlt } from "react-icons/fa";
 import GroupIcon from "@mui/icons-material/Group";
-import { GoListUnordered } from "react-icons/go";
-import { BiLogOutCircle } from "react-icons/bi";
 
 const menuItems = [
   { href: "/dashboard/apprentice", icon: FaHouseUser, label: "Aprendiz" },
@@ -28,15 +20,14 @@ export default function Sidebar() {
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
     >
-    
       <img
         src="/assets/img/logo.webp"
         alt="Bienesoft Logo"
         className="w-40 h-auto animate-pulse"
       />
 
-      <br></br>
-      
+      <br />
+
       <nav className="space-y-3">
         {menuItems.map(({ href, icon: Icon, label }) => (
           <a
@@ -51,4 +42,4 @@ export default function Sidebar() {
       </nav>
     </Card>
   );
-};
+}

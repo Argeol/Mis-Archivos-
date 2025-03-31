@@ -19,7 +19,7 @@ export default function RegisterFile() {
     useEffect(() => {
         const fetchPrograms = async () => {
             try {
-                const response = await axiosInstance.get("/api/Program/AllPrograms");
+                const response = await axiosInstance.get("api/Program/AllPrograms");
                 if (response.status === 200) {
                     setPrograms(response.data || []);
                 }

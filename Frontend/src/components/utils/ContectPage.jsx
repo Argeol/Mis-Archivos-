@@ -21,7 +21,8 @@ function ContecPage({
   updateComponets,
   campo1,
   tableCell,
-  translations
+  translations,
+  isDisabled
 }
 
 ) {
@@ -39,11 +40,12 @@ function ContecPage({
           tableCell={tableCell}
           TitlePage={titlesPage}
           translations={translations}
-          // createUrl={createUrl}
-          // initialData={initialData}
-          // onRegister={onRegister}
-          // fieldLabels={fieldLabels}
+          createUrl={createUrl}
+          initialData={initialData}
+          onRegister={onRegister}
+          fieldLabels={fieldLabels}
           RegisterComponets={registerComponets}
+          isDisabled={isDisabled}
       />
     </>
   )

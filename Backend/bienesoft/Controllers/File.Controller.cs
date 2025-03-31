@@ -58,46 +58,53 @@ namespace bienesoft.Controllers
         }
 
 
-        [HttpPost("UpdateFile")]
-        public IActionResult Update(int Id, FileModel file)
-        {
-            try
-            {
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
-            }
-        }
-        [HttpDelete("DeleteFile")]
-        public IActionResult Delete(int id)
-        {
-            try
-            {
-                var file = _FileServices.GetFileById(id);
-                if (file == null)
-                {
-                    return NotFound("La File Con El Id" + id + "No Se Pudo Encontrar");
-                }
-                _FileServices.Delete(id);
-                return Ok("File Eliminado Con Exito");
-            }
-            catch (KeyNotFoundException knFEx)
-            {
-                return NotFound(knFEx.Message);
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
-            }
-        }
+        //[HttpPost("UpdateFile")]
+        //public async Task<IActionResult> UpdateFile(int Id, FileModel updatedFile)
+        //{
+
+        //    try
+        //    {
+        //        var updatefile = await _FileServices.UpdateFileAsync( Id,updatedFile);
+        //        if (updatefile == null)
+        //        {
+        //            return BadRequest(new { message = "Ficha no encontrada" });
+        //        }
+        //        return Ok(new {message = "Aprendiz actualizado exitosamente "});
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        GeneralFunction.Addlog(ex.Message);
+        //        return StatusCode(500, ex.ToString());
+        //    }
+        //}
+        //[HttpDelete("DeleteFile")]
+        //public IActionResult Delete(int id)
+        //{
+        //    try
+        //    {
+        //        var file = _FileServices.GetFileById(id);
+        //        if (file == null)
+        //        {
+        //            return NotFound("La File Con El Id" + id + "No Se Pudo Encontrar");
+        //        }
+        //        _FileServices.Delete(id);
+        //        return Ok("File Eliminado Con Exito");
+        //    }
+        //    catch (KeyNotFoundException knFEx)
+        //    {
+        //        return NotFound(knFEx.Message);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        GeneralFunction.Addlog(ex.Message);
+        //        return StatusCode(500, ex.ToString());
+        //    }
+        //}
         [HttpGet("Getfiles")]
-        public ActionResult<IEnumerable<FileModel>> Getfiles()
+        public async Task<IActionResult> GetFiles()
         {
-            return Ok(_FileServices.Getfiles());
+            var files = await _FileServices.GetFilesAsync();
+            return Ok(files);
         }
         //[HttpPut("UpdateFile")]
         //public IActionResult Update(int id , FileModel file)
@@ -128,23 +135,31 @@ namespace bienesoft.Controllers
 
         //    }
         //}
-        [HttpPut]
-    public async Task<IActionResult> UpdateFile([FromBody] FileModel updatedFile)
-    {
-        if (updatedFile == null || updatedFile.File_Id == 0)
+        [HttpPut("UpdateFile/{Id}")]
+        public async Task<IActionResult> UpdateFile(int Id, [FromBody] FileModel updatedFile)
         {
-            return BadRequest("Datos inválidos.");
+            try
+            {
+                //// Validar que el ID de la URL coincida con el ID en el objeto enviado
+                //if (Id != updatedFile.File_Id)
+                //{
+                //    return BadRequest(new { message = "El ID en la URL no coincide con el ID de la ficha" });
+                //}
+
+                var updatefile = await _FileServices.UpdateFileAsync(Id, updatedFile);
+                if (updatefile == null)
+                {
+                    return NotFound(new { message = "Ficha no encontrada" });
+                }
+
+                return Ok(new { message = "Ficha actualizada exitosamente" });
+            }
+            catch (Exception ex)
+            {
+                GeneralFunction.Addlog(ex.Message);
+                return StatusCode(500, new { error = ex.Message });
+            }
         }
-
-        var result = await _FileServices.UpdateFileAsync(updatedFile);
-
-        if (result == null)
-        {
-            return NotFound($"No se encontró el archivo con ID {updatedFile.File_Id}.");
-        }
-
-        return Ok(result);
-    }
 
     }
 }
