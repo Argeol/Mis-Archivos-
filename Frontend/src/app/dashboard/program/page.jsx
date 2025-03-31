@@ -64,19 +64,11 @@ export default function Dashboard() {
                 titlesData={fieldLabels}
                 Data={dataProgram}
                 idKey="program_Id"
-                deleteUrl="/api/Program/DeleteProgram"
+                deleteUrl="/api/Program/DeleteProgram/"
                 setData={setDataProgram}
                 updateComponets={UpdateProgram}
                 tableCell={TableCell}
                 translations={translations}
-
-
-
-
-
-
-
-
               />
         </PrivateNav>
     );
