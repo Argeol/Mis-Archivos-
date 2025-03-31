@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import PrivateNav from "@/components/navs/PrivateNav";
 import ContecPage from "@/components/utils/ContectPage";
 import axiosInstance from "@/lib/axiosInstance";
@@ -8,27 +8,31 @@ import RegisterApprentice from "./registerApprentice";
 import UpdateApprentice from "./UpdateApprentice";
 
 export default function ApprenticeDashboard() {
-  const [dataApprentice, setDataApprentice] = useState([]); // Lista de aprendices
+  const queryClient = useQueryClient();
 
-  // Obtener aprendices desde el backend
-  useEffect(() => {
-    const fetchDataApprentice = async () => {
-      try {
-        const response = await axiosInstance.get(
-          "api/Apprentice/GetApprentices"
-        );
-        console.log("Datos recibidos:", response.data);
-        if (response.status !== 200) {
-          throw new Error("Error al cargar los aprendices");
-        }
-        setDataApprentice(response.data);
-      } catch (error) {
-        console.error("Error fetching apprentices:", error);
-      }
-    };
+  // 🔹 Obtener lista de aprendices
+  const { data: dataApprentice, isLoading, error } = useQuery({
+    queryKey: ["aprendices"], // Nombre del caché
+    queryFn: async () => {
+      const response = await axiosInstance.get("api/Apprentice/GetApprentices");
+      if (!response.status === 200) throw new Error("Error al cargar los datos");
+      return response.data;
+    },
+  });
 
-    fetchDataApprentice();
-  }, []);
+  // 🔹 Mutación para eliminar un aprendiz
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      await axiosInstance.delete(`/api/Apprentice/DeleteApprentice/${id}`);
+    },
+    onSuccess: () => {
+      // 🔥 Actualiza la caché después de eliminar
+      queryClient.invalidateQueries(["aprendices"]);
+    },
+  });
+
+  if (isLoading) return <p>Cargando...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
   const translations = {
     id_Apprentice: "ID del Aprendiz",
@@ -59,14 +63,13 @@ export default function ApprenticeDashboard() {
       <PrivateNav>
         <ContecPage
           registerComponets={RegisterApprentice}
-          titlesPage={"aprenidz"}
+          titlesPage={"Aprendiz"}
           titlesData={fieldLabels}
           Data={dataApprentice}
           idKey="id_Apprentice"
           deleteUrl="/api/Apprentice/DeleteApprentice"
-          setData={setDataApprentice}
+          deleteFunction={(id) => deleteMutation.mutate(id)}
           updateComponets={UpdateApprentice}
-          campo1="first_Name_Apprentice"
           tableCell={TableCell}
           translations={translations}
         />
@@ -74,3 +77,4 @@ export default function ApprenticeDashboard() {
     </>
   );
 }
+
