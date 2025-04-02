@@ -266,7 +266,7 @@ export default function RegisterApprentice() {
         <SelectContent>
           {files.map((file) => (
             <SelectItem key={file.file_Id} value={file.file_Id.toString()}>
-              {file.file_Id}-{file.program_Name}
+              {file.file_Id}-{file.programName}
             </SelectItem>
           ))}
         </SelectContent>

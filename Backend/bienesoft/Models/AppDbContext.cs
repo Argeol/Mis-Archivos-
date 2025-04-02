@@ -23,7 +23,7 @@ namespace bienesoft.Models
         public DbSet<PermissionGN> permissionGN { get; set; }
         public DbSet<PermissionApproval> permissionApproval { get; set; }
 
-        public DbSet<Responsible> responsible { get; set; }
+        public DbSet<ResponsibleModel> responsible { get; set; }
 
         public DbSet<Role> role { get; set; }
 
@@ -36,7 +36,7 @@ namespace bienesoft.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseMySql("Server=localhost;Database=Bienesoft;User=root;Password=elzurdojrprom2019;Port=3306",
+                optionsBuilder.UseMySql("Server=localhost;Database=Bienesoft;User=root;Password=murcia21;Port=3306",
                     new MySqlServerVersion(new Version(8, 0, 23)));
             }
 
@@ -97,11 +97,11 @@ namespace bienesoft.Models
                 .HasForeignKey(pa => pa.PermissionId) // Clave foránea en PermissionApproval
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<PermissionApproval>()
-                .HasOne(pa => pa.Responsible)       // Una aprobación pertenece a un responsable
-                .WithMany(r => r.PermissionApprovals) // Un responsable puede aprobar muchas solicitudes
-                .HasForeignKey(pa => pa.ResponsibleId) // Clave foránea en PermissionApproval
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<PermissionApproval>()
+            //    .HasOne(pa => pa.Responsible)       // Una aprobación pertenece a un responsable
+            //    .WithMany(r => r.PermissionApprovals) // Un responsable puede aprobar muchas solicitudes
+            //    .HasForeignKey(pa => pa.ResponsibleId) // Clave foránea en PermissionApproval
+            //    .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
         }
