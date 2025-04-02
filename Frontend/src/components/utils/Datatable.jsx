@@ -35,6 +35,7 @@ export default function DataTable({
   translations,
   RegisterComponets,
   isDisabled = () => false,
+  ignorar,
 }) {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,12 +63,13 @@ export default function DataTable({
     setIsOpen(false);
     setSelectedRow(null);
   };
+  console.log("hola mundo", selectedRow);
 
   return (
     <Card className="w-full max-w-5xl mx-auto p-4">
       <CardHeader>
         <CardTitle className="text-center text-xl font-semibold">
-          Lista de Aprendices
+          Lista de {TitlePage}
         </CardTitle>
         <div className="mb-4 flex justify-end">
           <Input
@@ -107,7 +109,6 @@ export default function DataTable({
                     {tableCell.map((cell, index) => (
                       <TableCell key={index}>{row[cell]}</TableCell>
                     ))}
-
                     <TableCell className="text-center space-x-2 !pointer-events-auto relative">
                       <ModalDialogUpdate
                         TitlePage={TitlePage}
@@ -115,10 +116,7 @@ export default function DataTable({
                         id={row[idKey]}
                         disabled={disabled}
                       />
-                      <Button
-                        onClick={() => handleOpen(row)}
-                        className="!bg-black !text-white !hover:bg-gray-900 !opacity-100 !pointer-events-auto"
-                      >
+                      <Button onClick={() => handleOpen(row)}>
                         Informacion de {TitlePage}
                       </Button>
                       <DeleteButton
@@ -166,6 +164,7 @@ export default function DataTable({
       </CardContent>
 
       {/* Modal de Más Info */}
+      {/* Modal de Más Info */}
       <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent>
           <DialogHeader>
@@ -173,12 +172,14 @@ export default function DataTable({
           </DialogHeader>
           <div className="space-y-2">
             {selectedRow &&
-              Object.entries(selectedRow).map(([key, value]) => (
-                <p key={key}>
-                  <strong>{translations[key] || key}:</strong>{" "}
-                  {value?.toString()}
-                </p>
-              ))}
+              Object.entries(selectedRow)
+                .filter(([key]) => !ignorar.includes(key)) // Filtrar los campos ignorados
+                .map(([key, value]) => (
+                  <p key={key}>
+                    <strong>{translations[key] || key}:</strong>{" "}
+                    {value?.toString()}
+                  </p>
+                ))}
           </div>
         </DialogContent>
       </Dialog>

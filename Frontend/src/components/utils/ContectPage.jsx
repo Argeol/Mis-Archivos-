@@ -22,7 +22,8 @@ function ContecPage({
   campo1,
   tableCell,
   translations,
-  isDisabled
+  isDisabled,
+  ignorar
 }
 
 ) {
@@ -46,6 +47,7 @@ function ContecPage({
           fieldLabels={fieldLabels}
           RegisterComponets={registerComponets}
           isDisabled={isDisabled}
+          ignorar={ignorar}
       />
     </>
   )

@@ -20,7 +20,6 @@ const tips = ["interno", "externo"];
 
 export default function RegisterApprentice() {
   const queryClient = useQueryClient();
-
   const [formData, setFormData] = useState({
     id_Apprentice: 0,
     first_Name_Apprentice: "",
