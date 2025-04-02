@@ -100,7 +100,7 @@ namespace bienesoft.Controllers
         //        return StatusCode(500, ex.ToString());
         //    }
         //}
-        [HttpGet("Getfiles")]
+        [HttpGet("GetFiles")]
         public async Task<IActionResult> GetFiles()
         {
             var files = await _FileServices.GetFilesAsync();
