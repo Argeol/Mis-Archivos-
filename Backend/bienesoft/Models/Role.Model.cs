@@ -9,7 +9,7 @@ namespace bienesoft.Models
         public int Id_role { get; set; }
         public string Name_role { get; set; }
 
-        public ICollection<Responsible> Responsibles { get; set; }
+        public ICollection<ResponsibleModel> Responsibles { get; set; }
     }
 
 
