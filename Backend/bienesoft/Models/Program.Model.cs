@@ -27,7 +27,7 @@ namespace Bienesoft.Models
     {
         public string? Program_Name { get; set; }
         public int? Area_Id { get; set; } = null;
-        public string State { get; set; }
+        public string? State { get; set; }
     }
 
     public class ResgisterProgram

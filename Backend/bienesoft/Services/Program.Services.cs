@@ -76,6 +76,7 @@ namespace bienesoft.Services
         {
             var newProgram = new ProgramModel
             {
+                Program_Id = program.Program_Id,
                 Program_Name = program.Program_Name,
                 Area_Id = program.Area_Id,
                 State = program.State,
@@ -108,7 +109,7 @@ namespace bienesoft.Services
             {
                 existingProgram.State = updateModel.State;
             }
-
+            
             _context.SaveChanges();
         }
     }

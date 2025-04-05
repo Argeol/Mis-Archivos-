@@ -11,7 +11,6 @@ function ContecPage({
   registerComponets,
   idKey,
   Data,
-  deleteUrl,
   setData,
   updateUrl,
   createUrl,
@@ -33,7 +32,6 @@ function ContecPage({
       <DataTable
           Data={Data}
           idKey={idKey} 
-          deleteUrl={deleteUrl}
           idField={idKey}
           setData={setData}
           updateComponets={updateComponets}

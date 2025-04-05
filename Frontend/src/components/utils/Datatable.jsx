@@ -102,9 +102,8 @@ export default function DataTable({
                 return (
                   <TableRow
                     key={index}
-                    className={`hover:bg-gray-100 transition-colors ${
-                      disabled ? "opacity-50 pointer-events-none" : ""
-                    }`}
+                    className={`hover:bg-gray-100 transition-colors ${disabled ? "opacity-50 pointer-events-none" : ""
+                      }`}
                   >
                     {tableCell.map((cell, index) => (
                       <TableCell key={index}>{row[cell]}</TableCell>
@@ -114,18 +113,13 @@ export default function DataTable({
                         TitlePage={TitlePage}
                         UpdateComponent={updateComponets}
                         id={row[idKey]}
+                        program_Name={row.program_Name}
+                        areas={areas} // ✅ Ahora sí se pasa correctamente
                         disabled={disabled}
                       />
                       <Button onClick={() => handleOpen(row)}>
                         Informacion de {TitlePage}
                       </Button>
-                      <DeleteButton
-                        id={row[idKey]}
-                        deleteUrl={deleteUrl}
-                        idField={idField}
-                        setData={setData}
-                        disabled={disabled}
-                      />
                     </TableCell>
                   </TableRow>
                 );
