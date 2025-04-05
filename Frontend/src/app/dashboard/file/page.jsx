@@ -61,6 +61,7 @@ export default function FileDashboard() {
           tableCell={TableCell}
           translations={translations}
           isDisabled={(row) => row.status === "Expirado"}
+          ignorar={["file_Id"]}
         />
       </PrivateNav>
     </>

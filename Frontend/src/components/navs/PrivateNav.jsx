@@ -23,7 +23,7 @@ function PrivateNav({ children }) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="p-2 text-blue-500">
-                  <BiUserCircle className="w-16 h-16" />
+                  <BiUserCircle/>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">

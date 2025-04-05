@@ -6,7 +6,7 @@ import { FaHome, FaListAlt, FaDollarSign, FaEnvelope, FaFileAlt,FaUserFriends,} 
 
 function PublicNav() {
   return (
-    <header className="px-4 lg:px-6 h-16 border-b flex items-center justify-between bg-slate-100 shadow-sm">
+    <header className="px-4 lg:px-6  h-16 border-b flex items-center justify-between bg-slate-100 shadow-sm">
       <Link className="flex items-center justify-center" href="/">
         <motion.div
           initial={{ x: "-100vw" }}
