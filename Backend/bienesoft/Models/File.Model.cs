@@ -18,9 +18,9 @@ public class FileModel
     [DataType(DataType.Date, ErrorMessage = "El formato de la fecha no es válido")]
     public DateTime? End_Date { get; set; }    // Ahora es DateTime?
 
+    [ForeignKey("Program_Id")]
     public int Program_Id { get; set; }
 
-    [ForeignKey("Program_Id")]
     public ProgramModel? program { get; set; }
 
     public ICollection<Apprentice>? Apprentice { get; set; }

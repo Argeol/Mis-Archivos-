@@ -26,9 +26,6 @@ function ModalDialog({TitlePage, RegisterComponets}) {
                 </DialogContent>
             </Dialog>
         
-        
-        
-        
         </>
      );
 }

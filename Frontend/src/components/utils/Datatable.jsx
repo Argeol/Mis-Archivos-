@@ -21,6 +21,7 @@ import {
 import DeleteButton from "./Delete";
 import ModalDialogUpdate from "./UpdateModalDialog";
 import ModalDialog from "./ModalDialog";
+import RowInfoModal from "./RowInfoModal";
 
 export default function DataTable({
   Data,
@@ -102,8 +103,9 @@ export default function DataTable({
                 return (
                   <TableRow
                     key={index}
-                    className={`hover:bg-gray-100 transition-colors ${disabled ? "opacity-50 pointer-events-none" : ""
-                      }`}
+                    className={`hover:bg-gray-100 transition-colors ${
+                      disabled ? "opacity-50 pointer-events-none" : ""
+                    }`}
                   >
                     {tableCell.map((cell, index) => (
                       <TableCell key={index}>{row[cell]}</TableCell>
@@ -113,8 +115,6 @@ export default function DataTable({
                         TitlePage={TitlePage}
                         UpdateComponent={updateComponets}
                         id={row[idKey]}
-                        program_Name={row.program_Name}
-                        areas={areas} // ✅ Ahora sí se pasa correctamente
                         disabled={disabled}
                       />
                       <Button onClick={() => handleOpen(row)}>
@@ -156,27 +156,15 @@ export default function DataTable({
           </Button>
         </div>
       </CardContent>
+      <RowInfoModal
+        isOpen={isOpen}
+        onClose={handleClose}
+        selectedRow={selectedRow}
+        TitlePage={TitlePage}
+        translations={translations}
+        ignorar={ignorar}
+      />
 
-      {/* Modal de Más Info */}
-      {/* Modal de Más Info */}
-      <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Información Completa del {TitlePage}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
-            {selectedRow &&
-              Object.entries(selectedRow)
-                .filter(([key]) => !ignorar.includes(key)) // Filtrar los campos ignorados
-                .map(([key, value]) => (
-                  <p key={key}>
-                    <strong>{translations[key] || key}:</strong>{" "}
-                    {value?.toString()}
-                  </p>
-                ))}
-          </div>
-        </DialogContent>
-      </Dialog>
     </Card>
   );
 }
