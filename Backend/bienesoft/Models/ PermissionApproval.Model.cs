@@ -16,6 +16,6 @@ namespace bienesoft.Models
         public PermissionGN Permission { get; set; }
 
         [ForeignKey("ResponsibleId")]
-        public Responsible Responsible { get; set; }
+        public ResponsibleModel Responsible { get; set; }
     }
 }

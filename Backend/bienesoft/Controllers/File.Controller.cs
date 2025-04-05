@@ -57,84 +57,13 @@ namespace bienesoft.Controllers
             return Ok(file);
         }
 
-
-        //[HttpPost("UpdateFile")]
-        //public async Task<IActionResult> UpdateFile(int Id, FileModel updatedFile)
-        //{
-
-        //    try
-        //    {
-        //        var updatefile = await _FileServices.UpdateFileAsync( Id,updatedFile);
-        //        if (updatefile == null)
-        //        {
-        //            return BadRequest(new { message = "Ficha no encontrada" });
-        //        }
-        //        return Ok(new {message = "Aprendiz actualizado exitosamente "});
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        GeneralFunction.Addlog(ex.Message);
-        //        return StatusCode(500, ex.ToString());
-        //    }
-        //}
-        //[HttpDelete("DeleteFile")]
-        //public IActionResult Delete(int id)
-        //{
-        //    try
-        //    {
-        //        var file = _FileServices.GetFileById(id);
-        //        if (file == null)
-        //        {
-        //            return NotFound("La File Con El Id" + id + "No Se Pudo Encontrar");
-        //        }
-        //        _FileServices.Delete(id);
-        //        return Ok("File Eliminado Con Exito");
-        //    }
-        //    catch (KeyNotFoundException knFEx)
-        //    {
-        //        return NotFound(knFEx.Message);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        GeneralFunction.Addlog(ex.Message);
-        //        return StatusCode(500, ex.ToString());
-        //    }
-        //}
         [HttpGet("Getfiles")]
         public async Task<IActionResult> GetFiles()
         {
             var files = await _FileServices.GetFilesAsync();
             return Ok(files);
         }
-        //[HttpPut("UpdateFile")]
-        //public IActionResult Update(int id , FileModel file)
-
-        //{
-        //    if (file == null)
-        //    {
-        //        return BadRequest("El modelo de File es nulo");
-        //    }
-
-        //    try
-        //    {
-        //        _FileServices.UpdateFileAsync(file);
-        //        return Ok("File actualizado exitosamente");
-        //    }
-        //    catch (ArgumentNullException ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //    catch (ArgumentException ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        GeneralFunction.Addlog(ex.Message);
-        //        return StatusCode(500, ex.ToString());
-
-        //    }
-        //}
+      
         [HttpPut("UpdateFile/{Id}")]
         public async Task<IActionResult> UpdateFile(int Id, [FromBody] FileModel updatedFile)
         {

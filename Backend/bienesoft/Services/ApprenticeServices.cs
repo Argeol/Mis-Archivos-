@@ -153,6 +153,7 @@ namespace Bienesoft.Services
                         .ThenInclude(p => p.Area)
                 .Select(a => new
                 {
+                    a.Id_Apprentice,
                     a.doc_apprentice,
                     a.First_Name_Apprentice,
                     a.Last_Name_Apprentice,

@@ -50,7 +50,7 @@ export default function FileDashboard() {
       <PrivateNav>
         <ContecPage
           registerComponets={RegisterFile}
-          titlesPage={"Archivos"}
+          titlesPage={"ficha"}
           titlesData={fieldLabels}
           Data={dataFile}
           idKey="file_Id"

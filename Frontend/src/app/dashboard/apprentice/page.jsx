@@ -33,23 +33,28 @@ export default function ApprenticeDashboard() {
 
   if (isLoading) return <p>Cargando...</p>;
   if (error) return <p>Error: {error.message}</p>;
-
   const translations = {
-    id_Apprentice: "ID del Aprendiz",
+    doc_apprentice: "Documento de Aprendiz",
     first_Name_Apprentice: "Nombre",
     last_Name_Apprentice: "Apellido",
     address_Type_Apprentice: "Tipo de Dirección",
+    address_Apprentice: "Dirección",
     email_Apprentice: "Correo Electrónico",
     birth_Date_Apprentice_Formatted: "Fecha de Nacimiento",
     phone_Apprentice: "Teléfono",
     gender_Apprentice: "Género",
     tip_Apprentice: "Tipo de Aprendiz",
-    municipality: "Municipio",
-    name_department: "Departamento",
+    nom_responsible: "Nombre del Responsable",
+    ape_responsible: "Apellido del Responsable",
+    email_responsible: "Correo del Responsable",
+    tel_responsible: "Teléfono del Responsable",
+    municipalityName: "Municipio",
+    departmentName: "Departamento",
     file_Id: "ID de Ficha",
-    program_Name: "Programa",
-    area_Name: "Área",
+    programName: "Programa",
+    areaName: "Área",
   };
+  
   const fieldLabels = ["Nombre", "Apellido", "Teléfono", "Ficha"];
   const TableCell = [
     "first_Name_Apprentice",
@@ -72,6 +77,7 @@ export default function ApprenticeDashboard() {
           updateComponets={UpdateApprentice}
           tableCell={TableCell}
           translations={translations}
+          ignorar={["id_Apprentice"]}
         />
       </PrivateNav>
     </>

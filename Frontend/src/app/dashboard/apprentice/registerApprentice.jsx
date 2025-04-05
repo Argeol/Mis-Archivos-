@@ -20,7 +20,6 @@ const tips = ["interno", "externo"];
 
 export default function RegisterApprentice() {
   const queryClient = useQueryClient();
-
   const [formData, setFormData] = useState({
     id_Apprentice: 0,
     first_Name_Apprentice: "",
@@ -266,7 +265,7 @@ export default function RegisterApprentice() {
         <SelectContent>
           {files.map((file) => (
             <SelectItem key={file.file_Id} value={file.file_Id.toString()}>
-              {file.file_Id}-{file.program_Name}
+              {file.file_Id}-{file.programName}
             </SelectItem>
           ))}
         </SelectContent>

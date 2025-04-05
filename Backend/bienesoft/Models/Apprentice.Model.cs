@@ -27,19 +27,12 @@ namespace bienesoft.Models
         public string ape_responsible { get; set; } = string.Empty;
         public string tel_responsible { get; set; } = string.Empty;
         public string email_responsible { get; set; } = string.Empty;
-
-
-        // Relación con File (Ficha)
         [ForeignKey("File")]
         public int File_Id { get; set; }
-        public FileModel? File { get; set; }
-
-        // Relación con Municipio
         [ForeignKey("Municipality")]
         public int Id_Municipality { get; set; }
         public Municipality? Municipality { get; set; }
-
-        // Relación con permisos
+        public FileModel? File { get; set; }
         public ICollection<PermissionGN>? PermissionGN { get; set; }
     }
 }
