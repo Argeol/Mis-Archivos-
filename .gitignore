@@ -4,4 +4,5 @@ obj/
 *.dll
 *.pdb
 *.log
-\Backend\.vs
+*\Backend\.vs
+Backend/bienesoft/appsettings.json

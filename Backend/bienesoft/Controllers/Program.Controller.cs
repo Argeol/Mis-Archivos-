@@ -65,7 +65,7 @@ namespace bienesoft.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("ProgramGetId{id}")]
         public IActionResult GetById(int id)
         {
             try
@@ -86,6 +86,11 @@ namespace bienesoft.Controllers
         [HttpPut("UpdateProgram/{id}")]
         public IActionResult UpdateProgram(int id, [FromBody] UpdateModelProgram updateModel)
         {
+            if (id <= 0)
+            {
+                return BadRequest(new { message = "El ID del programa no es válido." });
+            }
+
             if (updateModel == null)
             {
                 return BadRequest(new { message = "El modelo de actualización es nulo." });
@@ -93,8 +98,16 @@ namespace bienesoft.Controllers
 
             try
             {
+                // Verificar si el programa existe antes de actualizar
+                var existingProgram = _ProgramServices.GetProgramById(id);
+                if (existingProgram == null)
+                {
+                    return NotFound(new { message = "El programa no existe." });
+                }
+
+                // Proceder con la actualización
                 _ProgramServices.UpdateProgram(id, updateModel);
-                return Ok(new { message = "Programa actualizado exitosamente." });
+                return Ok(new { message = "✅ Programa actualizado exitosamente." });
             }
             catch (KeyNotFoundException ex)
             {
@@ -103,8 +116,9 @@ namespace bienesoft.Controllers
             catch (Exception ex)
             {
                 GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, new { error = ex.Message });
+                return StatusCode(500, new { error = "❌ Error interno al actualizar el programa." });
             }
         }
+
     }
 }

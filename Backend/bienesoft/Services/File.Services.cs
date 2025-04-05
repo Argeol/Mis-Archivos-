@@ -1,5 +1,4 @@
 ﻿using bienesoft.Models;
-using Bienesoft.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace bienesoft.Services
@@ -20,7 +19,6 @@ namespace bienesoft.Services
             var files = await _context.file
                 .Include(f => f.program)
                     .ThenInclude(p=>p.Area)
-                .Include(f => f.Apprentice)
                 .Select(f => new
                 {
                     f.File_Id,
@@ -59,46 +57,6 @@ namespace bienesoft.Services
             return file;
         }
 
-        //public void Delete(int id)
-        //{
-        //    var file = _context.file.FirstOrDefault(p => p.File_Id == id);
-        //    if (file != null)
-        //    {
-        //        try
-        //        {
-        //            _context.file.Remove(file);
-        //            _context.SaveChanges();
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            throw new Exception("No Se Pudo Eliminar La File" + ex.Message);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        throw new KeyNotFoundException("La File Con El Id" + id + "No Se Pudo Encontrar");
-        //    }
-        //}
-        //public void UpdateFile(FileModel file)
-        //{
-        //    if (file == null)
-        //    {
-        //        throw new ArgumentNullException(nameof(FileModel), "El modelo de File es nulo");
-        //    }
-
-        //    var existingFileModel = _context.file.Find(file.File_Id);
-        //    if (existingFileModel == null)
-        //    {
-        //        throw new ArgumentException("File no encontrado");
-        //    }
-
-        //    existingFileModel.File_Id = file.File_Id;
-        //    existingFileModel.File_Name = file.
-
-        //    // Actualiza otros campos según sea necesario
-
-        //    _context.SaveChanges();
-
         public async Task<FileModel?> UpdateFileAsync(int Id, FileModel updatedFile)
         {
             var existingFile = await _context.file.FindAsync(Id);
@@ -125,10 +83,5 @@ namespace bienesoft.Services
 
             return existingFile;
         }
-
-
     }
-
-
-
 }

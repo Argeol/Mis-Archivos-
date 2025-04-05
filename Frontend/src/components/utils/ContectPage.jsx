@@ -11,7 +11,6 @@ function ContecPage({
   registerComponets,
   idKey,
   Data,
-  deleteUrl,
   setData,
   updateUrl,
   createUrl,
@@ -22,7 +21,8 @@ function ContecPage({
   campo1,
   tableCell,
   translations,
-  isDisabled
+  isDisabled,
+  ignorar
 }
 
 ) {
@@ -32,7 +32,6 @@ function ContecPage({
       <DataTable
           Data={Data}
           idKey={idKey} 
-          deleteUrl={deleteUrl}
           idField={idKey}
           setData={setData}
           updateComponets={updateComponets}
@@ -46,6 +45,7 @@ function ContecPage({
           fieldLabels={fieldLabels}
           RegisterComponets={registerComponets}
           isDisabled={isDisabled}
+          ignorar={ignorar}
       />
     </>
   )

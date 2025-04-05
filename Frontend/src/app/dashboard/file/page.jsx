@@ -46,5 +46,6 @@ export default function FileDashboard() {
         isDisabled={(row) => row.status === "Expirado"}
       />
     </PrivateNav>
+
   );
 }
