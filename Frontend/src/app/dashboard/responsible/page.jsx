@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import PrivateNav from "@/components/navs/PrivateNav";
 import ContecPage from "@/components/utils/ContectPage";
 import axiosInstance from "@/lib/axiosInstance"; // Componente de registro de responsable
-import UpdateResponsible from "./UpdateResponsible";
+// import UpdateResponsible from "./UpdateResponsible";
 import RegisterResponsible from "./registerResposible"; // Componente de actualización de responsable
 
 export default function ResponsibleDashboard() {

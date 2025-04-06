@@ -172,7 +172,8 @@ namespace Bienesoft.Services
                     DepartmentName = a.Municipality.Department.Name_department,
                     a.File.File_Id,
                     ProgramName = a.File.program.Program_Name,
-                    AreaName = a.File.program.Area.Area_Name
+                    AreaName = a.File.program.Area.Area_Name,
+                    a.Status_Apprentice
                 }).ToList();
         }
 

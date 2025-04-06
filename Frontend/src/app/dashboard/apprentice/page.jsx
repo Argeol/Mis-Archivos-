@@ -21,15 +21,15 @@ export default function ApprenticeDashboard() {
   });
 
   // 🔹 Mutación para eliminar un aprendiz
-  const deleteMutation = useMutation({
-    mutationFn: async (id) => {
-      await axiosInstance.delete(`/api/Apprentice/DeleteApprentice/${id}`);
-    },
-    onSuccess: () => {
-      // 🔥 Actualiza la caché después de eliminar
-      queryClient.invalidateQueries(["aprendices"]);
-    },
-  });
+  // const deleteMutation = useMutation({
+  //   mutationFn: async (id) => {
+  //     await axiosInstance.delete(`/api/Apprentice/DeleteApprentice/${id}`);
+  //   },
+  //   onSuccess: () => {
+  //     // 🔥 Actualiza la caché después de eliminar
+  //     queryClient.invalidateQueries(["aprendices"]);
+  //   },
+  // });
 
   if (isLoading) return <p>Cargando...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -77,7 +77,11 @@ export default function ApprenticeDashboard() {
           updateComponets={UpdateApprentice}
           tableCell={TableCell}
           translations={translations}
-          ignorar={["id_Apprentice"]}
+          ignorar={["id_Apprentice","status_Apprentice"]}
+          currentStatus={"status_Apprentice"}
+          fieldName="status_Apprentice"
+          updateEndpoint="/api/Apprentice/UpdateApprentice"
+          queryKey="aprendices"
         />
       </PrivateNav>
     </>

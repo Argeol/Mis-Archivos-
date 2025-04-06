@@ -21,6 +21,8 @@ import {
 import DeleteButton from "./Delete";
 import ModalDialogUpdate from "./UpdateModalDialog";
 import ModalDialog from "./ModalDialog";
+import RowInfoModal from "./RowInfoModal";
+import StatusToggleButton from "./ButtonActiveupdate";
 
 export default function DataTable({
   Data,
@@ -36,6 +38,10 @@ export default function DataTable({
   RegisterComponets,
   isDisabled = () => false,
   ignorar,
+  currentStatus,
+  fieldName,
+  updateEndpoint,
+  queryKey,
 }) {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -119,13 +125,15 @@ export default function DataTable({
                       <Button onClick={() => handleOpen(row)}>
                         Informacion de {TitlePage}
                       </Button>
-                      <DeleteButton
-                        id={row[idKey]}
-                        deleteUrl={deleteUrl}
-                        idField={idField}
-                        setData={setData}
-                        disabled={disabled}
-                      />
+                      {fieldName && updateEndpoint && currentStatus &&(
+                        <StatusToggleButton
+                          id={row[idKey]}
+                          currentStatus={row[currentStatus]} 
+                          fieldName={fieldName}
+                          updateEndpoint={updateEndpoint}
+                          queryKey={queryKey}
+                        />
+                      )}
                     </TableCell>
                   </TableRow>
                 );
@@ -162,27 +170,14 @@ export default function DataTable({
           </Button>
         </div>
       </CardContent>
-
-      {/* Modal de Más Info */}
-      {/* Modal de Más Info */}
-      <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Información Completa del {TitlePage}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
-            {selectedRow &&
-              Object.entries(selectedRow)
-                .filter(([key]) => !ignorar.includes(key)) // Filtrar los campos ignorados
-                .map(([key, value]) => (
-                  <p key={key}>
-                    <strong>{translations[key] || key}:</strong>{" "}
-                    {value?.toString()}
-                  </p>
-                ))}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <RowInfoModal
+        isOpen={isOpen}
+        onClose={handleClose}
+        selectedRow={selectedRow}
+        TitlePage={TitlePage}
+        translations={translations}
+        ignorar={ignorar}
+      />
     </Card>
   );
 }

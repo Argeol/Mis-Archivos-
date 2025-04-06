@@ -16,7 +16,7 @@ export default function Sidebar() {
 
   return (
     <Card
-      className={`h-screen bg-slate-100 p-4 transition-all duration-300 ${isOpen ? "w-54" : "w-20"} border-0`}
+      className={`h-screen bg-slate-10 p-4 transition-all duration ${isOpen ? "w-54" : "w-20"} border-0`}
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
     >
