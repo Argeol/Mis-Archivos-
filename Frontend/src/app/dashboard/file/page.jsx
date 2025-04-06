@@ -34,6 +34,7 @@ export default function FileDashboard() {
   const TableCell = ["file_Id", "programName", "apprentice_count"];
 
   return (
+
     <PrivateNav>
       <ContecPage
         registerComponets={RegisterFile}
@@ -46,6 +47,5 @@ export default function FileDashboard() {
         isDisabled={(row) => row.status === "Expirado"}
       />
     </PrivateNav>
-
   );
 }

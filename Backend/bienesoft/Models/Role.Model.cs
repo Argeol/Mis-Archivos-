@@ -11,6 +11,4 @@ namespace bienesoft.Models
 
         public ICollection<ResponsibleModel> Responsibles { get; set; }
     }
-
-
 }

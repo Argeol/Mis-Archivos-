@@ -31,7 +31,7 @@ export default function ResponsibleDashboard() {
     },
   });
 
-  if (isLoading) return <p>Cargando...</p>;
+  if (isLoading) return <p className="ms-12 text-red-700 items-center">Ya casii... Ya casi.. ajjaja </p>;
   if (error) return <p>Error: {error.message}</p>;
 
   const translations = {
@@ -39,17 +39,17 @@ export default function ResponsibleDashboard() {
     nom_Responsible: "Nombre",
     ape_Responsible: "Apellido",
     tel_Responsible: "Teléfono",
-    roleId: "ID de Rol",
+    name_role: "Rol",
     state: "Estado",
   };
 
-  const fieldLabels = ["Nombre", "Apellido", "Teléfono", "Rol", "Estado"];
+  const fieldLabels = ["Nombre", "Apellido"];
   const TableCell = [
     "nom_Responsible",
     "ape_Responsible",
-    "tel_Responsible",
-    "roleId",
-    "state",
+    // "tel_Responsible",
+    // "roleId",
+    // "state",
   ];
 
   return (
@@ -65,6 +65,7 @@ export default function ResponsibleDashboard() {
         updateComponets={UpdateResponsible}
         tableCell={TableCell}
         translations={translations}
+        ignorar={["Responsible_Id"]}
       />
     </PrivateNav>
   );

@@ -29,14 +29,10 @@ namespace bienesoft.Models
         [ForeignKey("RoleId")]
         public Role? Role { get; set; }
 
-        public string State { get; set; } = ResponsibleState.Activo.ToString();
+        public string State { get; set; } = "Activo";
 
         //public ICollection<PermissionApproval> PermissionApprovals { get; set; }
     }
 
-    public enum ResponsibleState
-    {
-        Activo,
-        Inactivo
-    }
+    
 }
