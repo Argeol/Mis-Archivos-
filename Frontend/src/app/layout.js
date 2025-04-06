@@ -1,9 +1,6 @@
-"use client";
-
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+// src/app/layout.jsx
+import { ReactQueryProvider } from "./react-query-provider";
 import localFont from "next/font/local";
-import { metadata } from "./metadata"; // ✅ Importa metadata
 import "./globals.css";
 
 const geistSans = localFont({
@@ -17,18 +14,19 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-export default function RootLayout({ children }) {
-  const [queryClient] = useState(() => new QueryClient());
+export const metadata = {
+  title: "BIENESOFT",
+  description: "Gestionar permisos del centro SENA",
+};
 
+export default function RootLayout({ children }) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <html lang="es">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
+    <html lang="es">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ReactQueryProvider>
           {children}
-        </body>
-      </html>
-    </QueryClientProvider>
+        </ReactQueryProvider>
+      </body>
+    </html>
   );
 }

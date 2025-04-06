@@ -30,7 +30,7 @@ export default function RegisterApprentice() {
     address_Apprentice: "",
     address_Type_Apprentice: "",
     phone_Apprentice: "",
-    status_Apprentice: "Active",
+    status_Apprentice: "Activo",
     permission_Count_Apprentice: 0,
     tip_Apprentice: "",
     file_id: 0,

@@ -22,6 +22,7 @@ import DeleteButton from "./Delete";
 import ModalDialogUpdate from "./UpdateModalDialog";
 import ModalDialog from "./ModalDialog";
 import RowInfoModal from "./RowInfoModal";
+import StatusToggleButton from "./ButtonActiveupdate";
 
 export default function DataTable({
   Data,
@@ -37,6 +38,10 @@ export default function DataTable({
   RegisterComponets,
   isDisabled = () => false,
   ignorar,
+  currentStatus,
+  fieldName,
+  updateEndpoint,
+  queryKey,
 }) {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -120,6 +125,15 @@ export default function DataTable({
                       <Button onClick={() => handleOpen(row)}>
                         Informacion de {TitlePage}
                       </Button>
+                      {fieldName && updateEndpoint && currentStatus &&(
+                        <StatusToggleButton
+                          id={row[idKey]}
+                          currentStatus={row[currentStatus]} 
+                          fieldName={fieldName}
+                          updateEndpoint={updateEndpoint}
+                          queryKey={queryKey}
+                        />
+                      )}
                     </TableCell>
                   </TableRow>
                 );
@@ -164,7 +178,6 @@ export default function DataTable({
         translations={translations}
         ignorar={ignorar}
       />
-
     </Card>
   );
 }
