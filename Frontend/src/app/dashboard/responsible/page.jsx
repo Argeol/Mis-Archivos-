@@ -62,7 +62,7 @@ export default function ResponsibleDashboard() {
         idKey="responsible_Id"
         deleteUrl="/api/Responsible/DeleteResponsible"
         deleteFunction={(id) => deleteMutation.mutate(id)}
-        updateComponets={UpdateResponsible}
+        // updateComponets={UpdateResponsible}
         tableCell={TableCell}
         translations={translations}
         ignorar={["Responsible_Id"]}

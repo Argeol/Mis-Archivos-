@@ -97,11 +97,22 @@ namespace bienesoft.Models
                 .HasForeignKey(pa => pa.PermissionId) // Clave foránea en PermissionApproval
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //modelBuilder.Entity<PermissionApproval>()
-            //    .HasOne(pa => pa.Responsible)       // Una aprobación pertenece a un responsable
-            //    .WithMany(r => r.PermissionApprovals) // Un responsable puede aprobar muchas solicitudes
-            //    .HasForeignKey(pa => pa.ResponsibleId) // Clave foránea en PermissionApproval
-            //    .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PermissionApproval>()
+                .HasOne(pa => pa.Responsible)                     // Una aprobación pertenece a un responsable
+                .WithMany(r => r.PermissionApprovals)            // Un responsable puede aprobar muchas solicitudes
+                .HasForeignKey(pa => pa.ResponsibleId)           // Clave foránea en PermissionApproval
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PermissionApproval>()
+                .Property(p => p.ApprovalStatus)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<PermissionGN>()
+                .Property(p => p.Status)
+                .HasConversion<string>();
+
+
 
             base.OnModelCreating(modelBuilder);
         }

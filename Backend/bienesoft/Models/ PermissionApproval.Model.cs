@@ -4,18 +4,22 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace bienesoft.Models
 {
     public class PermissionApproval
-    {
-        [Key]
-        public int Id { get; set; }
-        public int PermissionId { get; set; }
-        public int ResponsibleId { get; set; }
-        public bool IsApproved { get; set; }
-        public DateTime ApprovalDate { get; set; } = DateTime.Now;
+{
+    public int Id { get; set; }
+    public int PermissionId { get; set; }
+    public int ResponsibleId { get; set; }
+    public DateTime? ApprovalDate { get; set; }
 
-        [ForeignKey("PermissionId")]
-        public PermissionGN Permission { get; set; }
+    public ApprovalStatus ApprovalStatus { get; set; } = ApprovalStatus.Pendiente;
 
-        [ForeignKey("ResponsibleId")]
-        public ResponsibleModel Responsible { get; set; }
-    }
+    public PermissionGN Permission { get; set; }
+    public ResponsibleModel Responsible { get; set; }
+}
+public enum ApprovalStatus
+{
+    Pendiente,
+    Aprobado,
+    Rechazado
+}
+
 }
