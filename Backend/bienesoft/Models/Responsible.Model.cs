@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace bienesoft.Models
 {
-    public class Responsible
+    public class ResponsibleModel 
     {
         [Key]
         public int Responsible_Id { get; set; }
@@ -25,8 +26,13 @@ namespace bienesoft.Models
 
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         public int RoleId { get; set; }
-        public Role Role { get; set; }
+        [ForeignKey("RoleId")]
+        public Role? Role { get; set; }
 
-        public ICollection<PermissionApproval>PermissionApprovals {get; set;}
+        public string State { get; set; } = "Activo";
+
+        public ICollection<PermissionApproval> PermissionApprovals { get; set; }
     }
+
+    
 }

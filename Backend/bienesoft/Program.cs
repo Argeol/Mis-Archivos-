@@ -68,11 +68,13 @@ builder.Services.AddScoped<ProgramServices>();
 builder.Services.AddScoped<DepartmentService>();
 // builder.Services.AddScoped<LocalityServices>();
 // builder.Services.AddScoped<AuthorizationResponsibleServices>();
-// builder.Services.AddScoped<ResponsibleServices>();
+builder.Services.AddScoped<ResponsibleServices>();
 builder.Services.AddScoped<PermissionFSServices>();
 // builder.Services.AddScoped<PermissionService>();
 builder.Services.AddScoped<MunicipalityService>();
-builder.Services.AddScoped<ApprovalService>();
+builder.Services.AddScoped<PermissionApprovalService>();
+builder.Services.AddScoped<RoleServices>();
+builder.Services.AddScoped<PermissionService>();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {

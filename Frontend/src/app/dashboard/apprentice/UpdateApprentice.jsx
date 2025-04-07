@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,99 +12,142 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 const genders = ["masculino", "femenino", "otro"];
 const addressTypes = ["Barrio", "Vereda", "Corregimiento", "Comuna"];
-const tips = ["interno", "externo"];
+const apprenticeTypes = ["interno", "externo"];
+const statusOptions = ["Active", "Inactive"];
 
 export default function UpdateApprentice({ id }) {
-  const [formData, setFormData] = useState({});
-  const [departments, setDepartments] = useState([]);
-  const [municipalities, setMunicipalities] = useState([]);
-  const [files, setFiles] = useState([]);
+  const queryClient = useQueryClient();
+  const [formData, setFormData] = useState({
+    id_Apprentice: id,
+    first_Name_Apprentice: "",
+    last_Name_Apprentice: "",
+    birth_date_apprentice: new Date().toISOString(),
+    gender_Apprentice: "",
+    email_Apprentice: "",
+    address_Apprentice: "",
+    address_Type_Apprentice: "",
+    phone_Apprentice: "",
+    status_Apprentice: "Activo",
+    permission_Count_Apprentice: 0,
+    tip_Apprentice: "",
+    doc_apprentice: "",
+    nom_responsible: "",
+    ape_responsible: "",
+    tel_responsible: "",
+    email_responsible: "",
+    file_Id: 0,
+    id_Municipality: 0,
+  });
+
+  const [id_department, setDepartmentId] = useState(null); // Guardamos el ID del departamento temporalmente
+
+  // Obtener datos del aprendiz
+  const { data, isLoading } = useQuery({
+    queryKey: ["apprentice", id],
+    queryFn: async () => {
+      const res = await axiosInstance.get(`/api/Apprentice/${id}`);
+      return res.data.apprentice || {};
+    },
+    enabled: !!id,
+  });
 
   useEffect(() => {
-    axiosInstance.get(`/api/Apprentice/${id}`)
-      .then((res) => setFormData(res.data.permission));
-    axiosInstance.get("/api/Department").then((res) => setDepartments(res.data));
-    axiosInstance.get("/Api/File/Getfiles").then((res) => setFiles(res.data));
-  }, [id]);
-
-  const handleDepartmentChange = async (departmentId) => {
-    try {
-      const res = await axiosInstance.get(
-        `/api/Municipality/byDepartment/${departmentId}`
-      );
-      setMunicipalities(res.data);
-    } catch (error) {
-      console.error("Error al cargar municipios:", error);
+    if (data) {
+      setFormData((prev) => ({
+        ...prev,
+        ...data,
+        birth_date_apprentice: data.birth_date_apprentice
+          ? new Date(data.birth_date_apprentice).toISOString()
+          : new Date().toISOString(),
+      }));
+      setDepartmentId(data.id_department || null); // Asignamos el departamento temporalmente
     }
-  };
+  }, [data]);
+
+  // Obtener Departamentos
+  const { data: departments = [] } = useQuery({
+    queryKey: ["departments"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/api/Department");
+      return res.data;
+    },
+  });
+
+  // Obtener Municipios según el departamento seleccionado
+  const { data: municipalities = [] } = useQuery({
+    queryKey: ["municipalities", id_department],
+    queryFn: async () => {
+      if (!id_department) return [];
+      const res = await axiosInstance.get(
+        `/api/Municipality/byDepartment/${id_department}`
+      );
+      return res.data;
+    },
+    enabled: !!id_department,
+  });
+
+  // Mutación para actualizar aprendiz
+  const mutation = useMutation({
+    mutationFn: async () => {
+      console.log("Enviando datos:", formData);
+      await axiosInstance.put(`/api/Apprentice/UpdateApprentice/${id}`, formData);
+    },
+    onSuccess: () => {
+      alert("Aprendiz actualizado correctamente");
+      queryClient.invalidateQueries(["apprentice", id]);
+    },
+    onError: (error) => {
+      alert(error.response?.data?.message || "Error al actualizar");
+    },
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      const response = await axiosInstance.put(
-        `/api/Apprentice/UpdateApprentice?id=${id}`,
-        formData
-      );
-      alert(response.data.message);
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || "Error desconocido.";
-      alert(errorMessage);
-    }
+    mutation.mutate();
   };
+
+  if (isLoading) return <p>Cargando datos del aprendiz...</p>;
+  if (!formData || Object.keys(formData).length === 0)
+    return <p>No se encontraron datos para el aprendiz.</p>;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
+      <Label>Nombre</Label>
+      <Input name="first_Name_Apprentice" value={formData.first_Name_Apprentice} onChange={handleChange} required />
+
+      <Label>Apellido</Label>
+      <Input name="last_Name_Apprentice" value={formData.last_Name_Apprentice} onChange={handleChange} required />
+
+      <Label>Email</Label>
+      <Input name="email_Apprentice" value={formData.email_Apprentice} onChange={handleChange} required />
+
+      <Label>Fecha de nacimiento</Label>
       <Input
-        name="first_Name_Apprentice"
-        value={formData.first_Name_Apprentice || ""}
-        placeholder="Nombre"
-        onChange={handleChange}
-        required
-      />
-      <Input
-        name="last_Name_Apprentice"
-        value={formData.last_Name_Apprentice || ""}
-        placeholder="Apellido"
-        onChange={handleChange}
-        required
-      />
-      <Input
-        name="birth_Date_Apprentice"
         type="date"
-        value={formData.birth_Date_Apprentice?.split('T')[0] || ""}
-        onChange={handleChange}
-        required
-      />
-      <Input
-        name="email_Apprentice"
-        value={formData.email_Apprentice || ""}
-        placeholder="Correo"
-        type="email"
-        onChange={handleChange}
-        required
-      />
-      <Input
-        name="phone_Apprentice"
-        value={formData.phone_Apprentice || ""}
-        placeholder="Teléfono"
-        onChange={handleChange}
+        name="birth_date_apprentice"
+        value={formData.birth_date_apprentice.split("T")[0]}
+        onChange={(e) =>
+          setFormData((prev) => ({
+            ...prev,
+            birth_date_apprentice: new Date(e.target.value).toISOString(),
+          }))
+        }
         required
       />
 
-      {/* Género */}
+      <Label>Género</Label>
       <Select
-        value={formData.gender_Apprentice || ""}
-        onValueChange={(value) =>
-          setFormData({ ...formData, gender_Apprentice: value })
-        }
+        value={formData.gender_Apprentice}
+        onValueChange={(value) => setFormData((prev) => ({ ...prev, gender_Apprentice: value }))}
       >
         <SelectTrigger>
           <SelectValue placeholder="Seleccionar Género" />
@@ -117,45 +161,64 @@ export default function UpdateApprentice({ id }) {
         </SelectContent>
       </Select>
 
-      {/* Tipo de Dirección */}
+      <Label>Departamento</Label>
       <Select
-        value={formData.address_Type_Apprentice || ""}
-        onValueChange={(value) =>
-          setFormData({ ...formData, address_Type_Apprentice: value })
-        }
+        value={id_department?.toString() || ""}
+        onValueChange={(value) => {
+          setDepartmentId(parseInt(value)); // Se guarda temporalmente
+        }}
       >
         <SelectTrigger>
-          <SelectValue placeholder="Seleccionar Tipo de Dirección" />
+          <SelectValue placeholder="Seleccionar Departamento" />
         </SelectTrigger>
         <SelectContent>
-          {addressTypes.map((type) => (
-            <SelectItem key={type} value={type}>
-              {type}
+          {departments.map((dept) => (
+            <SelectItem key={dept.id_department} value={dept.id_department.toString()}>
+              {dept.name_department}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      {/* Tipo de Aprendiz */}
+      <Label>Municipio</Label>
       <Select
-        value={formData.tip_Apprentice || ""}
+        value={formData.id_municipality?.toString() || ""}
         onValueChange={(value) =>
-          setFormData({ ...formData, tip_Apprentice: value })
+          setFormData((prev) => ({ ...prev, id_municipality: parseInt(value) }))
         }
       >
         <SelectTrigger>
-          <SelectValue placeholder="Seleccionar Tipo de Aprendiz" />
+          <SelectValue placeholder="Seleccionar Municipio" />
         </SelectTrigger>
         <SelectContent>
-          {tips.map((tip) => (
-            <SelectItem key={tip} value={tip}>
-              {tip}
+          {municipalities.map((mun) => (
+            <SelectItem key={mun.id_municipality} value={mun.id_municipality.toString()}>
+              {mun.municipality}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      <Button type="submit">Actualizar</Button>
+      <Label>Estado</Label>
+      <Select
+        value={formData.status_Apprentice}
+        onValueChange={(value) => setFormData((prev) => ({ ...prev, status_Apprentice: value }))}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Seleccionar Estado" />
+        </SelectTrigger>
+        <SelectContent>
+          {statusOptions.map((status) => (
+            <SelectItem key={status} value={status}>
+              {status}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Button type="submit" disabled={mutation.isLoading}>
+        {mutation.isLoading ? "Actualizando..." : "Actualizar"}
+      </Button>
     </form>
   );
 }

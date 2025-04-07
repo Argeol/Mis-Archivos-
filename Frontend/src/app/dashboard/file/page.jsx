@@ -34,6 +34,7 @@ export default function FileDashboard() {
   const TableCell = ["file_Id", "programName", "apprentice_count"];
 
   return (
+
     <PrivateNav>
       <ContecPage
         registerComponets={RegisterFile}

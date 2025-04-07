@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, Users, Calendar, FileText } from "lucide-react";
 
+
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">

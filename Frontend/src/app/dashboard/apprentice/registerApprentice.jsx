@@ -20,7 +20,6 @@ const tips = ["interno", "externo"];
 
 export default function RegisterApprentice() {
   const queryClient = useQueryClient();
-
   const [formData, setFormData] = useState({
     id_Apprentice: 0,
     first_Name_Apprentice: "",
@@ -31,7 +30,7 @@ export default function RegisterApprentice() {
     address_Apprentice: "",
     address_Type_Apprentice: "",
     phone_Apprentice: "",
-    status_Apprentice: "Active",
+    status_Apprentice: "Activo",
     permission_Count_Apprentice: 0,
     tip_Apprentice: "",
     file_id: 0,
@@ -120,24 +119,32 @@ export default function RegisterApprentice() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-xl mx-auto p-4 sm:p-6 md:p-8 border rounded-2xl shadow-md bg-white space-y-4"
+    >
+      <h2 className="text-lg font-semibold text-center mb-4">Registrar Aprendiz</h2>
+  
       <Input
         name="first_Name_Apprentice"
         placeholder="Nombre"
         onChange={handleChange}
         required
+        className="text-sm md:text-base"
       />
       <Input
         name="last_Name_Apprentice"
         placeholder="Apellido"
         onChange={handleChange}
         required
+        className="text-sm md:text-base"
       />
       <Input
         name="birth_Date_Apprentice"
         type="date"
         onChange={handleChange}
         required
+        className="text-sm md:text-base"
       />
       <Input
         name="email_Apprentice"
@@ -145,21 +152,22 @@ export default function RegisterApprentice() {
         type="email"
         onChange={handleChange}
         required
+        className="text-sm md:text-base"
       />
       <Input
         name="phone_Apprentice"
         placeholder="Teléfono"
         onChange={handleChange}
         required
+        className="text-sm md:text-base"
       />
-
-      {/* Género */}
+  
       <Select
         onValueChange={(value) =>
           setFormData({ ...formData, gender_Apprentice: value })
         }
       >
-        <SelectTrigger>
+        <SelectTrigger className="text-sm md:text-base">
           <SelectValue placeholder="Seleccionar Género" />
         </SelectTrigger>
         <SelectContent>
@@ -170,13 +178,13 @@ export default function RegisterApprentice() {
           ))}
         </SelectContent>
       </Select>
-      {/* Tipo de Dirección */}
+  
       <Select
         onValueChange={(value) =>
           setFormData({ ...formData, address_Type_Apprentice: value })
         }
       >
-        <SelectTrigger>
+        <SelectTrigger className="text-sm md:text-base">
           <SelectValue placeholder="Seleccionar Tipo de Dirección" />
         </SelectTrigger>
         <SelectContent>
@@ -187,21 +195,21 @@ export default function RegisterApprentice() {
           ))}
         </SelectContent>
       </Select>
-      
+  
       <Input
         name="address_Apprentice"
         placeholder="Cr4 #10-15"
         onChange={handleChange}
         required
+        className="text-sm md:text-base"
       />
-
-      {/* Tipo de Aprendiz */}
+  
       <Select
         onValueChange={(value) =>
           setFormData({ ...formData, tip_Apprentice: value })
         }
       >
-        <SelectTrigger>
+        <SelectTrigger className="text-sm md:text-base">
           <SelectValue placeholder="Seleccionar Tipo de Aprendiz" />
         </SelectTrigger>
         <SelectContent>
@@ -212,10 +220,9 @@ export default function RegisterApprentice() {
           ))}
         </SelectContent>
       </Select>
-
-      {/* Departamentos */}
+  
       <Select onValueChange={handleDepartmentChange}>
-        <SelectTrigger>
+        <SelectTrigger className="text-sm md:text-base">
           <SelectValue placeholder="Seleccionar Departamento" />
         </SelectTrigger>
         <SelectContent>
@@ -229,14 +236,13 @@ export default function RegisterApprentice() {
           ))}
         </SelectContent>
       </Select>
-
-      {/* Municipios */}
+  
       <Select
         onValueChange={(value) =>
-          setFormData({ ...formData,Id_municipality : parseInt(value) })
+          setFormData({ ...formData, Id_municipality: parseInt(value) })
         }
       >
-        <SelectTrigger>
+        <SelectTrigger className="text-sm md:text-base">
           <SelectValue placeholder="Seleccionar Municipio" />
         </SelectTrigger>
         <SelectContent>
@@ -253,60 +259,73 @@ export default function RegisterApprentice() {
           ))}
         </SelectContent>
       </Select>
-
-      {/* Fichas */}
+  
       <Select
         onValueChange={(value) =>
           setFormData({ ...formData, file_id: parseInt(value) })
         }
       >
-        <SelectTrigger>
+        <SelectTrigger className="text-sm md:text-base">
           <SelectValue placeholder="Seleccionar Ficha" />
         </SelectTrigger>
         <SelectContent>
           {files.map((file) => (
             <SelectItem key={file.file_Id} value={file.file_Id.toString()}>
-              {file.file_Id}-{file.program_Name}
+              {file.file_Id}-{file.programName}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
-      <Label>Correo acudiente</Label>
+  
+      <div className="space-y-2">
+        <Label htmlFor="email_responsible">Correo del acudiente</Label>
+        <Input
+          id="email_responsible"
+          name="email_responsible"
+          placeholder="Correo acudiente"
+          type="email"
+          onChange={handleChange}
+          required
+          className="text-sm md:text-base"
+        />
+      </div>
+  
       <Input
-        name="email_responsible"
-        placeholder="Correo acudiente"
-        type="email"
-        onChange={handleChange}
-        required
-      />
-       <Input
         name="doc_apprentice"
-        placeholder="documento"
+        placeholder="Documento"
         onChange={handleChange}
         required
+        className="text-sm md:text-base"
       />
       <Input
         name="nom_responsible"
-        placeholder="nombre del acudiente"
+        placeholder="Nombre del acudiente"
         onChange={handleChange}
         required
+        className="text-sm md:text-base"
       />
       <Input
         name="ape_responsible"
-        placeholder="apellidos del acudiente"
+        placeholder="Apellidos del acudiente"
         onChange={handleChange}
         required
+        className="text-sm md:text-base"
       />
-       <Input
+      <Input
         name="tel_responsible"
-        placeholder="telefono del acudiente"
+        placeholder="Teléfono del acudiente"
         onChange={handleChange}
         required
+        className="text-sm md:text-base"
       />
-      
-      <Button type="submit" disabled={mutation.isLoading}>
+  
+      <Button
+        type="submit"
+        disabled={mutation.isLoading}
+        className="w-full py-2 mt-2"
+      >
         {mutation.isLoading ? "Registrando..." : "Registrar"}
       </Button>
     </form>
   );
-}
+}  

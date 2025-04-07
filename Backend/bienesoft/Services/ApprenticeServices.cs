@@ -153,6 +153,7 @@ namespace Bienesoft.Services
                         .ThenInclude(p => p.Area)
                 .Select(a => new
                 {
+                    a.Id_Apprentice,
                     a.doc_apprentice,
                     a.First_Name_Apprentice,
                     a.Last_Name_Apprentice,
@@ -171,7 +172,8 @@ namespace Bienesoft.Services
                     DepartmentName = a.Municipality.Department.Name_department,
                     a.File.File_Id,
                     ProgramName = a.File.program.Program_Name,
-                    AreaName = a.File.program.Area.Area_Name
+                    AreaName = a.File.program.Area.Area_Name,
+                    a.Status_Apprentice
                 }).ToList();
         }
 

@@ -5,77 +5,57 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using bienesoft.Models;
 
-// namespace Bienesoft.Controllers
-// {
-//     [Route("api/permissions")]
-//     [ApiController]
-//     public class PermissionController : ControllerBase
-//     {
-//         private readonly PermissionService _service;
 
-//         public PermissionController(PermissionService service)
-//         {
-//             _service = service;
-//         }
-
-//         /// <summary>
-//         /// Obtiene todos los permisos con sus aprobaciones.
-//         /// </summary>
-//         [HttpGet]
-//         public async Task<ActionResult<List<ApprovalDto>>> GetApprovals()
-//         {
-//             var approvals = await _service.GetPermissions();
-//             return Ok(approvals);
-//         }
-
-//         /// <summary>
-//         /// Crea un nuevo permiso
-//         /// </summary>
-//         [HttpPost]
-//         public async Task<IActionResult> CreatePermission([FromBody] PermissionGN permission)
-//         {
-//             var result = await _service.CreatePermission(permission);
-//             return result ? Ok("Permiso creado exitosamente") : BadRequest("Error al crear el permiso");
-//         }
-
-//         /// <summary>
-//         /// Aprueba o rechaza un permiso
-//         /// </summary>
-//         [HttpPost("{permissionId}/approve/{responsibleId}")]
-//         public async Task<IActionResult> ApprovePermission(int permissionId, int responsibleId, [FromBody] bool isApproved)
-//         {
-//             var result = await _service.ApprovePermission(permissionId, responsibleId, isApproved);
-//             return result ? Ok("Permiso actualizado") : BadRequest("Error al actualizar el permiso");
-//         }
-//     }
-// }
-// using Bienesoft.ProductionDTOs;
-// using Microsoft.AspNetCore.Mvc;
-// using System.Threading.Tasks;
-
-[Route("api/approvals")]
-[ApiController]
-public class ApprovalController : ControllerBase
+namespace bienesoft.Controllers
 {
-    private readonly ApprovalService _approvalService;
+    [ApiController]
+    [Route("api/[controller]")]
 
-    public ApprovalController(ApprovalService approvalService)
+    public class permissionController : ControllerBase
     {
-        _approvalService = approvalService;
-    }
+        private readonly PermissionService _permissionService;
 
-
-    [HttpGet("GetApprovalById")]
-    public async Task<IActionResult> GetApprovalById([FromQuery] int id)
-    {
-        var approval = await _approvalService.GetApprovalByIdAsync(id);
-
-        if (approval == null)
+        public permissionController(PermissionService permissionService)
         {
-            return NotFound(new { message = "Approval not found" });
+            _permissionService = permissionService;
         }
 
-        return Ok(approval);
+        [HttpPost("CrearPermiso")]
+        public async Task<IActionResult> CreateApprentice(PermissionGN PermissionGN)
+        {
+            var Results = await _permissionService.CreatePermissionAsync(PermissionGN);
+            return Ok(new { message = Results });
+        }
+        [HttpGet("GetPermiso")]
+        public IActionResult GetActionResult()
+        {
+            var Results = _permissionService.GetAllPermissions();
+            return Ok(Results);
+        }
+        [HttpGet("exportar-aprobados")]
+        public IActionResult ExportApproved()
+        {
+            var fileBytes = _permissionService.ExportApprovedPermissionsToExcel();
+            var fileName = $"PermisosAprobados_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+
+            return File(fileBytes,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        fileName);
+        }
+        [HttpPut("UpdatePermiso")]
+        public async Task<IActionResult> UpdatePermission([FromQuery]int id, [FromBody] PermissionGN permiso)
+        {
+            var result = await _permissionService.UpdatePermissionAsync(id, permiso);
+            return Ok(result);
+        }
+
+
+
+
+
+
+
+
+
     }
 }
-

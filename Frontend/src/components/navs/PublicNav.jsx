@@ -9,11 +9,7 @@ function PublicNav() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 50);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -22,10 +18,9 @@ function PublicNav() {
 
   return (
     <header
-      className={`px-4 lg:px-6 h-16 fixed top-0 left-0 w-full flex items-center justify-between shadow-sm transition-all duration-300 ${
-        isScrolled ? "bg-white/30 backdrop-blur-md" : "bg-slate-100"
-      }`}
-      style={{ zIndex: 100 }}
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 
+      px-4 lg:px-6 h-16 border-b flex items-center justify-between shadow-sm
+      ${isScrolled ? "bg-transparent backdrop-blur-md" : "bg-slate-100"}`}
     >
       <Link className="flex items-center justify-center" href="/">
         <motion.div

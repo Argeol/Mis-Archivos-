@@ -58,6 +58,7 @@ namespace bienesoft.Controllers
         }
 
 
+
         //[HttpPost("UpdateFile")]
         //public async Task<IActionResult> UpdateFile(int Id, FileModel updatedFile)
         //{
@@ -106,35 +107,7 @@ namespace bienesoft.Controllers
             var files = await _FileServices.GetFilesAsync();
             return Ok(files);
         }
-        //[HttpPut("UpdateFile")]
-        //public IActionResult Update(int id , FileModel file)
-
-        //{
-        //    if (file == null)
-        //    {
-        //        return BadRequest("El modelo de File es nulo");
-        //    }
-
-        //    try
-        //    {
-        //        _FileServices.UpdateFileAsync(file);
-        //        return Ok("File actualizado exitosamente");
-        //    }
-        //    catch (ArgumentNullException ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //    catch (ArgumentException ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        GeneralFunction.Addlog(ex.Message);
-        //        return StatusCode(500, ex.ToString());
-
-        //    }
-        //}
+      
         [HttpPut("UpdateFile/{Id}")]
         public async Task<IActionResult> UpdateFile(int Id, [FromBody] FileModel updatedFile)
         {
