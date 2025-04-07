@@ -5,7 +5,11 @@ import Footer from "@/components/navs/Footer";
 const Documento = () => {
     return (
         <>
-            <PublicNav />
+            <PublicNav />    
+            <br>
+            </br>        
+            <br>
+            </br>
             <div className="flex flex-col min-h-screen">
                 {/* Título y enunciado */}
                 <div className="text-center p-4">
