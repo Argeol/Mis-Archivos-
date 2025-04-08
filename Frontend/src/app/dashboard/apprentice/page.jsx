@@ -79,7 +79,6 @@ export default function ApprenticeDashboard() {
           translations={translations}
           ignorar={["id_Apprentice","status_Apprentice"]}
           currentStatus={"status_Apprentice"}
-          fieldName="status_Apprentice"
           updateEndpoint="/api/Apprentice/UpdateApprentice"
           queryKey="aprendices"
         />

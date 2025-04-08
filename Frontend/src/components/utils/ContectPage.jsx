@@ -27,6 +27,7 @@ function ContecPage({
   fieldName,
   updateEndpoint,
   queryKey,
+  inf
 }) {
   return (
     <>
@@ -49,9 +50,10 @@ function ContecPage({
         isDisabled={isDisabled}
         ignorar={ignorar}
         currentStatus={currentStatus}
-        fieldName={fieldName}
+        fieldName={currentStatus}
         updateEndpoint={updateEndpoint}
         queryKey={queryKey}
+        inf={inf}
       />
     </>
   );

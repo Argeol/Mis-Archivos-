@@ -29,19 +29,26 @@ namespace Bienesoft.Services
                 .Select(a => new
                 {
                     a.Id_Apprentice,
+                    a.doc_apprentice,
                     a.First_Name_Apprentice,
                     a.Last_Name_Apprentice,
                     a.Address_Type_Apprentice,
+                    a.Address_Apprentice,
                     a.Email_Apprentice,
                     Birth_Date_Apprentice_Formatted = a.birth_date_apprentice.ToString("yyyy-MM-dd"),
                     a.Phone_Apprentice,
                     a.Gender_Apprentice,
                     a.Tip_Apprentice,
+                    a.nom_responsible,
+                    a.ape_responsible,
+                    a.email_responsible,
+                    a.tel_responsible,
                     MunicipalityName = a.Municipality.municipality,
                     DepartmentName = a.Municipality.Department.Name_department,
                     a.File.File_Id,
                     ProgramName = a.File.program.Program_Name,
-                    AreaName = a.File.program.Area.Area_Name
+                    AreaName = a.File.program.Area.Area_Name,
+                    a.Status_Apprentice
                 })
                 .FirstOrDefault();
         }

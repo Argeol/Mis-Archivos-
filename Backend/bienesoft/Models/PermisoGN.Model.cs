@@ -5,6 +5,10 @@ namespace bienesoft.Models
 {
     public class PermissionGN
     {
+         public PermissionGN()
+    {
+        ApplicationDate = DateTime.Now;
+    }
         [Key]
         public int PermissionId { get; set; }
         public DateTime DepartureDate { get; set; }

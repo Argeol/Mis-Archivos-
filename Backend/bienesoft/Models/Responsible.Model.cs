@@ -31,7 +31,7 @@ namespace bienesoft.Models
 
         public string State { get; set; } = "Activo";
 
-        public ICollection<PermissionApproval> PermissionApprovals { get; set; }
+        public ICollection<PermissionApproval>? PermissionApprovals { get; set; }
     }
 
     
