@@ -11,10 +11,11 @@ import {
 import Footer from "@/components/navs/Footer";
 
 const teamMembers = [
+  
   {
     name: "Argeol Guio Pineda",
     role: "Analista y Desarrollador",
-    image: "/assets/img/argeol.jpg",
+    image: "/assets/img/argeol.jpeg",
     description:
       "Experto en bases de datos y arquitectura de servidores. Enfocado en la optimización y seguridad de aplicaciones.",
     correo: "guiopinedaargeol79@gmail.com",
@@ -24,7 +25,7 @@ const teamMembers = [
     role: "Analista y Desarrollador",
     image: "/assets/img/adolfo.webp",
     description:
-      "Organizador con habilidades de liderazgo. Mantiene al equipo enfocado y asegura la entrega puntual de los proyectos.",
+      "Organizador con habilidades de liderazgo. Mantiene al equipo dando mayor sostenibilidad.",
     correo: "Sanchez.adolfo15@hotmail.com",
   },
   {
@@ -32,11 +33,11 @@ const teamMembers = [
     role: "Analista y Desarrollador",
     image: "/assets/img/murcia.webp",
     description:
-      "Creativa y detallista. Encargada de crear experiencias visuales atractivas y funcionales para nuestros usuarios.",
+      "Creativo y detallista. Encargado de crear experiencias visuales atractivas y funcionales para nuestros usuarios.",
     correo: "Murcia21.gmz@gmail.com",
   },
   {
-    name: "Daniel Camilo Perdomo Bonilla ",
+    name: "Daniel Camilo Perdomo Gonzalez ",
     role: "Analista y Desarrollador",
     image: "/assets/img/camilo.webp",
     description:
