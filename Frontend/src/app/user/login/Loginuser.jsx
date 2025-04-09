@@ -1,4 +1,5 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
@@ -8,6 +9,7 @@ import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 
 async function Login(credentials) {
   const response = await axiosInstance.post("/api/User/Login", credentials);
@@ -22,28 +24,33 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
+  const loginMutation = useMutation({
+    mutationFn: Login,
+    onMutate: () => setLoading(true),
+    onSuccess: (response) => {
+      if (response.status === 200) {
+        alert("token"); // ⚠️ Solo mostramos la palabra 'token'
+        router.push("../dashboard");
+      }
+    },
+    onError: (err) => {
+      console.error(err);
+      setError(
+        err.response ? err.response.data.message : "❌ Error desconocido"
+      );
+    },
+    onSettled: () => setLoading(false),
+  });
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true); // Activar estado de carga
 
     const credentials = {
       email: email,
       hashedPassword: password,
     };
 
-    try {
-      const responseLogin = await Login(credentials);
-      console.log(responseLogin);
-      if (responseLogin.status === 200) {
-        alert("token", responseLogin.data.message);
-        router.push("../dashboard");
-      }
-    } catch (error) {
-      console.log(error);
-      setError(error.response ? error.response.data.message : "Error desconocido");
-    } finally {
-      setLoading(false); // Desactivar estado de carga
-    }
+    loginMutation.mutate(credentials);
   };
 
   return (
@@ -64,57 +71,55 @@ function LoginPage() {
             />
           </motion.div>
         </div>
-        <a className="font-bold text-3xl flex ms-20 mb-6 -mt-1">
-          <h1>Iniciar Sesión</h1>
-        </a>
 
-        <TextField
-          label="Usuario"
-          placeholder="ejemplo@gmail.com"
-          id="email"
-          name="email"
-          type="email"
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          fullWidth
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <PermIdentityIcon />
-              </InputAdornment>
-            ),
-          }}
-          variant="outlined"
-          className="form-email w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-        />
+        <h1 className="font-bold text-3xl text-center mb-6 mt-2">Iniciar Sesión</h1>
+        <div className="flex flex-col gap-4">
+          <TextField
+            label="Usuario"
+            placeholder="ejemplo@gmail.com"
+            id="email"
+            name="email"
+            type="email"
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PermIdentityIcon />
+                </InputAdornment>
+              ),
+            }}
+            variant="outlined"
+          />
 
-        <TextField
-          label="Contraseña"
-          placeholder="Contraseña"
-          id="password"
-          name="password"
-          type="password"
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          fullWidth
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <LockIcon />
-              </InputAdornment>
-            ),
-          }}
-          variant="outlined"
-          className="form-email w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 mt-4"
-        />
+          <TextField
+            label="Contraseña"
+            placeholder="Contraseña"
+            id="password"
+            name="password"
+            type="password"
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon />
+                </InputAdornment>
+              ),
+            }}
+            variant="outlined"
+          />
 
-        <Button
-          type="submit" // Asegura que el botón dispare el evento onSubmit
-          className="btn btn-primary ms-28 p-5 bg-blue-500 text-white hover:bg-gray-400"
-          disabled={loading}
-        >
-          {loading ? "Ingresando..." : "Ingresar"}
-        </Button>
+          <Button
+            type="submit"
+            className="bg-blue-500 text-white hover:bg-gray-400 transition-colors duration-200 rounded-md mx-auto block"
+            disabled={loading}
+          >
+            {loading ? "Iniciando..." : "Ingresar"}
+          </Button>
+        </div>
 
         <div className="flex flex-col items-center space-y-2 mt-5">
           <a href="/user/reset" className="text-sm text-blue-600 hover:underline">
@@ -128,6 +133,7 @@ function LoginPage() {
           </div>
         </div>
       </form>
+
     </main>
   );
 }
