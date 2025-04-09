@@ -36,7 +36,6 @@ export default function ResponsibleDashboard() {
   if (error) return <p>Error: {error.message}</p>;
 
   const translations = {
-    responsible_Id: "ID del Responsable",
     nom_Responsible: "Nombre",
     ape_Responsible: "Apellido",
     tel_Responsible: "Teléfono",

@@ -47,7 +47,7 @@ namespace bienesoft.Controllers
         {
             var result = await _permissionService.UpdatePermissionAsync(id, permiso);
             return Ok(result);
-        }
+        }   
 
 
 

@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import React, { useState } from "react";
+import React, { useState } from "react"
 import {
   flexRender,
   getCoreRowModel,
@@ -8,11 +8,13 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+} from "@tanstack/react-table"
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { usePermissions } from "@/hooks/usePermissions"
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -21,8 +23,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -30,99 +32,72 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-
-// Datos de ejemplo para los aprendices
-const data = [
-  { id: "1", cedula: "123456789", nombre: "Juan Pérez" },
-  { id: "2", cedula: "987654321", nombre: "Ana Gómez" },
-  { id: "3", cedula: "567890123", nombre: "Carlos Rodríguez" },
-  { id: "4", cedula: "135792468", nombre: "Luisa Martínez" },
-  { id: "5", cedula: "246813579", nombre: "Pedro Fernández" },
-];
+} from "@/components/ui/table"
 
 const columns = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "cedula",
+    accessorKey: "nombreAprendiz",
     header: ({ column }) => (
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        Cédula
-        <ArrowUpDown />
+        Aprendiz <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => <div>{row.getValue("cedula")}</div>,
+    cell: ({ row }) => row.getValue("nombreAprendiz"),
   },
   {
-    accessorKey: "nombre",
+    accessorKey: "fechaSolicitud",
     header: ({ column }) => (
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        Nombre
-        <ArrowUpDown />
+        Fecha de Solicitud <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => <div>{row.getValue("nombre")}</div>,
+    cell: ({ row }) => new Date(row.getValue("fechaSolicitud")).toLocaleDateString(),
+  },
+  {
+    accessorKey: "estado",
+    header: "Estado",
+    cell: ({ row }) => <span>{row.getValue("estado")}</span>,
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const aprendiz = row.original;
+      const permiso = row.original
 
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
+              <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(aprendiz.id)}>
-              Copiar cédula
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(permiso.id)}>
+              Copiar ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Ver detalles</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      );
+      )
     },
   },
-];
+]
 
-function DataTableDemo() {
-  const [sorting, setSorting] = useState([]);
-  const [columnFilters, setColumnFilters] = useState([]);
-  const [columnVisibility, setColumnVisibility] = useState({});
-  const [rowSelection, setRowSelection] = useState({});
+function DataTablePermisos() {
+  const { data = [], isLoading, isError } = usePermissions()
+
+  const [sorting, setSorting] = useState([])
+  const [columnFilters, setColumnFilters] = useState([])
+  const [columnVisibility, setColumnVisibility] = useState({})
+  const [rowSelection, setRowSelection] = useState({})
 
   const table = useReactTable({
     data,
@@ -141,23 +116,26 @@ function DataTableDemo() {
       columnVisibility,
       rowSelection,
     },
-  });
+  })
+
+  if (isLoading) return <div className="p-4">Cargando permisos...</div>
+  if (isError) return <div className="p-4 text-red-500">Error al cargar permisos</div>
 
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filtrar por cédula o nombre..."
-          value={table.getColumn("cedula")?.getFilterValue() || ""}
-          onChange={(event) =>
-            table.getColumn("cedula")?.setFilterValue(event.target.value)
+          placeholder="Buscar aprendiz..."
+          value={table.getColumn("nombreAprendiz")?.getFilterValue() || ""}
+          onChange={(e) =>
+            table.getColumn("nombreAprendiz")?.setFilterValue(e.target.value)
           }
           className="max-w-sm"
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
-              Columnas <ChevronDown />
+              Columnas <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -179,6 +157,7 @@ function DataTableDemo() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -216,7 +195,7 @@ function DataTableDemo() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell colSpan={columns.length} className="text-center h-24">
                   No hay resultados.
                 </TableCell>
               </TableRow>
@@ -224,10 +203,11 @@ function DataTableDemo() {
           </TableBody>
         </Table>
       </div>
+
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} de{" "}
-          {table.getFilteredRowModel().rows.length} fila(s) seleccionada(s).
+          {table.getFilteredRowModel().rows.length} fila(s) seleccionada(s)
         </div>
         <div className="space-x-2">
           <Button
@@ -249,7 +229,7 @@ function DataTableDemo() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default DataTableDemo;
+export default DataTablePermisos

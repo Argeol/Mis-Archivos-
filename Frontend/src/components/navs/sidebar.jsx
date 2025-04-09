@@ -12,23 +12,31 @@ const menuItems = [
 ];
 
 export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   return (
     <Card
-      className={`h-screen bg-slate-10 p-4 transition-all duration ${isOpen ? "w-54" : "w-20"} border-0`}
+      className={`h-screen bg-slate-10 p-4 transition-all duration-300 border-0 ${isOpen ? "w-52" : "w-20"}`}
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
     >
-      <img
-        src="/assets/img/logo.webp"
-        alt="Bienesoft Logo"
-        className="w-40 h-auto animate-pulse"
-      />
+      {/* Mostrar logo diferente según estado del sidebar */}
+      {isOpen ? (
+        <img
+          src="/assets/img/logo.webp"
+          alt="Bienesoft Logo Grande"
+          className="w-40 h-auto animate-pulse mx-auto"
+        />
+      ) : (
+        <img
+          src="/assets/img/bienesoft.webp"
+          alt="Bienesoft Logo Pequeño"
+          className="w-10 h-auto mx-auto mb-4"
+        />
+      )}
 
-      <br />
-
-      <nav className="space-y-3">
+      {/* Menú con margen superior */}
+      <nav className="space-y-3 mt-5">
         {menuItems.map(({ href, icon: Icon, label }) => (
           <a
             key={href}
