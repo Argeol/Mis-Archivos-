@@ -56,7 +56,7 @@ namespace Bienesoft.Services
 
         public async Task<Apprentice> CreateApprenticeAsync(Apprentice apprentice)
         {
-            var municipality = await _context.municipality.FindAsync(apprentice.Id_Municipality);
+            var municipality = await _context.municipality.FindAsync(apprentice.id_municipality);
             var file = await _context.file.FindAsync(apprentice.File_Id);
 
             if (file == null)
@@ -66,85 +66,6 @@ namespace Bienesoft.Services
                 throw new ArgumentException("El municipio no existe en la base de datos.");
 
             _context.apprentice.Add(apprentice);
-            await _context.SaveChangesAsync();
-
-            return apprentice;
-        }
-
-        public async Task<Apprentice?> UpdateApprenticeAsync(int id, Apprentice apprenticeUpdate)
-        {
-            var apprentice = await _context.apprentice.FindAsync(id);
-            if (apprentice == null)
-                return null;
-
-            // Si el usuario envía un campo con valor, lo actualiza; si lo omite, mantiene el valor actual.
-            apprentice.First_Name_Apprentice = !string.IsNullOrWhiteSpace(apprenticeUpdate.First_Name_Apprentice)
-                ? apprenticeUpdate.First_Name_Apprentice
-                : apprentice.First_Name_Apprentice;
-
-            apprentice.Last_Name_Apprentice = !string.IsNullOrWhiteSpace(apprenticeUpdate.Last_Name_Apprentice)
-                ? apprenticeUpdate.Last_Name_Apprentice
-                : apprentice.Last_Name_Apprentice;
-
-            apprentice.birth_date_apprentice = apprenticeUpdate.birth_date_apprentice != default(DateTime)
-                ? apprenticeUpdate.birth_date_apprentice
-                : apprentice.birth_date_apprentice;
-
-            apprentice.Gender_Apprentice = !string.IsNullOrWhiteSpace(apprenticeUpdate.Gender_Apprentice)
-                ? apprenticeUpdate.Gender_Apprentice
-                : apprentice.Gender_Apprentice;
-
-            apprentice.Email_Apprentice = !string.IsNullOrWhiteSpace(apprenticeUpdate.Email_Apprentice)
-                ? apprenticeUpdate.Email_Apprentice
-                : apprentice.Email_Apprentice;
-
-            apprentice.Address_Apprentice = !string.IsNullOrWhiteSpace(apprenticeUpdate.Address_Apprentice)
-                ? apprenticeUpdate.Address_Apprentice
-                : apprentice.Address_Apprentice;
-
-            apprentice.Address_Type_Apprentice = !string.IsNullOrWhiteSpace(apprenticeUpdate.Address_Type_Apprentice)
-                ? apprenticeUpdate.Address_Type_Apprentice
-                : apprentice.Address_Type_Apprentice;
-
-            apprentice.Phone_Apprentice = !string.IsNullOrWhiteSpace(apprenticeUpdate.Phone_Apprentice)
-                ? apprenticeUpdate.Phone_Apprentice
-                : apprentice.Phone_Apprentice;
-
-            apprentice.Status_Apprentice = !string.IsNullOrWhiteSpace(apprenticeUpdate.Status_Apprentice)
-                ? apprenticeUpdate.Status_Apprentice
-                : apprentice.Status_Apprentice;
-
-            apprentice.Id_Municipality = apprenticeUpdate.Id_Municipality > 0
-                ? apprenticeUpdate.Id_Municipality
-                : apprentice.Id_Municipality;
-
-            apprentice.File_Id = apprenticeUpdate.File_Id > 0
-                ? apprenticeUpdate.File_Id
-                : apprentice.File_Id;
-
-            // Actualizar los campos que están causando errores de validación
-            apprentice.doc_apprentice = !string.IsNullOrWhiteSpace(apprenticeUpdate.doc_apprentice)
-                ? apprenticeUpdate.doc_apprentice
-                : apprentice.doc_apprentice;
-
-            apprentice.nom_responsible = !string.IsNullOrWhiteSpace(apprenticeUpdate.nom_responsible)
-                ? apprenticeUpdate.nom_responsible
-                : apprentice.nom_responsible;
-
-            apprentice.ape_responsible = !string.IsNullOrWhiteSpace(apprenticeUpdate.ape_responsible)
-                ? apprenticeUpdate.ape_responsible
-                : apprentice.ape_responsible;
-
-            apprentice.tel_responsible = !string.IsNullOrWhiteSpace(apprenticeUpdate.tel_responsible)
-                ? apprenticeUpdate.tel_responsible
-                : apprentice.tel_responsible;
-
-            apprentice.email_responsible = !string.IsNullOrWhiteSpace(apprenticeUpdate.email_responsible)
-                ? apprenticeUpdate.email_responsible
-                : apprentice.email_responsible;
-
-            // Guardar cambios en la base de datos
-            _context.Entry(apprentice).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
             return apprentice;
@@ -183,16 +104,83 @@ namespace Bienesoft.Services
                     a.Status_Apprentice
                 }).ToList();
         }
-
-        public async Task<bool> DeleteApprenticeAsync(int id)
+        public void UpdateApprentice(int id, UpdateApprentice update)
         {
-            var apprentice = await _context.apprentice.FindAsync(id);
-            if (apprentice == null)
-                return false;
 
-            _context.apprentice.Remove(apprentice);
-            await _context.SaveChangesAsync();
-            return true;
+            var exiteapprentice = _context.apprentice.Find(id);
+
+
+            if (exiteapprentice == null)
+            {
+                throw new KeyNotFoundException($"El aprendiz con ID {id} no se encontró.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(update.first_name_apprentice))
+                exiteapprentice.First_Name_Apprentice = update.first_name_apprentice;
+
+            if (!string.IsNullOrWhiteSpace(update.last_name_apprentice))
+                exiteapprentice.Last_Name_Apprentice = update.last_name_apprentice;
+
+            if (update.birth_date_apprentice.HasValue)
+                exiteapprentice.birth_date_apprentice = update.birth_date_apprentice.Value;
+
+            if (!string.IsNullOrWhiteSpace(update.gender_apprentice))
+                exiteapprentice.Gender_Apprentice = update.gender_apprentice;
+
+            if (!string.IsNullOrWhiteSpace(update.email_apprentice))
+                exiteapprentice.Email_Apprentice = update.email_apprentice;
+
+            if (!string.IsNullOrWhiteSpace(update.address_apprentice))
+                exiteapprentice.Address_Apprentice = update.address_apprentice;
+
+            if (!string.IsNullOrWhiteSpace(update.address_type_apprentice))
+                exiteapprentice.Address_Type_Apprentice = update.address_type_apprentice;
+
+            if (!string.IsNullOrWhiteSpace(update.phone_Apprentice))
+                exiteapprentice.Phone_Apprentice = update.phone_Apprentice;
+
+            if (!string.IsNullOrWhiteSpace(update.status_Apprentice))
+                exiteapprentice.Status_Apprentice = update.status_Apprentice;
+
+            if (update.id_municipality.HasValue && update.id_municipality.Value != 0)
+            {
+                exiteapprentice.id_municipality = update.id_municipality.Value;
+            }
+
+            if (update.File_Id.HasValue)
+                exiteapprentice.File_Id = update.File_Id.Value;
+
+            if (!string.IsNullOrWhiteSpace(update.Tip_Apprentice))
+                exiteapprentice.doc_apprentice = update.Tip_Apprentice;
+
+            if (!string.IsNullOrWhiteSpace(update.doc_apprentice))
+                exiteapprentice.doc_apprentice = update.doc_apprentice;
+
+            if (!string.IsNullOrWhiteSpace(update.nom_responsible))
+                exiteapprentice.nom_responsible = update.nom_responsible;
+
+            if (!string.IsNullOrWhiteSpace(update.ape_responsible))
+                exiteapprentice.ape_responsible = update.ape_responsible;
+
+            if (!string.IsNullOrWhiteSpace(update.tel_responsible))
+                exiteapprentice.tel_responsible = update.tel_responsible;
+
+            if (!string.IsNullOrWhiteSpace(update.email_responsible))
+                exiteapprentice.email_responsible = update.email_responsible;
+
+            _context.SaveChanges();
         }
+
+
     }
+    // public async Task<bool> DeleteApprenticeAsync(int id)
+    // {
+    //     var apprentice = await _context.apprentice.FindAsync(id);
+    //     if (apprentice == null)
+    //         return false;
+
+    //     _context.apprentice.Remove(apprentice);
+    //     await _context.SaveChangesAsync();
+    //     return true;
+    // }
 }
