@@ -107,7 +107,7 @@ namespace bienesoft.Controllers
 
                 // Proceder con la actualización
                 _ProgramServices.UpdateProgram(id, updateModel);
-                return Ok(new { message = "✅ Programa actualizado exitosamente." });
+                return Ok(new { message = "Programa actualizado exitosamente." });
             }
             catch (KeyNotFoundException ex)
             {
@@ -116,7 +116,7 @@ namespace bienesoft.Controllers
             catch (Exception ex)
             {
                 GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, new { error = "❌ Error interno al actualizar el programa." });
+                return StatusCode(500, new { error = "Error interno al actualizar el programa." });
             }
         }
 
