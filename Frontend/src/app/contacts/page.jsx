@@ -8,6 +8,10 @@ export default function Contact() {
   return (
     <>
       <PublicNav />
+      <br>
+      </br>
+      <br>
+      </br>
       <ContactPage /> {/* Aquí renderizamos el componente ContactPage */}
       <Footer/>
     </>

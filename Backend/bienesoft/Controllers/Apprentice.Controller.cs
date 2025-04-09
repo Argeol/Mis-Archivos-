@@ -80,20 +80,17 @@ namespace Bienesoft.Controllers
         }
 
         [HttpPut("UpdateApprentice/{id}")]
-        public async Task<IActionResult> UpdateApprentice(int id, [FromBody] Apprentice apprentice)
+        public IActionResult UpdateApprentice(int id, [FromBody] UpdateApprentice apprentice)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            // if (!ModelState.IsValid)
+            // {
+            //     return BadRequest(ModelState);
+            // }
             try
             {
-                var updatedApprentice = await _apprenticeService.UpdateApprenticeAsync(id, apprentice);
-                if (updatedApprentice == null)
-                {
-                    return NotFound(new { message = "El aprendiz no fue encontrado." });
-                }
-                return Ok(new { message = "Aprendiz actualizado exitosamente", updatedApprentice });
+                _apprenticeService.UpdateApprentice(id,apprentice);
+                return Ok(new{message = "aprendiz actualizado"});
+
             }
             catch (Exception ex)
             {
@@ -116,23 +113,23 @@ namespace Bienesoft.Controllers
             }
         }
 
-        [HttpDelete("DeleteApprentice/{id}")]
-        public async Task<IActionResult> DeleteApprentice(int id)
-        {
-            try
-            {
-                var deleted = await _apprenticeService.DeleteApprenticeAsync(id);
-                if (!deleted)
-                {
-                    return NotFound(new { message = "Aprendiz no encontrado" });
-                }
-                return Ok(new { message = "Aprendiz eliminado correctamente" });
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, new { message = "Error interno al eliminar el aprendiz" });
-            }
-        }
+        // [HttpDelete("DeleteApprentice/{id}")]
+        // public async Task<IActionResult> DeleteApprentice(int id)
+        // {
+        //     try
+        //     {
+        //         var deleted = await _apprenticeService.DeleteApprenticeAsync(id);
+        //         if (!deleted)
+        //         {
+        //             return NotFound(new { message = "Aprendiz no encontrado" });
+        //         }
+        //         return Ok(new { message = "Aprendiz eliminado correctamente" });
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         GeneralFunction.Addlog(ex.Message);
+        //         return StatusCode(500, new { message = "Error interno al eliminar el aprendiz" });
+        //     }
+        // }
     }
 }

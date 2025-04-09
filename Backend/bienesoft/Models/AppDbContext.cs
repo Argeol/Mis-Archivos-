@@ -65,7 +65,7 @@ namespace bienesoft.Models
             modelBuilder.Entity<Municipality>()
                 .HasMany(m => m.apprentice)  // Un municipio tiene muchos aprendices
                 .WithOne(a => a.Municipality) // Un aprendiz tiene un municipio
-                .HasForeignKey(a => a.Id_Municipality)
+                .HasForeignKey(a => a.id_municipality)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Apprentice>()

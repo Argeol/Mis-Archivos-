@@ -56,10 +56,12 @@ namespace Bienesoft.Services
                 {
                     p.PermissionId,
                     p.Motive,
-                    p.DepartureDate,
-                    p.EntryDate,
+                    Fechadesolicitud = p.ApplicationDate.ToString("HH:mm yyyy-MM-dd"),
+                    Fechalsalida = p.DepartureDate.ToString("HH:mm yyyy-MM-dd"),
+                    Fechallegada = p.EntryDate.ToString("HH:mm yyyy-MM-dd"),
                     Estado = p.Status.ToString(),
-                    NombreAprendiz = p.Apprentice.First_Name_Apprentice + " " + p.Apprentice.Last_Name_Apprentice
+                    NombreAprendiz = p.Apprentice.First_Name_Apprentice + " " + p.Apprentice.Last_Name_Apprentice,
+                    p.Id_Apprentice
                 })
                 .ToList();
         }
