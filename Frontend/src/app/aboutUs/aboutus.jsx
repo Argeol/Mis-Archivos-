@@ -3,15 +3,9 @@
 import * as React from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
 import Footer from "@/components/navs/Footer";
 
 const teamMembers = [
-  
   {
     name: "Argeol Guio Pineda",
     role: "Analista y Desarrollador",
@@ -51,105 +45,83 @@ export function AboutUs() {
 
   React.useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) =>
-        prevIndex + 2 >= teamMembers.length ? 0 : prevIndex + 2
-      );
-    }, 5000); // Cambio automático cada 5 segundos
+      setCurrentIndex((prev) => (prev === 0 ? 2 : 0));
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  const displayedItems = (index) => {
-    const firstIndex = index % teamMembers.length;
-    const secondIndex = (index + 1) % teamMembers.length;
-    return [teamMembers[firstIndex], teamMembers[secondIndex]];
-  };
+  const currentGroup = teamMembers.slice(currentIndex, currentIndex + 2);
 
   return (
     <>
-      <div className="m-8 p-8 rounded">
-        <section className="-mt-14 bg-white">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-5">Quiénes Somos</h2>
-            <p className="tblue-6blue-6ext-center mb-12 max-w-2xl mx-auto">
-              Somos un grupo de 4 aprendices del SENA, apasionados por la
-              tecnología y comprometidos con el desarrollo de soluciones
-              innovadoras. Nuestro proyecto busca aplicar los conocimientos
-              adquiridos para crear impacto en el centro.
+      <div className="bg-white min-h-screen pt-10">
+        <section className="container mx-auto px-4 py-8">
+          <h2 className="text-5xl font-bold text-center text-black mb-6">
+            Nuestro Equipo
+          </h2>
+          <p className="text-center text-gray-700 mb-12 max-w-3xl mx-auto text-lg leading-relaxed">
+            Somos un equipo de aprendices del SENA apasionados por la innovación
+            tecnológica. Combinamos nuestras habilidades para desarrollar
+            soluciones útiles, funcionales y de alto impacto, enfocándonos en la
+            mejora continua y el aprendizaje colaborativo.
+          </p>
+
+          <div className="flex flex-wrap justify-center gap-8 transition-all duration-1000">
+            {currentGroup.map((member, index) => (
+              <Card
+                key={index}
+                className="max-w-md w-full bg-white shadow-xl hover:shadow-2xl rounded-xl transition duration-500"
+              >
+                <CardContent className="flex flex-col items-center text-center p-6">
+                  <div className="relative w-40 h-40 mb-4">
+                    <Image
+                      src={member.image}
+                      alt={member.name}
+                      layout="fill"
+                      objectFit="cover"
+                      className="rounded-full ring-4 ring-blue-200 shadow-md hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <h3 className="text-xl font-semibold text-black">
+                    {member.name}
+                  </h3>
+                  <p className="text-blue-700 font-medium mt-1">
+                    {member.role}
+                  </p>
+                  <p className="text-gray-600 text-sm mt-2 mb-2">
+                    {member.description}
+                  </p>
+                  <a
+                    href={`mailto:${member.correo}`}
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    {member.correo}
+                  </a>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="bg-gray-50 rounded-xl shadow-md mt-16 p-8">
+            <h3 className="text-3xl font-bold text-black mb-4">
+              Sobre el Proyecto
+            </h3>
+            <p className="text-gray-700 leading-relaxed mb-6">
+              Estamos desarrollando un sistema de gestión de permisos de salida
+              para el Centro Agropecuario La Granja. Nuestra plataforma está
+              pensada para simplificar el proceso mediante una interfaz web que
+              combina eficiencia, seguridad y facilidad de uso.
             </p>
-            <Carousel className="relative w-full max-w-4xl mx-auto">
-              <CarouselContent className="flex justify-around">
-                {displayedItems(currentIndex).map((member, index) => (
-                  <CarouselItem key={index} className="flex-1 mx-4">
-                    <Card>
-                      <CardContent className="flex flex-col items-center p-6">
-                        <Image
-                          src={member.image}
-                          alt={member.name}
-                          width={300}
-                          height={300}
-                          className="rounded-lg mb-4"
-                        />
-                        <h3 className="text-xl font-semibold mb-2">
-                          {member.name}
-                        </h3>
-                        <p className="text-gray-600 font-medium mb-2">
-                          {member.role}
-                        </p>
-                        <p className="text-center text-sm">
-                          {member.description}
-                        </p>
-                        <a
-                          href={`mailto:${member.correo}`}
-                          className="text-center text-blue-6blue-600 text-sm underline hover:text-blue-800"
-                        >
-                          {member.correo}
-                        </a>
-                      </CardContent>
-                    </Card>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
-            <Card className="mt-12">
-              <CardContent className="p-6">
-                <h3 className="text-2xl font-bold mb-4">Nuestro Proyecto</h3>
-                <p className="mb-4">
-                  Como aprendices del SENA, estamos desarrollando un proyecto
-                  innovador que busca mejorar los permisos de salida en un
-                  sistema de gestión de permisos para el Centro Agropecuario La
-                  Granja. Este sistema tiene como objetivo gestionar tanto
-                  permisos físicos como virtuales, utilizando una página web
-                  que facilite esta tarea.
-                  <br />
-                  Nuestro enfoque combina las habilidades únicas de cada miembro
-                  del equipo para crear una solución integral y efectiva.
-                </p>
-                <ul className="list-disc pl-5 space-y-2">
-                  <li>
-                    Aplicamos metodologías ágiles para una gestión eficiente del
-                    proyecto.
-                  </li>
-                  <li>
-                    Utilizamos tecnologías de vanguardia para asegurar un
-                    producto final de alta calidad.
-                  </li>
-                  <li>
-                    Nos enfocamos en crear soluciones que tengan un impacto
-                    positivo en nuestra comunidad.
-                  </li>
-                  <li>
-                    Buscamos constantemente oportunidades de aprendizaje y
-                    crecimiento durante el desarrollo del proyecto.
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+            <ul className="list-disc pl-6 space-y-2 text-gray-600">
+              <li>Planificación ágil con enfoque colaborativo.</li>
+              <li>Uso de tecnologías modernas: React, Nest.js, TailwindCSS.</li>
+              <li>Enfoque en impacto real y escalabilidad.</li>
+              <li>Equipo comprometido con el aprendizaje continuo.</li>
+            </ul>
           </div>
         </section>
       </div>
-      <div className="mt-auto">
-        <Footer />
-      </div>
+      <Footer />
     </>
   );
 }
