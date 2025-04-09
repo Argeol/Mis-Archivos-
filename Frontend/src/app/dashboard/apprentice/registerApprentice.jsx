@@ -139,7 +139,9 @@ export default function RegisterApprentice() {
         required
         className="text-sm md:text-base"
       />
+      <Label>Fecha de Nacimiento</Label>
       <Input
+
         name="birth_Date_Apprentice"
         type="date"
         onChange={handleChange}

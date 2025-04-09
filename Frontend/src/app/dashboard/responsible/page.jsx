@@ -6,6 +6,7 @@ import ContecPage from "@/components/utils/ContectPage";
 import axiosInstance from "@/lib/axiosInstance"; // Componente de registro de responsable
 // import UpdateResponsible from "./UpdateResponsible";
 import RegisterResponsible from "./registerResposible"; // Componente de actualización de responsable
+import UpdateResponsible from "./updateResponsible";
 
 export default function ResponsibleDashboard() {
   const queryClient = useQueryClient();
@@ -20,16 +21,16 @@ export default function ResponsibleDashboard() {
     },
   });
 
-  // 🔹 Mutación para eliminar un responsable
-  const deleteMutation = useMutation({
-    mutationFn: async (id) => {
-      await axiosInstance.delete(`/api/Responsible/DeleteResponsible/${id}`);
-    },
-    onSuccess: () => {
-      // 🔥 Actualiza la caché después de eliminar
-      queryClient.invalidateQueries(["responsables"]);
-    },
-  });
+  // // 🔹 Mutación para eliminar un responsable
+  // const deleteMutation = useMutation({
+  //   mutationFn: async (id) => {
+  //     await axiosInstance.delete(`/api/Responsible/DeleteResponsible/${id}`);
+  //   },
+  //   onSuccess: () => {
+  //     // 🔥 Actualiza la caché después de eliminar
+  //     queryClient.invalidateQueries(["responsables"]);
+  //   },
+  // });
 
   if (isLoading) return <p className="ms-12 text-red-700 items-center">Ya casii... Ya casi.. ajjaja </p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -39,7 +40,7 @@ export default function ResponsibleDashboard() {
     ape_Responsible: "Apellido",
     tel_Responsible: "Teléfono",
     name_role: "Rol",
-    state: "Estado",
+    state: "Estado",  
   };
 
   const fieldLabels = ["Nombre", "Apellido"];
@@ -61,10 +62,14 @@ export default function ResponsibleDashboard() {
         idKey="responsible_Id"
         deleteUrl="/api/Responsible/DeleteResponsible"
         deleteFunction={(id) => deleteMutation.mutate(id)}
-        // updateComponets={UpdateResponsible}
+        updateComponets={UpdateResponsible}
         tableCell={TableCell}
         translations={translations}
-        ignorar={["Responsible_Id"]}
+        ignorar={["responsible_Id", "state"]}
+        currentStatus={"state"}
+        fieldName="state"
+        updateEndpoint="/api/Responsible/UpdateResponsible"
+        queryKey="responsables"
       />
     </PrivateNav>
   );
