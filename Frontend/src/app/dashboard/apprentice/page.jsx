@@ -6,6 +6,7 @@ import ContecPage from "@/components/utils/ContectPage";
 import axiosInstance from "@/lib/axiosInstance";
 import RegisterApprentice from "./registerApprentice";
 import UpdateApprentice from "./UpdateApprentice";
+import LoadingPage from "@/components/utils/LoadingPage";
 
 export default function ApprenticeDashboard() {
   const queryClient = useQueryClient();
@@ -31,8 +32,9 @@ export default function ApprenticeDashboard() {
   //   },
   // });
 
-  if (isLoading) return <p>Cargando...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  if (isLoading) return <LoadingPage />;
+    if (error) return <p>Error: {error.message}</p>;
+  
   const translations = {
     doc_apprentice: "Documento de Aprendiz",
     first_Name_Apprentice: "Nombre",

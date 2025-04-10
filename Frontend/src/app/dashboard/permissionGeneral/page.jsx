@@ -5,6 +5,7 @@ import PrivateNav from "@/components/navs/PrivateNav";
 import ContecPage from "@/components/utils/ContectPage";
 import axiosInstance from "@/lib/axiosInstance";
 import RegisterPermission from "./RegisterPermission";
+import LoadingPage from "@/components/utils/LoadingPage";
 
 // Si luego tienes formularios de registro o edición
 // // import RegisterPermission from "./RegisterPermission";
@@ -30,9 +31,7 @@ export default function PermissionDashboard() {
 //   });
     console.log(dataPermissions)
 
-  if (isLoading) return <p>Cargando...</p>;
-  if (error) return <p>Error: {error.message}</p>;
-
+  if (isLoading) return <LoadingPage />;
   const translations = {
     id_permission: "ID",
     NombreAprendiz: "Aprendiz",

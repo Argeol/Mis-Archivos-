@@ -5,6 +5,7 @@ import PrivateNav from "@/components/navs/PrivateNav";
 import ContecPage from "@/components/utils/ContectPage";
 import axiosInstance from "@/lib/axiosInstance";
 import RegisterFile from "./registerComponet";
+import LoadingPage from "@/components/utils/LoadingPage"; // ya debe estar importado
 
 export default function FileDashboard() {
   // 🔹 Obtener lista de fichas con React Query
@@ -17,8 +18,9 @@ export default function FileDashboard() {
     },
   });
 
-  if (isLoading) return <p>Cargando...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  // 🔹 Mostrar loading mientras se cargan los datos
+  if (isLoading) return <LoadingPage />;
+
 
   const translations = {
     file_Id: "Numero de Ficha",
@@ -34,7 +36,6 @@ export default function FileDashboard() {
   const TableCell = ["file_Id", "programName", "apprentice_count"];
 
   return (
-
     <PrivateNav>
       <ContecPage
         registerComponets={RegisterFile}

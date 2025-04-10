@@ -6,6 +6,7 @@ import ContecPage from "@/components/utils/ContectPage";
 import axiosInstance from "@/lib/axiosInstance"; // Componente de registro de responsable
 // import UpdateResponsible from "./UpdateResponsible";
 import RegisterResponsible from "./registerResposible"; // Componente de actualización de responsable
+import LoadingPage from "@/components/utils/LoadingPage";
 
 export default function ResponsibleDashboard() {
   const queryClient = useQueryClient();
@@ -31,8 +32,7 @@ export default function ResponsibleDashboard() {
     },
   });
 
-  if (isLoading) return <p className="ms-12 text-red-700 items-center">Ya casii... Ya casi.. ajjaja </p>;
-  if (error) return <p>Error: {error.message}</p>;
+    if (isLoading) return <LoadingPage />;
 
   const translations = {
     nom_Responsible: "Nombre",

@@ -8,6 +8,7 @@ import UpdateProgram from "./UpdateComponet";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Spinner from "@/components/Loading/spinner"; 
 import { Button } from "@/components/ui/button";
+import LoadingPage from "@/components/utils/LoadingPage";
 
 export default function Dashboard() {
     const queryClient = useQueryClient();
@@ -17,7 +18,7 @@ export default function Dashboard() {
         queryKey: ["programs"], 
         queryFn: async () => {
             const response = await axiosInstance.get("/api/Program/GetProgram");
-            if (response.status !== 200) throw new Error("Error al cargar los programas");
+          
 
             console.log("Datos recibidos:", response.data); // 🔍 Depuración
 
@@ -52,6 +53,7 @@ export default function Dashboard() {
     const handleChangeState = (id, currentState) => {
         changeStateMutation.mutate({ id, currentState });
     };
+if (isLoading) return <LoadingPage />;
 
     const translations = {
         program_Id: "Número Ficha",
