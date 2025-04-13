@@ -25,6 +25,74 @@ namespace Bienesoft.Services
 
             return permission;
         }
+        // public async Task<object> CreatePermissionAsync(PermissionGN permission, List<int> responsablesSeleccionados)
+        // {
+        //     // Verificar si el aprendiz existe
+        //     var apprentice = await _context.apprentice.FindAsync(permission.Id_Apprentice);
+        //     if (apprentice == null)
+        //     {
+        //         return new
+        //         {
+        //             Success = false,
+        //             Message = "El aprendiz no existe."
+        //         };
+        //     }
+
+        //     // Verificar si el aprendiz es interno o externo
+        //     bool esInterno = apprentice.Tip_Apprentice == "interno";
+
+        //     // Determinar los roles necesarios
+        //     List<int> rolesRequeridos = esInterno
+        //         ? new List<int> { 1, 2, 3, 4 } // Incluir rol de Internado
+        //         : new List<int> { 1, 2, 3 };    // Solo Instructor, Coordinador, Bienestar
+
+        //     // Verificar que se hayan seleccionado los roles correctos
+        //     var rolesSeleccionados = responsablesSeleccionados.Distinct().ToList();
+        //     if (esInterno && rolesSeleccionados.Count != 4)
+        //     {
+        //         return new
+        //         {
+        //             Success = false,
+        //             Message = "Faltan responsables para el permiso. Como es un aprendiz interno, debe seleccionar 4 responsables."
+        //         };
+        //     }
+
+        //     // Verificar que todos los roles requeridos estén seleccionados
+        //     if (!rolesRequeridos.All(role => rolesSeleccionados.Contains(role)))
+        //     {
+        //         return new
+        //         {
+        //             Success = false,
+        //             Message = "Faltan roles por seleccionar. Asegúrese de seleccionar los responsables correctos."
+        //         };
+        //     }
+
+        //     // Registrar el permiso
+        //     _context.permissionGN.Add(permission);
+        //     await _context.SaveChangesAsync();
+
+        //     // Ahora agregar las aprobaciones para los responsables seleccionados
+        //     foreach (var responsibleId in responsablesSeleccionados)
+        //     {
+        //         _context.permissionApproval.Add(new PermissionApproval
+        //         {
+        //             PermissionId = permission.PermissionId,
+        //             ResponsibleId = responsibleId,
+        //             ApprovalStatus = ApprovalStatus.Pendiente // Estado inicial de la aprobación
+        //         });
+        //     }
+
+        //     // Guardar cambios después de agregar las aprobaciones
+        //     await _context.SaveChangesAsync();
+
+        //     return new
+        //     {
+        //         Success = true,
+        //         Message = "Permiso creado con éxito.",
+        //         Data = permission // Puedes devolver cualquier tipo de datos, en este caso el permiso
+        //     };
+        // }
+
 
         public object GetPermissionById(int id)
         {
@@ -121,7 +189,7 @@ namespace Bienesoft.Services
                 }
             }
         }
-        public async Task<object> UpdatePermissionAsync(int id, PermissionGN updatedPermiso)
+        public async Task<object> UpdatePermissionAsync(int id, UpdatePermiso updatedPermiso)
         {
             var permiso = await _context.permissionGN
                 .Include(p => p.Approvals)
@@ -130,26 +198,48 @@ namespace Bienesoft.Services
             if (permiso == null)
                 return new { success = false, message = "Permiso no encontrado." };
 
-            // Verificar si ya hay alguna aprobación que no sea Pendiente
+            // Verificar si ya fue aprobado o rechazado
             bool yaFueAprobado = permiso.Approvals.Any(a =>
                 a.ApprovalStatus == ApprovalStatus.Aprobado || a.ApprovalStatus == ApprovalStatus.Rechazado);
 
             if (yaFueAprobado)
                 return new { success = false, message = "No se puede actualizar el permiso, ya fue aprobado o rechazado por un responsable." };
 
-            // Actualizar campos
-            permiso.DepartureDate = updatedPermiso.DepartureDate;
-            permiso.EntryDate = updatedPermiso.EntryDate;
-            permiso.Adress = updatedPermiso.Adress;
-            permiso.Destination = updatedPermiso.Destination;
-            permiso.Motive = updatedPermiso.Motive;
-            permiso.Observation = updatedPermiso.Observation;
+            // Validar y actualizar solo si el campo tiene un valor distinto de vacío, null o 0
+            if (updatedPermiso.DepartureDate.HasValue && updatedPermiso.DepartureDate.Value != default)
+                permiso.DepartureDate = updatedPermiso.DepartureDate.Value;
+
+            if (updatedPermiso.EntryDate.HasValue && updatedPermiso.EntryDate.Value != default)
+                permiso.EntryDate = updatedPermiso.EntryDate.Value;
+
+            if (!string.IsNullOrWhiteSpace(updatedPermiso.Adress))
+                permiso.Adress = updatedPermiso.Adress;
+
+            if (!string.IsNullOrWhiteSpace(updatedPermiso.Destination))
+                permiso.Destination = updatedPermiso.Destination;
+
+            if (!string.IsNullOrWhiteSpace(updatedPermiso.Motive))
+                permiso.Motive = updatedPermiso.Motive;
+
+            if (!string.IsNullOrWhiteSpace(updatedPermiso.Observation))
+                permiso.Observation = updatedPermiso.Observation;
 
             _context.permissionGN.Update(permiso);
             await _context.SaveChangesAsync();
 
             return new { success = true, message = "Permiso actualizado correctamente." };
         }
+
+        // public async Task<object> GetApprenticePermission(int id, PermissionGN permissionGN)
+        // {
+        //    var permisos = await _context.permissionGN
+        //     .Where(p => p.Id_Apprentice == id)
+        //     .Include(p=> p
+
+        //     return permiso;
+
+
+        // }
 
     }
 }

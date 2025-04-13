@@ -46,8 +46,6 @@ namespace bienesoft.Models
         [Required, StringLength(20)]
         public string Tip_Apprentice { get; set; } = "interno";
 
-        [Required, StringLength(30)]
-        public string doc_apprentice { get; set; } = string.Empty;
 
         [Required, StringLength(100)]
         public string nom_responsible { get; set; } = string.Empty;
@@ -83,7 +81,6 @@ namespace bienesoft.Models
         public string? 	address_type_apprentice { get; set; }
         public string? phone_Apprentice { get; set; }
         public string? status_Apprentice { get; set; } = "Activo";
-        public string? doc_apprentice { get; set; }
         public string? Tip_Apprentice {get; set;}
         public string? nom_responsible { get; set; }
         public string? ape_responsible { get; set; }

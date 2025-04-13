@@ -8,6 +8,7 @@ using System.Text;
 using Bienesoft.Models;
 using Bienesoft.Services;
 using System.Text.Json;
+using bienesoft.Funcions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,6 +76,8 @@ builder.Services.AddScoped<MunicipalityService>();
 builder.Services.AddScoped<PermissionApprovalService>();
 builder.Services.AddScoped<RoleServices>();
 builder.Services.AddScoped<PermissionService>();
+builder.Services.AddScoped<GeneralFunction>();
+
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {

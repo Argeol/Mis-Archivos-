@@ -1,6 +1,11 @@
 ﻿
 using bienesoft.Models;
+using bienesoft.Services;
+using Bienesoft.utils;
 using Microsoft.EntityFrameworkCore;
+using bienesoft.models;
+using bienesoft.Funcions;
+
 
 
 namespace Bienesoft.Services
@@ -10,13 +15,63 @@ namespace Bienesoft.Services
     {
 
         private readonly AppDbContext _context;
+        private readonly UserServices _userService;
+        public GeneralFunction _GeneralFunction;
 
-        public ApprenticeService(AppDbContext context)
+        public ApprenticeService(AppDbContext context, UserServices userServices, GeneralFunction generalFunction)
         {
             _context = context;
+            _userService = userServices;
+            _GeneralFunction = generalFunction;
         }
 
 
+        public async Task<Apprentice> CreateApprenticeAsync(Apprentice apprentice, string email)
+        {
+            var municipality = await _context.municipality.FindAsync(apprentice.id_municipality);
+            var file = await _context.file.FindAsync(apprentice.File_Id);
+
+            if (file == null)
+                throw new ArgumentException("La ficha no existe.");
+
+            if (municipality == null)
+                throw new ArgumentException("El municipio no existe en la base de datos.");
+
+            // Verificar si el correo ya existe
+            if (await _userService.UserByEmail(email))
+                throw new ArgumentException("El correo ya está registrado.");
+
+            // Generar contraseña aleatoria
+            string plainPassword = PasswordGenerator.Generate(8); // Ej: "Abc123!@"
+            string salt = PasswordHasher.GenerateSalt();
+            string hashedPassword = PasswordHasher.HashPassword(plainPassword, salt);
+
+            // Crear el usuario
+            var user = new User
+            {
+                Email = email,
+                HashedPassword = hashedPassword,
+                Salt = salt,
+                UserType = "Aprendiz",
+                SessionCount = 0,
+                Blockade = false,
+                Asset = true
+            };
+
+            await _userService.AddUserAsync(user);
+
+            // Asociar el ID del usuario al aprendiz
+            apprentice.Email_Apprentice = user.Email;
+
+            // Guardar aprendiz
+            _context.apprentice.Add(apprentice);
+            await _context.SaveChangesAsync();
+
+            // Enviar correo con la contraseña
+            await _GeneralFunction.SendWelcomeEmail(email, plainPassword);
+
+            return apprentice;
+        }
         public object GetApprenticeById(int id)
         {
             return _context.apprentice
@@ -29,7 +84,6 @@ namespace Bienesoft.Services
                 .Select(a => new
                 {
                     a.Id_Apprentice,
-                    a.doc_apprentice,
                     a.First_Name_Apprentice,
                     a.Last_Name_Apprentice,
                     a.Address_Type_Apprentice,
@@ -53,24 +107,6 @@ namespace Bienesoft.Services
                 .FirstOrDefault();
         }
 
-
-        public async Task<Apprentice> CreateApprenticeAsync(Apprentice apprentice)
-        {
-            var municipality = await _context.municipality.FindAsync(apprentice.id_municipality);
-            var file = await _context.file.FindAsync(apprentice.File_Id);
-
-            if (file == null)
-                throw new ArgumentException("La ficha no existe.");
-
-            if (municipality == null)
-                throw new ArgumentException("El municipio no existe en la base de datos.");
-
-            _context.apprentice.Add(apprentice);
-            await _context.SaveChangesAsync();
-
-            return apprentice;
-        }
-
         public IEnumerable<object> GetApprentices()
         {
             return _context.apprentice
@@ -82,7 +118,6 @@ namespace Bienesoft.Services
                 .Select(a => new
                 {
                     a.Id_Apprentice,
-                    a.doc_apprentice,
                     a.First_Name_Apprentice,
                     a.Last_Name_Apprentice,
                     a.Address_Type_Apprentice,
@@ -151,10 +186,7 @@ namespace Bienesoft.Services
                 exiteapprentice.File_Id = update.File_Id.Value;
 
             if (!string.IsNullOrWhiteSpace(update.Tip_Apprentice))
-                exiteapprentice.doc_apprentice = update.Tip_Apprentice;
-
-            if (!string.IsNullOrWhiteSpace(update.doc_apprentice))
-                exiteapprentice.doc_apprentice = update.doc_apprentice;
+                exiteapprentice.Tip_Apprentice = update.Tip_Apprentice;
 
             if (!string.IsNullOrWhiteSpace(update.nom_responsible))
                 exiteapprentice.nom_responsible = update.nom_responsible;
