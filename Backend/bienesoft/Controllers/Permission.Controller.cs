@@ -19,7 +19,19 @@ namespace bienesoft.Controllers
         {
             _permissionService = permissionService;
         }
-
+        // [HttpPost("create")]
+        // public async Task<IActionResult> CreatePermission([FromBody] CreatePermissionRequest request)
+        // {
+        //     try
+        //     {
+        //         var response = await _permissionService.CreatePermissionAsync(request.Permission, request.ResponsablesSeleccionados);
+        //         return Ok(response); // Devuelve el objeto de respuesta
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return BadRequest(new { Success = false, Message = ex.Message });
+        //     }
+        // }
         [HttpPost("CrearPermiso")]
         public async Task<IActionResult> CreateApprentice(PermissionGN PermissionGN)
         {
@@ -43,11 +55,11 @@ namespace bienesoft.Controllers
                         fileName);
         }
         [HttpPut("UpdatePermiso")]
-        public async Task<IActionResult> UpdatePermission([FromQuery]int id, [FromBody] PermissionGN permiso)
+        public async Task<IActionResult> UpdatePermission([FromQuery] int id, [FromBody] UpdatePermiso permiso)
         {
             var result = await _permissionService.UpdatePermissionAsync(id, permiso);
             return Ok(result);
-        }   
+        }
 
 
 

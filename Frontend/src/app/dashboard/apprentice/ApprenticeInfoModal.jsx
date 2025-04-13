@@ -36,7 +36,7 @@ export default function ModalInfoApprentice({ isOpen, onClose, apprenticeId }) {
     queryKey: ["apprentice", apprenticeId],
     queryFn: async () => {
       const res = await axiosInstance.get(`/api/Apprentice/${apprenticeId}`);
-      return res.data.apprentice;
+      return res.data;
     },
     enabled: !!apprenticeId && isOpen, // Solo consulta si hay ID y el modal está abierto
   });

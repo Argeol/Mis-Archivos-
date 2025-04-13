@@ -1,10 +1,12 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import PrivateNav from "@/components/navs/PrivateNav";
 import ContecPage from "@/components/utils/ContectPage";
 import axiosInstance from "@/lib/axiosInstance";
 import RegisterProgram from "./registerComponet";
 import UpdateProgram from "./UpdateComponet";
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Spinner from "@/components/Loading/spinner"; 
 import { Button } from "@/components/ui/button";

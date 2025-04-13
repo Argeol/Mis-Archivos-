@@ -32,7 +32,7 @@ export default function RegisterPermission() {
   const { data: apprentices = [] } = useQuery({
     queryKey: ["apprentices"],
     queryFn: async () => {
-      const res = await axiosInstance.get("/api/Apprentice/GetApprentices");
+      const res = await axiosInstance.get("/api/Apprentice/all");
       return res.data;
     },
   });

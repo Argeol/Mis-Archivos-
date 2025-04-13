@@ -36,7 +36,7 @@ namespace bienesoft.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseMySql("Server=localhost;Database=Bienesoft;User=root;Password=murcia21;Port=3306",
+                optionsBuilder.UseMySql("Server=localhost;Database=Bienesoft;User=root;Password=elzurdojrprom2019;Port=3306",
                     new MySqlServerVersion(new Version(8, 0, 23)));
             }
 
@@ -65,7 +65,7 @@ namespace bienesoft.Models
             modelBuilder.Entity<Municipality>()
                 .HasMany(m => m.apprentice)  // Un municipio tiene muchos aprendices
                 .WithOne(a => a.Municipality) // Un aprendiz tiene un municipio
-                .HasForeignKey(a => a.Id_Municipality)
+                .HasForeignKey(a => a.id_municipality)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Apprentice>()

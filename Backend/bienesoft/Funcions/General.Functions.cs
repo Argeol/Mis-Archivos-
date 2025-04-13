@@ -102,5 +102,56 @@ namespace bienesoft.Funcions
             }
             return errors.ToArray();
         }
+        public async Task<ResponseSend> SendWelcomeEmail(string emailDestination, string plainPassword)
+        {
+            ResponseSend response = new ResponseSend();
+            try
+            {
+                using (SmtpClient smtpClient = new SmtpClient(configServer.HostName, configServer.PortHost))
+                {
+                    smtpClient.Credentials = new NetworkCredential(configServer.Email, configServer.Password);
+                    smtpClient.EnableSsl = true;
+
+                    MailAddress remitente = new MailAddress(configServer.Email, "Bienesoft", Encoding.UTF8);
+                    MailAddress destinatario = new MailAddress(emailDestination);
+
+                    using (MailMessage message = new MailMessage(remitente, destinatario))
+                    {
+                        message.IsBodyHtml = true;
+                        message.Subject = "👋 Bienvenido a Bienesoft";
+                        message.Body = GenerateWelcomeEmailBody(plainPassword);
+                        message.BodyEncoding = Encoding.UTF8;
+
+                        await smtpClient.SendMailAsync(message);
+                    }
+                }
+
+                response.Message = "Correo de bienvenida enviado";
+                response.Status = true;
+            }
+            catch (Exception ex)
+            {
+                Addlog($"Error al enviar correo de bienvenida: {ex}");
+                response.Message = ex.Message;
+                response.Status = false;
+            }
+
+            return response;
+        }
+        private string GenerateWelcomeEmailBody(string password)
+        {
+            return $@"
+        <html>
+        <body style='font-family: Arial, sans-serif; text-align: center;'>
+            <h2>¡Bienvenido a Bienesoft!</h2>
+            <p>Tu cuenta ha sido registrada exitosamente.</p>
+            <p><strong>Contraseña temporal:</strong> {password}</p>
+            <p>Por seguridad, te recomendamos cambiarla al iniciar sesión.</p>
+            <br />
+            <p>Gracias por confiar en <strong>Bienesoft</strong>.</p>
+        </body>
+        </html>";
+        }
+
     }
 }

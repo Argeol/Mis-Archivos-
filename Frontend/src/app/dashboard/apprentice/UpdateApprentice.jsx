@@ -22,35 +22,29 @@ const statusOptions = ["Active", "Inactive"];
 export default function UpdateApprentice({ id }) {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
-    id_Apprentice: id,
-    first_Name_Apprentice: "",
-    last_Name_Apprentice: "",
+    first_name_apprentice: "",
+    last_name_apprentice: "",
     birth_date_apprentice: new Date().toISOString(),
-    gender_Apprentice: "",
-    email_Apprentice: "",
-    address_Apprentice: "",
-    address_Type_Apprentice: "",
+    gender_apprentice: "",
+    email_apprentice: "",
+    address_apprentice: "",
+    address_type_apprentice: "",
     phone_Apprentice: "",
-    status_Apprentice: "Activo",
-    permission_Count_Apprentice: 0,
+    status_Apprentice: "Active",
     tip_Apprentice: "",
-    doc_apprentice: "",
     nom_responsible: "",
     ape_responsible: "",
     tel_responsible: "",
     email_responsible: "",
+    id_municipality: 0,
     file_Id: 0,
-    id_Municipality: 0,
   });
 
-  const [id_department, setDepartmentId] = useState(null); // Guardamos el ID del departamento temporalmente
-
-  // Obtener datos del aprendiz
   const { data, isLoading } = useQuery({
     queryKey: ["apprentice", id],
     queryFn: async () => {
       const res = await axiosInstance.get(`/api/Apprentice/${id}`);
-      return res.data.apprentice || {};
+      return res.data || {};
     },
     enabled: !!id,
   });
@@ -64,11 +58,9 @@ export default function UpdateApprentice({ id }) {
           ? new Date(data.birth_date_apprentice).toISOString()
           : new Date().toISOString(),
       }));
-      setDepartmentId(data.id_department || null); // Asignamos el departamento temporalmente
     }
   }, [data]);
 
-  // Obtener Departamentos
   const { data: departments = [] } = useQuery({
     queryKey: ["departments"],
     queryFn: async () => {
@@ -77,7 +69,8 @@ export default function UpdateApprentice({ id }) {
     },
   });
 
-  // Obtener Municipios según el departamento seleccionado
+  const [id_department, setDepartmentId] = useState(null);
+
   const { data: municipalities = [] } = useQuery({
     queryKey: ["municipalities", id_department],
     queryFn: async () => {
@@ -90,11 +83,13 @@ export default function UpdateApprentice({ id }) {
     enabled: !!id_department,
   });
 
-  // Mutación para actualizar aprendiz
   const mutation = useMutation({
     mutationFn: async () => {
       console.log("Enviando datos:", formData);
-      await axiosInstance.put(`/api/Apprentice/UpdateApprentice/${id}`, formData);
+      await axiosInstance.put(
+        `/api/Apprentice/${id}`,
+        formData
+      );
     },
     onSuccess: () => {
       alert("Aprendiz actualizado correctamente");
@@ -116,19 +111,17 @@ export default function UpdateApprentice({ id }) {
   };
 
   if (isLoading) return <p>Cargando datos del aprendiz...</p>;
-  if (!formData || Object.keys(formData).length === 0)
-    return <p>No se encontraron datos para el aprendiz.</p>;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
       <Label>Nombre</Label>
-      <Input name="first_Name_Apprentice" value={formData.first_Name_Apprentice} onChange={handleChange} required />
+      <Input name="first_name_apprentice" value={formData.first_name_apprentice} onChange={handleChange} required />
 
       <Label>Apellido</Label>
-      <Input name="last_Name_Apprentice" value={formData.last_Name_Apprentice} onChange={handleChange} required />
+      <Input name="last_name_apprentice" value={formData.last_name_apprentice} onChange={handleChange} required />
 
       <Label>Email</Label>
-      <Input name="email_Apprentice" value={formData.email_Apprentice} onChange={handleChange} required />
+      <Input name="email_apprentice" value={formData.email_apprentice} onChange={handleChange} required />
 
       <Label>Fecha de nacimiento</Label>
       <Input
@@ -146,8 +139,10 @@ export default function UpdateApprentice({ id }) {
 
       <Label>Género</Label>
       <Select
-        value={formData.gender_Apprentice}
-        onValueChange={(value) => setFormData((prev) => ({ ...prev, gender_Apprentice: value }))}
+        value={formData.gender_apprentice}
+        onValueChange={(value) =>
+          setFormData((prev) => ({ ...prev, gender_apprentice: value }))
+        }
       >
         <SelectTrigger>
           <SelectValue placeholder="Seleccionar Género" />
@@ -161,11 +156,67 @@ export default function UpdateApprentice({ id }) {
         </SelectContent>
       </Select>
 
+      <Label>Dirección</Label>
+      <Input name="address_apprentice" value={formData.address_apprentice} onChange={handleChange} />
+
+      <Label>Tipo de Dirección</Label>
+      <Select
+        value={formData.address_type_apprentice}
+        onValueChange={(value) =>
+          setFormData((prev) => ({ ...prev, address_type_apprentice: value }))
+        }
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Seleccionar tipo" />
+        </SelectTrigger>
+        <SelectContent>
+          {addressTypes.map((type) => (
+            <SelectItem key={type} value={type}>
+              {type}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Label>Teléfono</Label>
+      <Input name="phone_Apprentice" value={formData.phone_Apprentice} onChange={handleChange} />
+
+      <Label>Tipo de Aprendiz</Label>
+      <Select
+        value={formData.tip_Apprentice}
+        onValueChange={(value) =>
+          setFormData((prev) => ({ ...prev, tip_Apprentice: value }))
+        }
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Seleccionar tipo" />
+        </SelectTrigger>
+        <SelectContent>
+          {apprenticeTypes.map((type) => (
+            <SelectItem key={type} value={type}>
+              {type}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Label>Nombre Responsable</Label>
+      <Input name="nom_responsible" value={formData.nom_responsible} onChange={handleChange} />
+
+      <Label>Apellido Responsable</Label>
+      <Input name="ape_responsible" value={formData.ape_responsible} onChange={handleChange} />
+
+      <Label>Teléfono Responsable</Label>
+      <Input name="tel_responsible" value={formData.tel_responsible} onChange={handleChange} />
+
+      <Label>Email Responsable</Label>
+      <Input name="email_responsible" value={formData.email_responsible} onChange={handleChange} />
+
       <Label>Departamento</Label>
       <Select
         value={id_department?.toString() || ""}
         onValueChange={(value) => {
-          setDepartmentId(parseInt(value)); // Se guarda temporalmente
+          setDepartmentId(parseInt(value));
         }}
       >
         <SelectTrigger>
@@ -199,10 +250,20 @@ export default function UpdateApprentice({ id }) {
         </SelectContent>
       </Select>
 
+      <Label>Ficha</Label>
+      <Input
+        type="number"
+        name="file_Id"
+        value={formData.file_Id}
+        onChange={handleChange}
+      />
+
       <Label>Estado</Label>
       <Select
         value={formData.status_Apprentice}
-        onValueChange={(value) => setFormData((prev) => ({ ...prev, status_Apprentice: value }))}
+        onValueChange={(value) =>
+          setFormData((prev) => ({ ...prev, status_Apprentice: value }))
+        }
       >
         <SelectTrigger>
           <SelectValue placeholder="Seleccionar Estado" />

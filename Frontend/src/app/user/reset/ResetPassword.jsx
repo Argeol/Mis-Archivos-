@@ -1,47 +1,69 @@
+"use client";
+
 import { useState } from "react";
 import axiosInstance from "@/lib/axiosInstance";
 import { Button } from "@/components/ui/button";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import AtIcon from "@mui/icons-material/AlternateEmail";
+import { motion } from "framer-motion";
+import { useMutation } from "@tanstack/react-query";
+
+async function resetPasswordRequest(data) {
+  const response = await axiosInstance.post("/api/User/ResetPassUser", data);
+  return response;
+}
 
 function ResetPassword() {
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState(null);
-  const [issubmitting, setsubmitting] = useState(false);
+  const [message, setMessage] = useState("");
 
-  async function handlerSubmit(event) {
-    event.preventDefault();
-    setMessage(null);
-    setsubmitting(true);
-
-    try {
-      const response = await axiosInstance.post("/api/User/ResetPassUser", {
-        email,
-      });
-
-      if (response.status === 200) {
-        alert(response.data.message);
+  const mutation = useMutation({
+    mutationFn: resetPasswordRequest,
+    onSuccess: (res) => {
+      if (res.status === 200) {
+        alert(res.data.message);
+        setMessage("");
       }
-    } catch (error) {
-      setMessage(error.response?.data?.message || "Ocurrió un error");
-    } finally {
-      setsubmitting(false);
-    }
-  }
+    },
+    onError: (err) => {
+      setMessage(err.response?.data?.message || "Ocurrió un error");
+    },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setMessage("");
+    mutation.mutate({ email });
+  };
 
   return (
-    <main className="flex items-center justify-center min-h-screen bg-gray-100">
+    <main className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
       <form
-        className="shadow-lg p-6 bg-white rounded-lg max-w-sm mx-auto"
-        onSubmit={handlerSubmit}
+        className="shadow-lg p-6 bg-white rounded-lg max-w-sm w-full"
+        onSubmit={handleSubmit}
       >
-        <h2 className="text-2xl font-semibold mb-4 text-center">
+        {/* LOGO ANIMADO */}
+        <div className="flex justify-center mb-2">
+          <motion.div
+            animate={{ y: [0, -5, 0], opacity: [1, 0.7, 1] }}
+            transition={{ repeat: Infinity, duration: 1 }}
+          >
+            <img
+              className="w-20"
+              alt="logo"
+              src="/assets/img/bienesoft.webp"
+            />
+          </motion.div>
+        </div>
+
+        <h2 className="text-2xl font-semibold mb-3 text-center">
           Recuperación de Cuenta
         </h2>
-        <p className="mb-4">
+        <p className="mb-4 text-sm text-gray-700 text-center">
           Ingrese su correo electrónico para recuperar su cuenta
         </p>
+
         <TextField
           label="Email"
           placeholder="Correo electrónico"
@@ -59,17 +81,19 @@ function ResetPassword() {
             ),
           }}
           variant="outlined"
-          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 mt-4"
         />
+
         <Button
           type="submit"
-          className="btn btn-blue-500 hover:bg-gray-300 text-white rounded w-full bg-blue-500 mt-4"
-          disabled={issubmitting}
+          className="mt-4 bg-blue-500 text-white hover:bg-gray-400 transition-colors duration-200 rounded-md mx-auto block"
+          disabled={mutation.isPending}
         >
-          {issubmitting ? "Enviando..." : "Restablecer contraseña"}
+          {mutation.isPending ? "Enviando..." : "Restablecer contraseña"}
         </Button>
+
         {message && <p className="mt-4 text-center text-red-500">{message}</p>}
-        <div className="link-container mt-4 text-center">
+
+        <div className="mt-4 text-center text-sm">
           <a className="text-blue-700 hover:underline" href="/user/login">
             Volver a inicio
           </a>

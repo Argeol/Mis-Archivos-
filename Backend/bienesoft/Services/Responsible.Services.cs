@@ -1,5 +1,6 @@
 ﻿using bienesoft.Models;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace bienesoft.Services
 {
@@ -53,30 +54,71 @@ namespace bienesoft.Services
             return responsible; 
         }
 
-        public async Task<ResponsibleModel?> UpdateResponsibleAsync(int Id, ResponsibleModel updateResponsible)
+        //public async Task<ResponsibleModel> UpdateResponsibleAsync(int Id, UpdateResponsible updateResponsible)
+        //{
+        //    var existingResponsible = await _context.responsible.FindAsync(Id);
+        //    if (existingResponsible == null)
+        //    {
+        //        return null;
+        //    }
+
+        //    if (updateResponsible.Nom_Responsible != "")
+        //        existingResponsible.Nom_Responsible = updateResponsible.Nom_Responsible;
+
+        //    if (updateResponsible.Ape_Responsible != "")
+        //        existingResponsible.Ape_Responsible = updateResponsible.Ape_Responsible;
+
+        //    if (updateResponsible.Tel_Responsible != 0)
+        //        existingResponsible.Tel_Responsible = updateResponsible.Tel_Responsible;
+
+        //    if (updateResponsible.RoleId != 0)
+        //        existingResponsible.RoleId = updateResponsible.RoleId.Value;
+
+        //    if (updateResponsible.State != "")
+        //        existingResponsible.State = updateResponsible.State;    
+
+        //    await _context.SaveChangesAsync();
+
+        //    return existingResponsible;
+        //}
+        public void UpdateResponsible(int id, UpdateResponsible updateResponsible)
         {
-            var existingResponsible = await _context.responsible.FindAsync(Id);
+            var existingResponsible = _context.responsible.Find(id);
             if (existingResponsible == null)
             {
-                return null;
+                throw new KeyNotFoundException($"El responsable con el ID {id} no se encontró.");
             }
 
-            if (updateResponsible.Nom_Responsible != "")
+            if (!string.IsNullOrWhiteSpace(updateResponsible.Nom_Responsible))
+            {
                 existingResponsible.Nom_Responsible = updateResponsible.Nom_Responsible;
+            }
 
-            if (updateResponsible.Ape_Responsible != "")
+            if (!string.IsNullOrWhiteSpace(updateResponsible.Ape_Responsible))
+            {
                 existingResponsible.Ape_Responsible = updateResponsible.Ape_Responsible;
+            }
 
-            if (updateResponsible.Tel_Responsible != 0)
-                existingResponsible.Tel_Responsible = updateResponsible.Tel_Responsible;
+            if (updateResponsible.Tel_Responsible.HasValue)
+            {
+                existingResponsible.Tel_Responsible = updateResponsible.Tel_Responsible.Value;
+            }
 
-            if (updateResponsible.RoleId != 0)
-                existingResponsible.RoleId = updateResponsible.RoleId;
+            if (updateResponsible.RoleId.HasValue && updateResponsible.RoleId.Value != 0)
+            {
+                existingResponsible.RoleId = updateResponsible.RoleId.Value;
+            }
 
-            await _context.SaveChangesAsync();
+            if (!string.IsNullOrWhiteSpace(updateResponsible.State))
+            {
+                existingResponsible.State = updateResponsible.State;
+            }
 
-            return existingResponsible;
+            _context.SaveChanges();
         }
+
+
+
 
     }
 }

@@ -15,7 +15,7 @@ export default function ApprenticeDashboard() {
   const { data: dataApprentice, isLoading, error } = useQuery({
     queryKey: ["aprendices"], // Nombre del caché
     queryFn: async () => {
-      const response = await axiosInstance.get("api/Apprentice/GetApprentices");
+      const response = await axiosInstance.get("/api/Apprentice/all");
       if (!response.status === 200) throw new Error("Error al cargar los datos");
       return response.data;
     },
@@ -36,6 +36,7 @@ export default function ApprenticeDashboard() {
     if (error) return <p>Error: {error.message}</p>;
   
   const translations = {
+    id_Apprentice: "Documento",
     doc_apprentice: "Documento de Aprendiz",
     first_Name_Apprentice: "Nombre",
     last_Name_Apprentice: "Apellido",
@@ -57,8 +58,9 @@ export default function ApprenticeDashboard() {
     areaName: "Área",
   };
   
-  const fieldLabels = ["Nombre", "Apellido", "Teléfono", "Ficha"];
+  const fieldLabels = ["Documento","Nombre", "Apellido", "Teléfono", "Ficha"];
   const TableCell = [
+    "id_Apprentice",
     "first_Name_Apprentice",
     "last_Name_Apprentice",
     "phone_Apprentice",
@@ -74,14 +76,13 @@ export default function ApprenticeDashboard() {
           titlesData={fieldLabels}
           Data={dataApprentice}
           idKey="id_Apprentice"
-          deleteUrl="/api/Apprentice/DeleteApprentice"
           deleteFunction={(id) => deleteMutation.mutate(id)}
           updateComponets={UpdateApprentice}
           tableCell={TableCell}
           translations={translations}
-          ignorar={["id_Apprentice","status_Apprentice"]}
+          ignorar={["status_Apprentice"]}
           currentStatus={"status_Apprentice"}
-          updateEndpoint="/api/Apprentice/UpdateApprentice"
+          updateEndpoint="/api/Apprentice"
           queryKey="aprendices"
         />
       </PrivateNav>
