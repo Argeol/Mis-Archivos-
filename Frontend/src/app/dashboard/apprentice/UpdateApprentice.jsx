@@ -48,15 +48,28 @@ export default function UpdateApprentice({ id }) {
     },
     enabled: !!id,
   });
-
   useEffect(() => {
     if (data) {
       setFormData((prev) => ({
         ...prev,
-        ...data,
-        birth_date_apprentice: data.birth_date_apprentice
-          ? new Date(data.birth_date_apprentice).toISOString()
+        first_name_apprentice: data.first_Name_Apprentice || "",
+        last_name_apprentice: data.last_Name_Apprentice || "",
+        birth_date_apprentice: data.birth_Date_Apprentice_Formatted
+          ? new Date(data.birth_Date_Apprentice_Formatted).toISOString()
           : new Date().toISOString(),
+        gender_apprentice: data.gender_Apprentice || "",
+        email_apprentice: data.email_Apprentice || "",
+        address_apprentice: data.address_Apprentice || "",
+        address_type_apprentice: data.address_Type_Apprentice || "",
+        phone_Apprentice: data.phone_Apprentice || "",
+        status_Apprentice: data.status_Apprentice || "Active",
+        tip_Apprentice: data.tip_Apprentice || "",
+        nom_responsible: data.nom_responsible || "",
+        ape_responsible: data.ape_responsible || "",
+        tel_responsible: data.tel_responsible || "",
+        email_responsible: data.email_responsible || "",
+        id_municipality: data.Id_municipality || 0, // Ajusta según el ID real
+        file_Id: data.file_Id || 0,
       }));
     }
   }, [data]);
@@ -86,10 +99,7 @@ export default function UpdateApprentice({ id }) {
   const mutation = useMutation({
     mutationFn: async () => {
       console.log("Enviando datos:", formData);
-      await axiosInstance.put(
-        `/api/Apprentice/${id}`,
-        formData
-      );
+      await axiosInstance.put(`/api/Apprentice/${id}`, formData);
     },
     onSuccess: () => {
       alert("Aprendiz actualizado correctamente");
@@ -113,15 +123,31 @@ export default function UpdateApprentice({ id }) {
   if (isLoading) return <p>Cargando datos del aprendiz...</p>;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
-      <Label>Nombre</Label>
-      <Input name="first_name_apprentice" value={formData.first_name_apprentice} onChange={handleChange} required />
+    <form onSubmit={handleSubmit} className="space-y-4 p-4 ">
+     
 
+    <Label>Nombre</Label>
+    <Input
+      name="first_name_apprentice"
+      value={formData.first_name_apprentice}
+      onChange={handleChange}
+      required
+    />
       <Label>Apellido</Label>
-      <Input name="last_name_apprentice" value={formData.last_name_apprentice} onChange={handleChange} required />
+      <Input
+        name="last_name_apprentice"
+        value={formData.last_name_apprentice}
+        onChange={handleChange}
+        required
+      />
 
       <Label>Email</Label>
-      <Input name="email_apprentice" value={formData.email_apprentice} onChange={handleChange} required />
+      <Input
+        name="email_apprentice"
+        value={formData.email_apprentice}
+        onChange={handleChange}
+        required
+      />
 
       <Label>Fecha de nacimiento</Label>
       <Input
@@ -157,7 +183,11 @@ export default function UpdateApprentice({ id }) {
       </Select>
 
       <Label>Dirección</Label>
-      <Input name="address_apprentice" value={formData.address_apprentice} onChange={handleChange} />
+      <Input
+        name="address_apprentice"
+        value={formData.address_apprentice}
+        onChange={handleChange}
+      />
 
       <Label>Tipo de Dirección</Label>
       <Select
@@ -179,7 +209,11 @@ export default function UpdateApprentice({ id }) {
       </Select>
 
       <Label>Teléfono</Label>
-      <Input name="phone_Apprentice" value={formData.phone_Apprentice} onChange={handleChange} />
+      <Input
+        name="phone_Apprentice"
+        value={formData.phone_Apprentice}
+        onChange={handleChange}
+      />
 
       <Label>Tipo de Aprendiz</Label>
       <Select
@@ -201,16 +235,32 @@ export default function UpdateApprentice({ id }) {
       </Select>
 
       <Label>Nombre Responsable</Label>
-      <Input name="nom_responsible" value={formData.nom_responsible} onChange={handleChange} />
+      <Input
+        name="nom_responsible"
+        value={formData.nom_responsible}
+        onChange={handleChange}
+      />
 
       <Label>Apellido Responsable</Label>
-      <Input name="ape_responsible" value={formData.ape_responsible} onChange={handleChange} />
+      <Input
+        name="ape_responsible"
+        value={formData.ape_responsible}
+        onChange={handleChange}
+      />
 
       <Label>Teléfono Responsable</Label>
-      <Input name="tel_responsible" value={formData.tel_responsible} onChange={handleChange} />
+      <Input
+        name="tel_responsible"
+        value={formData.tel_responsible}
+        onChange={handleChange}
+      />
 
       <Label>Email Responsable</Label>
-      <Input name="email_responsible" value={formData.email_responsible} onChange={handleChange} />
+      <Input
+        name="email_responsible"
+        value={formData.email_responsible}
+        onChange={handleChange}
+      />
 
       <Label>Departamento</Label>
       <Select
@@ -224,14 +274,20 @@ export default function UpdateApprentice({ id }) {
         </SelectTrigger>
         <SelectContent>
           {departments.map((dept) => (
-            <SelectItem key={dept.id_department} value={dept.id_department.toString()}>
+            <SelectItem
+              key={dept.id_department}
+              value={dept.id_department.toString()}
+            >
               {dept.name_department}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      <Label>Municipio</Label>
+      <Label>
+        Municipio Seleccionado: {data.municipalityName || "Sin municipio seleccionado"}
+      </Label>
+
       <Select
         value={formData.id_municipality?.toString() || ""}
         onValueChange={(value) =>
@@ -239,18 +295,21 @@ export default function UpdateApprentice({ id }) {
         }
       >
         <SelectTrigger>
-          <SelectValue placeholder="Seleccionar Municipio" />
+          <SelectValue placeholder={data.municipalityName} />
         </SelectTrigger>
         <SelectContent>
           {municipalities.map((mun) => (
-            <SelectItem key={mun.id_municipality} value={mun.id_municipality.toString()}>
+            <SelectItem
+              key={mun.id_municipality}
+              value={mun.id_municipality.toString()}
+            >
               {mun.municipality}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      <Label>Ficha</Label>
+      <Label>Ficha:</Label>
       <Input
         type="number"
         name="file_Id"

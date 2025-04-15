@@ -97,6 +97,7 @@ namespace Bienesoft.Services
                     a.ape_responsible,
                     a.email_responsible,
                     a.tel_responsible,
+                    a.Municipality.Id_municipality,
                     MunicipalityName = a.Municipality.municipality,
                     DepartmentName = a.Municipality.Department.Name_department,
                     a.File.File_Id,
