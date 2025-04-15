@@ -68,7 +68,7 @@ export default function Dashboard() {
     state: "Estado",
   };
 
-  const fieldLabels = ["Id programa", "Programa", "Área", "Estado", "Acciones"];
+  const fieldLabels = ["Id programa", "Programa", "Área", "Estado"];
   const TableCell = ["program_Id", "program_Name", "area_Name", "state"];
 
   return (

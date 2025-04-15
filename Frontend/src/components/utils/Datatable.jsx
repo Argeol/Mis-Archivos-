@@ -135,15 +135,17 @@ export default function DataTable({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-44">
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setResponsibleId(row[idKey]); // aquí asumes que el ID del responsable viene en ese campo
-                              setIsOpenAuthorizationModal(true);
-                            }}
-                          >
-                            <CheckCircle className="mr-2 h-4 w-4" /> Autorizar
-                          </DropdownMenuItem>
-
+                          {idKey === "responsible_Id" && row[idKey] != null && (
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setResponsibleId(row[idKey]);
+                                setIsOpenAuthorizationModal(true);
+                              }}
+                            >
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              Autorizar
+                            </DropdownMenuItem>
+                          )}
                           {/* Otros elementos del menú */}
                           <DropdownMenuItem
                             onClick={() => {
@@ -187,14 +189,15 @@ export default function DataTable({
                               />
                             </DropdownMenuItem>
                           )}
-
-                          <DropdownMenuItem asChild>
-                            <DeleteButton
-                              id={row[idKey]}
-                              deleteUrl={deleteUrl}
-                              setData={setData}
-                            />
-                          </DropdownMenuItem>
+                          {deleteUrl && (
+                            <DropdownMenuItem asChild>
+                              <DeleteButton
+                                id={row[idKey]}
+                                deleteUrl={deleteUrl}
+                                setData={setData}
+                              />
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -264,13 +267,14 @@ export default function DataTable({
           TitlePage={TitlePage}
           UpdateComponent={updateComponets}
           id={selectedUpdateId}
-          disabled={false}
+          isOpen={isOpenUpdateModal} // <- esta es la que faltaba
           onClose={() => {
             setIsOpenUpdateModal(false);
             setSelectedUpdateId(null);
           }}
         />
       )}
+
       <AuthorizePermissionModal
         isOpen={isOpenAuthorizationModal}
         onClose={() => setIsOpenAuthorizationModal(false)}

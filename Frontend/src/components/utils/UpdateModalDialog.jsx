@@ -1,25 +1,15 @@
-import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Button } from "../ui/button";
 
-function ModalDialogUpdate({ TitlePage, UpdateComponent, id }) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleOpen = () => setIsOpen(true);
-  const handleCloseForm = () => setIsOpen(false);
-
+function ModalDialogUpdate({ TitlePage, UpdateComponent, id, isOpen, onClose }) {
   return (
-    <>
-      <Button onClick={handleOpen}>Actualizar {TitlePage}</Button>
-      <Dialog open={isOpen} onOpenChange={handleCloseForm}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-h-[80vh] overflow-auto">
-          <DialogHeader>
-            <DialogTitle>Actualizar {TitlePage}</DialogTitle>
-          </DialogHeader>
-          <UpdateComponent id={id} />
-        </DialogContent>
-      </Dialog>
-    </>
+        <DialogHeader>
+          <DialogTitle>Actualizar {TitlePage}</DialogTitle>
+        </DialogHeader>
+        <UpdateComponent id={id} closeModal={onClose} />
+      </DialogContent>
+    </Dialog>
   );
 }
 

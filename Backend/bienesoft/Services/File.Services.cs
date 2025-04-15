@@ -22,6 +22,7 @@ namespace bienesoft.Services
                 .Select(f => new
                 {
                     f.File_Id,
+                    f.Program_Id,
                     f.Apprentice_count,
                     f.Start_Date,
                     f.End_Date,
@@ -46,6 +47,7 @@ namespace bienesoft.Services
                 .Select(a => new
                 {
                     a.File_Id,
+                    a.Program_Id,
                     a.Apprentice_count,
                     a.End_Date,
                     a.Start_Date,
@@ -82,6 +84,12 @@ namespace bienesoft.Services
             await _context.SaveChangesAsync();
 
             return existingFile;
+        }
+         public async Task<List<FileModel?>> GetFileProgramAsync(int programId)
+        {
+            return await _context.file
+                .Where(m => m.Program_Id == programId)
+                .ToListAsync();
         }
     }
 }

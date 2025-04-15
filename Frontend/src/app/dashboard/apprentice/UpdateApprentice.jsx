@@ -123,15 +123,16 @@ export default function UpdateApprentice({ id }) {
   if (isLoading) return <p>Cargando datos del aprendiz...</p>;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
-      <Label>Nombre</Label>
-      <Input
-        name="first_name_apprentice"
-        value={formData.first_name_apprentice}
-        onChange={handleChange}
-        required
-      />
+    <form onSubmit={handleSubmit} className="space-y-4 p-4 ">
+     
 
+    <Label>Nombre</Label>
+    <Input
+      name="first_name_apprentice"
+      value={formData.first_name_apprentice}
+      onChange={handleChange}
+      required
+    />
       <Label>Apellido</Label>
       <Input
         name="last_name_apprentice"
@@ -283,7 +284,10 @@ export default function UpdateApprentice({ id }) {
         </SelectContent>
       </Select>
 
-      <Label>Municipio</Label>
+      <Label>
+        Municipio Seleccionado: {data.municipalityName || "Sin municipio seleccionado"}
+      </Label>
+
       <Select
         value={formData.id_municipality?.toString() || ""}
         onValueChange={(value) =>
@@ -291,7 +295,7 @@ export default function UpdateApprentice({ id }) {
         }
       >
         <SelectTrigger>
-          <SelectValue placeholder="Seleccionar Municipio" />
+          <SelectValue placeholder={data.municipalityName} />
         </SelectTrigger>
         <SelectContent>
           {municipalities.map((mun) => (
@@ -305,7 +309,7 @@ export default function UpdateApprentice({ id }) {
         </SelectContent>
       </Select>
 
-      <Label>Ficha</Label>
+      <Label>Ficha:</Label>
       <Input
         type="number"
         name="file_Id"

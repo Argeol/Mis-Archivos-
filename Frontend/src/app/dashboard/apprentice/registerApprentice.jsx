@@ -42,6 +42,7 @@ export default function RegisterApprentice() {
   });
 
   const [id_department, setDepartmentId] = useState(null);
+  const [program_Id, setProgramId] = useState(null);
 
   const { data: departments = [] } = useQuery({
     queryKey: ["departments"],
@@ -52,13 +53,19 @@ export default function RegisterApprentice() {
   });
 
   const { data: files = [] } = useQuery({
-    queryKey: ["files"],
+    queryKey: ["files", program_Id],
     queryFn: async () => {
-      const res = await axiosInstance.get("/Api/File/Getfiles");
+      const res = await axiosInstance.get(`Api/File/GetMunicipalitiesByDepartment/${program_Id}`);
       return res.data;
     },
   });
-
+const { data: program = [] } = useQuery({
+    queryKey: ["program"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/Api/Program/GetProgram");
+      return res.data;
+    },
+  });
   const { data: municipalities = [] } = useQuery({
     queryKey: ["municipalities", id_department],
     queryFn: async () => {
@@ -93,13 +100,20 @@ export default function RegisterApprentice() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleDepartmentChange = (value) => {
+ const handleDepartmentChange = (value) => {
     const departmentId = parseInt(value);
     setDepartmentId(departmentId);
     setFormData((prev) => ({ ...prev, Id_municipality: 0 }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleprogramChange = (value) => {
+    const program_Id = parseInt(value);
+    setProgramId(program_Id);
+    setFormData((prev) => ({ ...prev, file_id: 0 }));
+  };
+    
+  
+    const handleSubmit = async (e) => {
     e.preventDefault();
     mutation.mutate();
   };
@@ -288,6 +302,23 @@ export default function RegisterApprentice() {
             </SelectContent>
           </Select>
         </div>
+        <Select
+        onValueChange={(value) =>
+          setFormData({ ...formData, program_Id: parseInt(value) })
+        }
+      >
+      <SelectTrigger>
+        <SelectValue placeholder="Seleccionar Programa" />
+      </SelectTrigger>
+      <SelectContent>
+        {program.map((Program) => (
+          <SelectItem key={Program.program_Id} value={Program.program_Id.toString()}>
+            {Program.program_Name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+      </Select>
+
 
         <div>
           <Label>Ficha</Label>

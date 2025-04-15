@@ -62,8 +62,7 @@ export default function AuthorizePermissionModal({
 
         <Input value={responsibleId} readOnly className="mb-4" />
         <Select
-          onValueChange={(value) => setSelectedPermissionId(parseInt(value))}
-        >
+          onValueChange={(value) => setSelectedPermissionId(parseInt(value))}>
           <SelectTrigger>
             <SelectValue placeholder="Seleccionar Permiso" />
           </SelectTrigger>
