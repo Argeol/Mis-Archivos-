@@ -264,8 +264,8 @@ public class PermissionApprovalService
     {
         var permiso = await _context.permissionGN
             .Include(p => p.Approvals)
-                .ThenInclude(pa => pa.Responsible)
-                    .ThenInclude(r => r.Role)
+            .ThenInclude(pa => pa.Responsible)
+               .ThenInclude(r => r.Role)
             .Include(a => a.Apprentice)
             .FirstOrDefaultAsync(p => p.PermissionId == idPermiso);
 
@@ -274,60 +274,43 @@ public class PermissionApprovalService
             return new { success = false, message = "Permiso no encontrado." };
         }
 
-        var aprendiz = permiso.Apprentice;
+        var aprendiz = await _context.apprentice
+            .FirstOrDefaultAsync(a => a.Id_Apprentice == permiso.Id_Apprentice);
 
         if (aprendiz == null)
         {
             return new { success = false, message = "Aprendiz no encontrado." };
         }
 
-        // Roles requeridos por tipo de aprendiz
+        // Determinar los roles necesarios
         List<int> rolesRequeridos = aprendiz.Tip_Apprentice == "interno"
-            ? new List<int> { 1, 2, 3, 4 } // Instructor, Coordinador, Bienestar, Internado
-            : new List<int> { 1, 2, 3 };   // Instructor, Coordinador, Bienestar
+            ? new List<int> { 1, 2, 3, 4 }
+            : new List<int> { 1, 2, 3 };
 
-        // Obtener todos los responsables requeridos
-        var responsablesRequeridos = await _context.responsible
-            .Include(r => r.Role)
-            .Where(r => rolesRequeridos.Contains(r.RoleId))
-            .ToListAsync();
-
-        // Obtener aprobaciones existentes del permiso
-        var aprobacionesExistentes = permiso.Approvals.ToList();
-
-        // Determinar el estado global del permiso
-        var rolesAprobados = aprobacionesExistentes
-            .Where(a => a.ApprovalStatus == ApprovalStatus.Aprobado)
-            .Select(a => a.Responsible.RoleId)
+        // Extraer los roles que ya aprobaron
+        var aprobaciones = permiso.Approvals
+            .Where(pa => pa.ApprovalStatus == ApprovalStatus.Aprobado)
+            .Select(pa => pa.Responsible.RoleId)
             .Distinct()
             .ToList();
 
-        var hayRechazo = aprobacionesExistentes
-            .Any(a => a.ApprovalStatus == ApprovalStatus.Rechazado &&
-                    rolesRequeridos.Contains(a.Responsible.RoleId));
+        var rechazos = permiso.Approvals
+            .Any(pa => pa.ApprovalStatus == ApprovalStatus.Rechazado && rolesRequeridos.Contains(pa.Responsible.RoleId));
 
         string estado;
-        if (hayRechazo)
-            estado = Status.Rechazado.ToString();
-        else if (rolesRequeridos.All(r => rolesAprobados.Contains(r)))
-            estado = Status.Aprobado.ToString();
-        else
-            estado = Status.Pendiente.ToString();
 
-        // Armar la lista de aprobaciones completas (incluye los que faltan)
-        var listaAprobaciones = responsablesRequeridos.Select(r =>
+        if (rechazos)
         {
-            var aprobacion = aprobacionesExistentes
-                .FirstOrDefault(a => a.ResponsibleId == r.Responsible_Id);
-
-            return new
-            {
-                nom_Responsible = r.Nom_Responsible,
-                name_role = r.Role.Name_role,
-                approvalStatus = aprobacion?.ApprovalStatus ?? ApprovalStatus.Pendiente,
-                approvalDate = aprobacion?.ApprovalDate
-            };
-        });
+            estado = Status.Rechazado.ToString();
+        }
+        else if (rolesRequeridos.All(r => aprobaciones.Contains(r)))
+        {
+            estado = Status.Aprobado.ToString();
+        }
+        else
+        {
+            estado = Status.Pendiente.ToString();
+        }
 
         return new
         {
@@ -335,13 +318,18 @@ public class PermissionApprovalService
             estadoPermiso = estado,
             aprendiz = new
             {
-                aprendiz.First_Name_Apprentice,
-                aprendiz.Tip_Apprentice
+                permiso.Apprentice.First_Name_Apprentice,
+                permiso.Apprentice.Tip_Apprentice
             },
-            aprobaciones = listaAprobaciones
+            aprobaciones = permiso.Approvals.Select(pa => new
+            {
+                pa.Responsible.Nom_Responsible,
+                pa.Responsible.Role.Name_role,
+                pa.ApprovalStatus,
+                pa.ApprovalDate
+            }).ToList()
         };
     }
-
     public object GetPendingApprovalsBy(int permissionId)
     {
         var pendientes = _context.permissionApproval
@@ -378,5 +366,4 @@ public class PermissionApprovalService
 
 
 }
-
 

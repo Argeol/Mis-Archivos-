@@ -61,6 +61,7 @@ export default function PermissionDashboard() {
         fieldName="status"
         inf={"id_Apprentice"}
         
+        
       />
     </PrivateNav>
   );
