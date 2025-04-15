@@ -17,9 +17,9 @@ namespace bienesoft.Models
 }
 public enum ApprovalStatus
 {
-    Pendiente,
-    Aprobado,
-    Rechazado
-}
+        Pendiente = 0,
+        Aprobado = 1,
+        Rechazado = 2
+    }
 
 }
