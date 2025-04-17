@@ -1,133 +1,128 @@
-﻿using bienesoft.Funcions;
-using bienesoft.Models;
+﻿using bienesoft.Models;
 using bienesoft.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bienesoft.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
-    //[Authorize]
-    public class PermissionFSController : Controller
+    [ApiController]
+    public class PermissionFSController : ControllerBase
     {
-        public IConfiguration _Configuration { get; set; }
-        public GeneralFunction GeneralFunction;
         private readonly PermissionFSServices _permissionFSServices;
 
-        public PermissionFSController(IConfiguration configuration, PermissionFSServices permissionFSServices)
+        public PermissionFSController(PermissionFSServices permissionFSServices)
         {
-            _Configuration = configuration;
             _permissionFSServices = permissionFSServices;
         }
 
-        [HttpPost("CreatePermissionFS")]
-        public IActionResult AddPermissionFS(PermissionFS permissionFS)
+        [HttpGet]
+        public IActionResult GetAllPermissionFS()
         {
             try
             {
+                var permissions = _permissionFSServices.AllPermissionFSWithApprentice();
+                return Ok(permissions);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetPermissionFSById(int id)
+        {
+            try
+            {
+                var permission = _permissionFSServices.GetByIdWithApprentice(id);
+                if (permission == null)
+                    return NotFound(new { message = "PermissionFS no encontrado" });
+
+                return Ok(permission);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult AddPermissionFS([FromBody] PermissionFS permissionFS)
+        {
+            try
+            {
+                if (permissionFS == null)
+                    return BadRequest(new { message = "El objeto PermissionFS es nulo" });
+
                 _permissionFSServices.AddPermissionFS(permissionFS);
-                return Ok(new
-                {
-                    message = "Permiso creado con éxito"
-                });
+                return CreatedAtAction(nameof(GetPermissionFSById), new { id = permissionFS.PermissionFS_Id }, permissionFS);
             }
             catch (Exception ex)
             {
-                GeneralFunction.Addlog(ex.ToString());
-                return StatusCode(500, ex.ToString());
+                return StatusCode(500, new { error = ex.Message });
             }
         }
 
-        [HttpGet("GetPermissionFS")]
-        public IActionResult GetPermissionFS(int id)
+        [HttpPut("{id}")]
+        public IActionResult UpdatePermissionFS(int id, [FromBody] PermissionFS permissionFS)
         {
             try
             {
-                var permissionFS = _permissionFSServices.GetById(id);
-                if (permissionFS == null)
-                {
-                    return NotFound("No Se Encontró El Permiso");
-                }
-                return Ok(permissionFS);
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
-            }
-        }
+                if (id != permissionFS.PermissionFS_Id)
+                    return BadRequest(new { message = "El ID en la URL no coincide con el ID del cuerpo" });
 
-        [HttpPost("UpdatePermissionFS")]
-        public IActionResult Update(int id, PermissionFS permissionFS)
-        {
-            try
-            {
                 _permissionFSServices.UpdatePermissionFS(permissionFS);
-                return Ok("Permiso actualizado con éxito");
+                return NoContent();
             }
             catch (Exception ex)
             {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
+                return StatusCode(500, new { error = ex.Message });
             }
         }
 
-        [HttpDelete("DeletePermissionFS")]
-        public IActionResult Delete(int id)
+        [HttpPatch("{id}")]
+        public IActionResult UpdateSingleField(int id, [FromBody] Dictionary<string, object> updateData)
         {
             try
             {
-                var permissionFS = _permissionFSServices.GetById(id);
-                if (permissionFS == null)
-                {
-                    return NotFound("El Permiso Con El Id " + id + " No Se Pudo Encontrar");
-                }
+                _permissionFSServices.UpdateSingleField(id, updateData);
+                return Ok(new { message = "Campo actualizado exitosamente" });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeletePermissionFS(int id)
+        {
+            try
+            {
                 _permissionFSServices.Delete(id);
-                return Ok("Permiso Eliminado Con Éxito");
-            }
-            catch (KeyNotFoundException knFEx)
-            {
-                return NotFound(knFEx.Message);
+                return NoContent();
             }
             catch (Exception ex)
             {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
+                return StatusCode(500, new { error = ex.Message });
             }
         }
 
-        [HttpGet("AllPermissionFS")]
-        public ActionResult<IEnumerable<PermissionFS>> GetAllPermissionFS()
+        [HttpGet("Export")]
+        public IActionResult ExportPermissionFS()
         {
-            return Ok(_permissionFSServices.AllPermissionFS());
-        }
-
-        [HttpPut("UpdatePermissionFS")]
-        public IActionResult UpdatePermissionFS(PermissionFS permissionFS)
-        {
-            if (permissionFS == null)
-            {
-                return BadRequest("El modelo de permiso es nulo");
-            }
-
             try
             {
-                _permissionFSServices.UpdatePermissionFS(permissionFS);
-                return Ok("Permiso actualizado exitosamente");
-            }
-            catch (ArgumentNullException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
+                var excelStream = _permissionFSServices.ExportPermissionFSToExcel();
+                return File(excelStream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PermissionsFS.xlsx");
             }
             catch (Exception ex)
             {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
+                return StatusCode(500, new { error = ex.Message });
             }
         }
     }
