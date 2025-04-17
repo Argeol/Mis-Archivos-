@@ -43,8 +43,9 @@ export default function PermissionDashboard() {
   };
 
   const fieldLabels = ["Fecha","Aprendiz", "Fecha Inicio", "Fecha Entrada", "Estado"];
-  const tableCell = ["fechadesolicitud","nombreAprendiz", "fechalsalida", "fechallegada", "estado"];
+  const tableCell = ["fechadesolicitud","nombreAprendiz", "fechalsalida", "fechallegada", "estado","porcentaje"];
 
+  
   return (
     <PrivateNav>
       <ContecPage

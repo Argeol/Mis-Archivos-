@@ -48,13 +48,5 @@ namespace Bienesoft.Controllers
             var data = _approvalService.GetPendingApprovalsBy(permissionId);
             return Ok(data);
         }
-        [HttpGet("porcentaje-aprobacion")]
-        public async Task<IActionResult> GetPorcentajeAprobacion([FromQuery] int idPermiso)
-        {
-            var porcentaje = await _approvalService.GetPorcentajePermisoAsync(idPermiso);
-            return Ok(new { porcentaje });
-        }
-
-
     }
 }

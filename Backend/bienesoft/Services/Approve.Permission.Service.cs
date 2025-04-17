@@ -260,33 +260,6 @@ public class PermissionApprovalService
 
     //     return "Estado pendiente registrado correctamente.";
     // }
-    public async Task<double> GetPorcentajePermisoAsync(int idPermiso)
-    {
-        var permiso = await _context.permissionGN
-            .Include(p => p.Apprentice)
-            .Include(p => p.Approvals)
-            .FirstOrDefaultAsync(p => p.PermissionId == idPermiso);
-
-        if (permiso == null || permiso.Approvals == null || permiso.Approvals.Count == 0)
-            return 0;
-
-        // Obtener el tipo de aprendiz en minúsculas
-        string tipoAprendiz = permiso.Apprentice?.Tip_Apprentice?.ToLower();
-
-        // Determinar el total de responsables según el tipo de aprendiz
-        int totalResponsables = tipoAprendiz == "interno" ? 4 : 3;
-
-        // Contar cuántos responsables ya aprobaron
-        int aprobados = permiso.Approvals.Count(pa => pa.ApprovalStatus == ApprovalStatus.Aprobado);
-
-        // Calcular el porcentaje basado en el tipo de aprendiz
-        double porcentaje = (double)aprobados / totalResponsables * 100;
-
-        // Asegurar que el porcentaje no supere el 100%
-        return Math.Min(porcentaje, 100);
-    }
-
-
 
     public async Task<object> GetEstadoPermisoAsync(int idPermiso)
     {
