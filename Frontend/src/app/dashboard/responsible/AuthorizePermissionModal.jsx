@@ -19,11 +19,13 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function AuthorizePermissionModal({
   isOpen,
   onClose,
   responsibleId,
+  responsibleName
 }) {
   const [selectedPermissionId, setSelectedPermissionId] = useState(null);
 
@@ -59,8 +61,9 @@ export default function AuthorizePermissionModal({
         <DialogHeader>
           <DialogTitle>Autorizar Permiso</DialogTitle>
         </DialogHeader>
-
-        <Input value={responsibleId} readOnly className="mb-4" />
+        <Label htmlFor="responsibleName">Nombre del Responsable Autorizar</Label>
+        <Input value={responsibleName} readOnly className="mb-4" />
+        <Label htmlFor="permission">Seleccionar Permiso</Label>
         <Select
           onValueChange={(value) => setSelectedPermissionId(parseInt(value))}>
           <SelectTrigger>

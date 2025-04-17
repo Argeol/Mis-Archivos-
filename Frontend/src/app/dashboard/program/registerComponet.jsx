@@ -57,8 +57,7 @@ export default function RegisterProgram() {
     };
 
     return (
-        <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Registrar Nuevo Programa</h2>
+        <div className="p-8 space-y-4">
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <Label htmlFor="programId">ID del Programa</Label>

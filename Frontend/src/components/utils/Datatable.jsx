@@ -78,6 +78,7 @@ export default function DataTable({
   const [isOpenAuthorizationModal, setIsOpenAuthorizationModal] =
     useState(false); // Estado para el modal de autorización
   const [responsibleId, setResponsibleId] = useState(null); // 👈 Agrega esta línea
+  const [responsibleName, setResponsibleName] = useState("");
 
   return (
     <Card className="w-full max-w-5xl mx-auto p-4">
@@ -140,6 +141,7 @@ export default function DataTable({
                               onClick={() => {
                                 setResponsibleId(row[idKey]);
                                 setIsOpenAuthorizationModal(true);
+                                setResponsibleName(row.nom_Responsible);
                               }}
                             >
                               <CheckCircle className="mr-2 h-4 w-4" />
@@ -279,6 +281,7 @@ export default function DataTable({
         isOpen={isOpenAuthorizationModal}
         onClose={() => setIsOpenAuthorizationModal(false)}
         responsibleId={responsibleId}
+        responsibleName={responsibleName} // 👈 Agrega esta línea
       />
     </Card>
   );

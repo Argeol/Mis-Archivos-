@@ -71,16 +71,25 @@ export default function ApprenticeDashboard() {
     <>
       <PrivateNav>
         <ContecPage
+          //para registrar
           registerComponets={RegisterApprentice}
+          //como se llama la tabla
           titlesPage={"Aprendiz"}
+          //como se llaman los camppos de la datatable
           titlesData={fieldLabels}
+          //la data que se va a mostrar del metodo get
           Data={dataApprentice}
+          //id de la tabla
           idKey="id_Apprentice"
-          deleteFunction={(id) => deleteMutation.mutate(id)}
+          // deleteFunction={(id) => deleteMutation.mutate(id)}
+          // Para el update del componente
           updateComponets={UpdateApprentice}
+          //lo que vas a mostrar en la tabla y el trslations es el la lista de como se van a llamar los campos visualmente
           tableCell={TableCell}
           translations={translations}
+          //ignorar los campos que no se van a mostrar en la tabla
           ignorar={["status_Apprentice"]}
+          //update del estado -->
           currentStatus={"status_Apprentice"}
           updateEndpoint="/api/Apprentice"
           queryKey="aprendices"

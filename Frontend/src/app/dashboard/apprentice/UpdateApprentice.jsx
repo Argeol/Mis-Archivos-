@@ -125,7 +125,8 @@ export default function UpdateApprentice({ id }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 ">
      
-
+    <Label>Estado del Aprendiz: {data.status_Apprentice}</Label>
+    <hr></hr>
     <Label>Nombre</Label>
     <Input
       name="first_name_apprentice"
@@ -316,26 +317,7 @@ export default function UpdateApprentice({ id }) {
         value={formData.file_Id}
         onChange={handleChange}
       />
-
-      <Label>Estado</Label>
-      <Select
-        value={formData.status_Apprentice}
-        onValueChange={(value) =>
-          setFormData((prev) => ({ ...prev, status_Apprentice: value }))
-        }
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Seleccionar Estado" />
-        </SelectTrigger>
-        <SelectContent>
-          {statusOptions.map((status) => (
-            <SelectItem key={status} value={status}>
-              {status}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
+      
       <Button type="submit" disabled={mutation.isLoading}>
         {mutation.isLoading ? "Actualizando..." : "Actualizar"}
       </Button>

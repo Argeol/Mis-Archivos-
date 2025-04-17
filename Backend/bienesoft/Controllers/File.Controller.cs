@@ -56,8 +56,8 @@ namespace bienesoft.Controllers
 
             return Ok(file);
         }
-        [HttpGet("GetMunicipalitiesByDepartment/{ProgramId}")]
-        public async Task<IActionResult> GetMunicipalitiesByDepartment(int ProgramId)
+        [HttpGet("GetFileProgram/{ProgramId}")]
+        public async Task<IActionResult> GetFileProgram(int ProgramId)
         {
             var files = await _FileServices.GetFileProgramAsync(ProgramId);
             if (files == null || files.Count == 0)

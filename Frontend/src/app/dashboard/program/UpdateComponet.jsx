@@ -89,7 +89,7 @@ export default function UpdateProgram({ id }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
+    <form onSubmit={handleSubmit} className="p-8 space-y-4">
       {isLoadingProgram ? (
         <p className="text-center text-blue-500">Cargando datos...</p>
       ) : (
