@@ -39,7 +39,10 @@ export default function RegisterPermission() {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const res = await axiosInstance.post("/api/permission/CrearPermiso/", formData);
+      const res = await axiosInstance.post(
+        "/api/permission/CrearPermiso/",
+        formData
+      );
       return res.data;
     },
     onSuccess: (data) => {
@@ -74,90 +77,119 @@ export default function RegisterPermission() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="max-w-xl mx-auto p-6 border rounded-2xl shadow-md bg-white space-y-4"
-    >
-      <h2 className="text-lg font-semibold text-center mb-4">
-        Registrar Permiso
-      </h2>
+    <form onSubmit={handleSubmit} className="w-full p-2 bg-white space-y-4">
+      <div className="space-y-1 px-2">
+        <Label htmlFor="departureDate" className="text-left">
+          Fecha de salida
+        </Label>
+        <Input
+          id="departureDate"
+          type="datetime-local"
+          name="departureDate"
+          onChange={handleChange}
+          required
+          className="w-full text-sm md:text-base"
+        />
+      </div>
 
-      <Input
-        type="datetime-local"
-        name="departureDate"
-        onChange={handleChange}
-        required
-        className="text-sm md:text-base"
-      />
-      <Input
-        type="datetime-local"
-        name="entryDate"
-        onChange={handleChange}
-        required
-        className="text-sm md:text-base"
-      />
-      {/* <Input
-        type="datetime-local"
-        name="applicationDate"
-        onChange={handleChange}
-        required
-        className="text-sm md:text-base"
-      /> */}
+      <div className="space-y-1 px-2">
+        <Label htmlFor="entryDate" className="text-left">
+          Fecha de entrada
+        </Label>
+        <Input
+          id="entryDate"
+          type="datetime-local"
+          name="entryDate"
+          onChange={handleChange}
+          required
+          className="w-full text-sm md:text-base"
+        />
+      </div>
 
-      <Input
-        name="adress"
-        placeholder="Dirección"
-        onChange={handleChange}
-        required
-        className="text-sm md:text-base"
-      />
+      <div className="space-y-1 px-2">
+        <Label htmlFor="adress" className="text-left">
+          Dirección
+        </Label>
+        <Input
+          id="adress"
+          name="adress"
+          placeholder="Dirección"
+          onChange={handleChange}
+          required
+          className="w-full text-sm md:text-base"
+        />
+      </div>
 
-      <Input
-        name="destination"
-        placeholder="Destino"
-        onChange={handleChange}
-        required
-        className="text-sm md:text-base"
-      />
+      <div className="space-y-1 px-2">
+        <Label htmlFor="destination" className="text-left">
+          Destino
+        </Label>
+        <Input
+          id="destination"
+          name="destination"
+          placeholder="Destino"
+          onChange={handleChange}
+          required
+          className="w-full text-sm md:text-base"
+        />
+      </div>
 
-      <Input
-        name="motive"
-        placeholder="Motivo del permiso"
-        onChange={handleChange}
-        required
-        className="text-sm md:text-base"
-      />
+      <div className="space-y-1 px-2">
+        <Label htmlFor="motive" className="text-left">
+          Motivo
+        </Label>
+        <Input
+          id="motive"
+          name="motive"
+          placeholder="Motivo del permiso"
+          onChange={handleChange}
+          required
+          className="w-full text-sm md:text-base"
+        />
+      </div>
 
-      <Textarea
-        name="observation"
-        placeholder="Observaciones"
-        onChange={handleChange}
-        className="text-sm md:text-base"
-      />
+      <div className="space-y-1 px-2">
+        <Label htmlFor="observation" className="text-left">
+          Observaciones
+        </Label>
+        <Textarea
+          id="observation"
+          name="observation"
+          placeholder="Observaciones"
+          onChange={handleChange}
+          className="w-full text-sm md:text-base"
+        />
+      </div>
 
-      <Select onValueChange={handleSelectApprentice}>
-        <SelectTrigger className="text-sm md:text-base">
-          <SelectValue placeholder="Seleccionar Aprendiz" />
-        </SelectTrigger>
-        <SelectContent>
-          {apprentices.map((a) => (
-            <SelectItem
-              key={a.id_Apprentice}
-              value={a.id_Apprentice.toString()}
-            >
-              {a.first_Name_Apprentice} {a.last_Name_Apprentice}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="space-y-1 px-2">
+        <Label className="text-left">Aprendiz</Label>
+        <Select onValueChange={handleSelectApprentice}>
+          <SelectTrigger className="w-full text-sm md:text-base">
+            <SelectValue placeholder="Seleccionar Aprendiz" />
+          </SelectTrigger>
+          <SelectContent>
+            {apprentices.map((a) => (
+              <SelectItem
+                key={a.id_Apprentice}
+                value={a.id_Apprentice.toString()}
+                className="text-sm"
+              >
+                {a.first_Name_Apprentice} {a.last_Name_Apprentice}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-      <Button
-        type="submit"
-        disabled={mutation.isLoading}
-        className="w-full py-2 mt-2"
-      >
-        {mutation.isLoading ? "Registrando..." : "Registrar Permiso"}
-      </Button>
+      <div className="px-2">
+        <Button
+          type="submit"
+          disabled={mutation.isLoading}
+          className="w-full py-2 mt-2"
+        >
+          {mutation.isLoading ? "Registrando..." : "Registrar Permiso"}
+        </Button>
+      </div>
     </form>
   );
 }

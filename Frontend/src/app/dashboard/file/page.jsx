@@ -6,6 +6,7 @@ import ContecPage from "@/components/utils/ContectPage";
 import axiosInstance from "@/lib/axiosInstance";
 import RegisterFile from "./registerComponet";
 import LoadingPage from "@/components/utils/LoadingPage"; // ya debe estar importado
+import UpdateFile from "./UpdateComponet";
 
 export default function FileDashboard() {
   // 🔹 Obtener lista de fichas con React Query
@@ -46,6 +47,7 @@ export default function FileDashboard() {
         tableCell={TableCell}
         translations={translations}
         isDisabled={(row) => row.status === "Expirado"}
+        updateComponets={UpdateFile}
       />
     </PrivateNav>
   );

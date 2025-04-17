@@ -59,7 +59,9 @@ export default function ModalInfoApprentice({ isOpen, onClose, apprenticeId }) {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {Object.entries(data)
-              .filter(([key]) => key !== "id_Apprentice") // Ignorar campos
+              .filter(
+                ([key]) => !["id_Apprentice", "id_municipality"].includes(key)
+              )
               .map(([key, value]) => (
                 <div key={key} className="bg-gray-100 rounded-xl p-3 shadow-sm">
                   <p className="text-sm text-gray-500 font-medium">

@@ -27,11 +27,10 @@ function ContecPage({
   fieldName,
   updateEndpoint,
   queryKey,
-  inf
+  inf,
 }) {
   return (
     <>
-      {/* <ModalDialog RegisterComponets={registerComponets} TitlePage={titlesPage} /> */}
       <DataTable
         Data={Data}
         idKey={idKey}

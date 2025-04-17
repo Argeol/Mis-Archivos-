@@ -24,7 +24,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical } from "lucide-react";
+import {
+  Eye,
+  Edit,
+  Trash2,
+  Info,
+  User,
+  MoreVertical,
+  CheckCircle,
+} from "lucide-react";
+import AuthorizePermissionModal from "@/app/dashboard/responsible/AuthorizePermissionModal";
 
 export default function DataTable({
   Data,
@@ -64,6 +73,12 @@ export default function DataTable({
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
+  const [selectedUpdateId, setSelectedUpdateId] = useState(null);
+  const [isOpenAuthorizationModal, setIsOpenAuthorizationModal] =
+    useState(false); // Estado para el modal de autorización
+  const [responsibleId, setResponsibleId] = useState(null); // 👈 Agrega esta línea
+  const [responsibleName, setResponsibleName] = useState("");
 
   return (
     <Card className="w-full max-w-5xl mx-auto p-4">
@@ -81,6 +96,7 @@ export default function DataTable({
         </div>
         {RegisterComponets && (
           <ModalDialog
+            className="w-full max-w-mda sm:max-w-xl sm:rounded-lg"
             RegisterComponets={RegisterComponets}
             TitlePage={TitlePage}
           />
@@ -112,45 +128,80 @@ export default function DataTable({
                     {tableCell.map((cell, index) => (
                       <TableCell key={index}>{row[cell]}</TableCell>
                     ))}
-                    <TableCell className="text-center space-x-2 !pointer-events-auto relative">
-                      <ModalDialogUpdate
-                        TitlePage={TitlePage}
-                        UpdateComponent={updateComponets}
-                        id={row[idKey]}
-                        disabled={disabled}
-                      />
+                    <TableCell className="text-center !pointer-events-auto">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-44">
+                          {idKey === "responsible_Id" && row[idKey] != null && (
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setResponsibleId(row[idKey]);
+                                setIsOpenAuthorizationModal(true);
+                                setResponsibleName(row.nom_Responsible);
+                              }}
+                            >
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              Autorizar
+                            </DropdownMenuItem>
+                          )}
+                          {/* Otros elementos del menú */}
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedUpdateId(row[idKey]);
+                              setIsOpenUpdateModal(true);
+                            }}
+                          >
+                            <Edit className="mr-2 h-4 w-4" /> Editar
+                          </DropdownMenuItem>
 
-                      {inf && (
-                        <Button
-                          onClick={() => {
-                            setSelectedApprenticeId(row[inf]);
-                            setIsOpenApprenticeModal(true);
-                          }}
-                        >
-                          Ver aprendiz
-                        </Button>
-                      )}
+                          {inf && (
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedApprenticeId(row[inf]);
+                                setIsOpenApprenticeModal(true);
+                              }}
+                            >
+                              <User className="mr-2 h-4 w-4" /> Ver aprendiz
+                            </DropdownMenuItem>
+                          )}
 
-                      {translations && (
-                        <Button
-                          onClick={() => {
-                            setSelectedRowInfo(row);
-                            setIsOpenInfoModal(true);
-                          }}
-                        >
-                          Información de {TitlePage}
-                        </Button>
-                      )}
+                          {translations && (
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedRowInfo(row);
+                                setIsOpenInfoModal(true);
+                              }}
+                            >
+                              <Info className="mr-2 h-4 w-4" /> Información
+                            </DropdownMenuItem>
+                          )}
 
-                      {fieldName && updateEndpoint && currentStatus && (
-                        <StatusToggleButton
-                          id={row[idKey]}
-                          currentStatus={row[currentStatus]}
-                          fieldName={fieldName}
-                          updateEndpoint={updateEndpoint}
-                          queryKey={queryKey}
-                        />
-                      )}
+                          {fieldName && updateEndpoint && currentStatus && (
+                            <DropdownMenuItem asChild>
+                              <StatusToggleButton
+                                id={row[idKey]}
+                                currentStatus={row[currentStatus]}
+                                fieldName={fieldName}
+                                updateEndpoint={updateEndpoint}
+                                queryKey={queryKey}
+                              />
+                            </DropdownMenuItem>
+                          )}
+                          {deleteUrl && (
+                            <DropdownMenuItem asChild>
+                              <DeleteButton
+                                id={row[idKey]}
+                                deleteUrl={deleteUrl}
+                                setData={setData}
+                              />
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 );
@@ -213,6 +264,25 @@ export default function DataTable({
           ignorar={ignorar}
         />
       )}
+      {isOpenUpdateModal && selectedUpdateId && (
+        <ModalDialogUpdate
+          TitlePage={TitlePage}
+          UpdateComponent={updateComponets}
+          id={selectedUpdateId}
+          isOpen={isOpenUpdateModal} // <- esta es la que faltaba
+          onClose={() => {
+            setIsOpenUpdateModal(false);
+            setSelectedUpdateId(null);
+          }}
+        />
+      )}
+
+      <AuthorizePermissionModal
+        isOpen={isOpenAuthorizationModal}
+        onClose={() => setIsOpenAuthorizationModal(false)}
+        responsibleId={responsibleId}
+        responsibleName={responsibleName} // 👈 Agrega esta línea
+      />
     </Card>
   );
 }

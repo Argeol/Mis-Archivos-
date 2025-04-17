@@ -42,6 +42,7 @@ export default function RegisterApprentice() {
   });
 
   const [id_department, setDepartmentId] = useState(null);
+  const [program_Id, setProgramId] = useState(null);
 
   const { data: departments = [] } = useQuery({
     queryKey: ["departments"],
@@ -52,13 +53,22 @@ export default function RegisterApprentice() {
   });
 
   const { data: files = [] } = useQuery({
-    queryKey: ["files"],
+    queryKey: ["files", program_Id],
     queryFn: async () => {
-      const res = await axiosInstance.get("/Api/File/Getfiles");
+      if (!program_Id) return [];
+      const res = await axiosInstance.get(
+        `Api/File/GetFileProgram/${program_Id}`
+      );
       return res.data;
     },
   });
-
+  const { data: program = [] } = useQuery({
+    queryKey: ["program"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/Api/Program/GetProgram");
+      return res.data;
+    },
+  });
   const { data: municipalities = [] } = useQuery({
     queryKey: ["municipalities", id_department],
     queryFn: async () => {
@@ -98,6 +108,12 @@ export default function RegisterApprentice() {
     setFormData((prev) => ({ ...prev, Id_municipality: 0 }));
   };
 
+  const handleprogramChange = (value) => {
+    const program_Id = parseInt(value);
+    setProgramId(program_Id);
+    setFormData((prev) => ({ ...prev, file_id: 0 }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     mutation.mutate();
@@ -106,31 +122,38 @@ export default function RegisterApprentice() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-4xl mx-auto p-4 sm:p-6 md:p-8 border rounded-2xl shadow-md bg-white space-y-4"
+      className="p-2  rounded-2xl bg-white space-y-4"
     >
-      <h2 className="text-lg font-semibold text-center col-span-full">
-        Registrar Aprendiz
-      </h2>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Input
-          name="id_Apprentice"
-          placeholder="Documento"
-          onChange={handleChange}
-          required
-        />
-        <Input
-          name="first_Name_Apprentice"
-          placeholder="Nombre"
-          onChange={handleChange}
-          required
-        />
-        <Input
-          name="last_Name_Apprentice"
-          placeholder="Apellido"
-          onChange={handleChange}
-          required
-        />
+        <div>
+          <Label>Documento</Label>
+          <Input
+            name="id_Apprentice"
+            placeholder="Documento"
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <Label>Nombre</Label>
+          <Input
+            name="first_Name_Apprentice"
+            placeholder="Nombre"
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <Label>Apellido</Label>
+          <Input
+            name="last_Name_Apprentice"
+            placeholder="Apellido"
+            onChange={handleChange}
+            required
+          />
+        </div>
 
         <div>
           <Label>Fecha de Nacimiento</Label>
@@ -142,19 +165,26 @@ export default function RegisterApprentice() {
           />
         </div>
 
-        <Input
-          name="email_Apprentice"
-          type="email"
-          placeholder="Correo"
-          onChange={handleChange}
-          required
-        />
-        <Input
-          name="phone_Apprentice"
-          placeholder="Teléfono"
-          onChange={handleChange}
-          required
-        />
+        <div>
+          <Label>Correo</Label>
+          <Input
+            name="email_Apprentice"
+            type="email"
+            placeholder="Correo"
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <Label>Teléfono</Label>
+          <Input
+            name="phone_Apprentice"
+            placeholder="Teléfono"
+            onChange={handleChange}
+            required
+          />
+        </div>
 
         <div>
           <Label>Género</Label>
@@ -196,12 +226,15 @@ export default function RegisterApprentice() {
           </Select>
         </div>
 
-        <Input
-          name="address_Apprentice"
-          placeholder="Dirección (Cr4 #10-15)"
-          onChange={handleChange}
-          required
-        />
+        <div className="md:col-span-2">
+          <Label>Dirección</Label>
+          <Input
+            name="address_Apprentice"
+            placeholder="Dirección (Cr4 #10-15)"
+            onChange={handleChange}
+            required
+          />
+        </div>
 
         <div>
           <Label>Tipo de Aprendiz</Label>
@@ -270,6 +303,24 @@ export default function RegisterApprentice() {
             </SelectContent>
           </Select>
         </div>
+        <div>
+          <Label>Programas</Label>
+          <Select onValueChange={handleprogramChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Seleccionar Programa" />
+            </SelectTrigger>
+            <SelectContent>
+              {program.map((Program) => (
+                <SelectItem
+                  key={Program.program_Id}
+                  value={Program.program_Id.toString()}
+                >
+                  {Program.program_Name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
         <div>
           <Label>Ficha</Label>
@@ -283,49 +334,57 @@ export default function RegisterApprentice() {
             </SelectTrigger>
             <SelectContent>
               {files.map((file) => (
-                <SelectItem
-                  key={file.file_Id}
-                  value={file.file_Id.toString()}
-                >
-                  {file.file_Id} - {file.programName}
+                <SelectItem key={file.file_Id} value={file.file_Id.toString()}>
+                  {file.file_Id} - {file.program.program_Name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
-        <Input
-          name="email_responsible"
-          placeholder="Correo del Acudiente"
-          onChange={handleChange}
-          required
-        />
-        <Input
-          name="nom_responsible"
-          placeholder="Nombre del Acudiente"
-          onChange={handleChange}
-          required
-        />
-        <Input
-          name="ape_responsible"
-          placeholder="Apellido del Acudiente"
-          onChange={handleChange}
-          required
-        />
-        <Input
-          name="tel_responsible"
-          placeholder="Teléfono del Acudiente"
-          onChange={handleChange}
-          required
-        />
+        <div>
+          <Label>Correo del Acudiente</Label>
+          <Input
+            name="email_responsible"
+            placeholder="Correo del Acudiente"
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <Label>Nombre del Acudiente</Label>
+          <Input
+            name="nom_responsible"
+            placeholder="Nombre del Acudiente"
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <Label>Apellido del Acudiente</Label>
+          <Input
+            name="ape_responsible"
+            placeholder="Apellido del Acudiente"
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <Label>Teléfono del Acudiente</Label>
+          <Input
+            name="tel_responsible"
+            placeholder="Teléfono del Acudiente"
+            onChange={handleChange}
+            required
+          />
+        </div>
       </div>
 
       <div className="pt-2">
-        <Button
-          type="submit"
-          disabled={mutation.isLoading}
-          className="w-full"
-        >
+        <Button type="submit" disabled={mutation.isLoading} className="w-full">
           {mutation.isLoading ? "Registrando..." : "Registrar"}
         </Button>
       </div>

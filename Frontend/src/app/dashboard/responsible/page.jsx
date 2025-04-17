@@ -8,6 +8,7 @@ import axiosInstance from "@/lib/axiosInstance"; // Componente de registro de re
 import RegisterResponsible from "./registerResposible"; // Componente de actualización de responsable
 
 import LoadingPage from "@/components/utils/LoadingPage";
+import UpdateResponsible from "./updateResponsible";
 
 export default function ResponsibleDashboard() {
   const queryClient = useQueryClient();
@@ -43,10 +44,11 @@ export default function ResponsibleDashboard() {
     state: "Estado",  
   };
 
-  const fieldLabels = ["Nombre", "Apellido"];
+  const fieldLabels = ["Nombre", "Apellido", "rol"];
   const TableCell = [
     "nom_Responsible",
     "ape_Responsible",
+    "name_role"
     // "tel_Responsible",
     // "roleId",
     // "state",

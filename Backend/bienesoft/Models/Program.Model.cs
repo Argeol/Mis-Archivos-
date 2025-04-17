@@ -9,7 +9,7 @@ namespace Bienesoft.Models
         [Key] public int Program_Id { get; set; }
 
         [Required(ErrorMessage = "El nombre del programa es obligatorio.")]
-        [StringLength(35, ErrorMessage = "El nombre no puede tener más de 35 caracteres.")]
+        [StringLength(255, ErrorMessage = "El nombre no puede tener más de 35 caracteres.")]
         public string Program_Name { get; set; }
 
         public int? Area_Id { get; set; }
@@ -35,7 +35,7 @@ namespace Bienesoft.Models
         [Key] public int Program_Id { get; set; }
 
         [Required(ErrorMessage = "El nombre del programa es obligatorio.")]
-        [StringLength(35, ErrorMessage = "El nombre no puede tener más de 35 caracteres.")]
+        [StringLength(255, ErrorMessage = "El nombre no puede tener más de 255 caracteres.")]
         public string Program_Name { get; set; }
 
         public int Area_Id { get; set; }

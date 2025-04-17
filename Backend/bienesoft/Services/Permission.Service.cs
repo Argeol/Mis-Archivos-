@@ -97,7 +97,7 @@ namespace Bienesoft.Services
         public object GetPermissionById(int id)
         {
             var permiso = _context.permissionGN
-                .Include(p => p.Apprentice)
+                // .Include(p => p.Apprentice)
                 .FirstOrDefault(p => p.PermissionId == id);
 
             if (permiso == null) return null;
@@ -112,7 +112,7 @@ namespace Bienesoft.Services
                 permiso.Motive,
                 permiso.Observation,
                 Status = permiso.Status.ToString(),
-                Aprendiz = _apprenticeService.GetApprenticeById(permiso.Id_Apprentice)
+                // Aprendiz = _apprenticeService.GetApprenticeById(permiso.Id_Apprentice)
             };
         }
 
@@ -124,6 +124,9 @@ namespace Bienesoft.Services
                 {
                     p.PermissionId,
                     p.Motive,
+                    p.Observation,
+                    p.Adress,
+                    p.Destination,
                     Fechadesolicitud = p.ApplicationDate.ToString("HH:mm yyyy-MM-dd"),
                     Fechalsalida = p.DepartureDate.ToString("HH:mm yyyy-MM-dd"),
                     Fechallegada = p.EntryDate.ToString("HH:mm yyyy-MM-dd"),

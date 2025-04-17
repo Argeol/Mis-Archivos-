@@ -17,15 +17,13 @@ import { Label } from "@/components/ui/label";
 const statusOptions = ["Activo", "Inactivo"];
 
 export default function UpdateResponsible({ id }) {
- 
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     nom_Responsible: "",
     ape_Responsible: "",
     tel_Responsible: "",
     roleId: 0,
-    state:""
-   
+    state: "",
   });
 
   // Obtener datos del responsable
@@ -60,7 +58,10 @@ export default function UpdateResponsible({ id }) {
   const mutation = useMutation({
     mutationFn: async () => {
       console.log("Enviando datos:", formData);
-      await axiosInstance.put(`/api/Responsible/UpdateResponsible/${id}`,formData);
+      await axiosInstance.put(
+        `/api/Responsible/UpdateResponsible/${id}`,
+        formData
+      );
     },
     onSuccess: () => {
       alert("Responsable actualizado correctamente");
@@ -86,7 +87,9 @@ export default function UpdateResponsible({ id }) {
     return <p>No se encontraron datos para el responsable.</p>;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
+    <form onSubmit={handleSubmit} className="space-y-4 p-4">
+      <Label>Estado: {data.state}</Label>
+      <hr/>
       <Label>Nombre</Label>
       <Input
         name="nom_Responsible"
@@ -130,8 +133,7 @@ export default function UpdateResponsible({ id }) {
         </SelectContent>
       </Select>
 
-      <Label>Estado</Label>
-      <Select
+      {/* <Select
         value={formData.state}
         onValueChange={(value) =>
           setFormData((prev) => ({ ...prev, state: value }))
@@ -147,7 +149,7 @@ export default function UpdateResponsible({ id }) {
             </SelectItem>
           ))}
         </SelectContent>
-      </Select>
+      </Select> */}
 
       <Button type="submit" disabled={mutation.isLoading}>
         {mutation.isLoading ? "Actualizando..." : "Actualizar"}

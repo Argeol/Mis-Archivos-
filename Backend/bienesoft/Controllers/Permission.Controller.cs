@@ -44,6 +44,16 @@ namespace bienesoft.Controllers
             var Results = _permissionService.GetAllPermissions();
             return Ok(Results);
         }
+        [HttpGet("GetPermisoById/{id}")]
+        public IActionResult GetPermissionById(int id)
+        {
+            var Results = _permissionService.GetPermissionById(id);
+            if (Results == null)
+            {
+                return NotFound(new { message = "Permiso no encontrado" });
+            }
+            return Ok(Results);
+        }
         [HttpGet("exportar-aprobados")]
         public IActionResult ExportApproved()
         {
@@ -54,8 +64,8 @@ namespace bienesoft.Controllers
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         fileName);
         }
-        [HttpPut("UpdatePermiso")]
-        public async Task<IActionResult> UpdatePermission([FromQuery] int id, [FromBody] UpdatePermiso permiso)
+        [HttpPut("UpdatePermission/{id}")]
+        public async Task<IActionResult> UpdatePermission(int id, [FromBody] UpdatePermiso permiso)
         {
             var result = await _permissionService.UpdatePermissionAsync(id, permiso);
             return Ok(result);

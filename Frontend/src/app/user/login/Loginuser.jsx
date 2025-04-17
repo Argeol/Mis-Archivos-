@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
 import LockIcon from "@mui/icons-material/Lock";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { motion } from "framer-motion";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -22,6 +24,7 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // Estado para la visibilidad de la contraseña
 
   const loginMutation = useMutation({
     mutationFn: Login,
@@ -51,7 +54,7 @@ function LoginPage() {
         className="shadow-2xl p-6 w-full max-w-sm rounded-xl bg-white"
         onSubmit={handleSubmit}
       >
-        <div className="flex items-center justify-center mb-2"> {/* antes: mb-6 */}
+        <div className="flex items-center justify-center mb-2">
           <motion.div
             animate={{ y: [0, -5, 0], opacity: [1, 0.7, 1] }}
             transition={{ repeat: Infinity, duration: 1 }}
@@ -64,10 +67,9 @@ function LoginPage() {
           </motion.div>
         </div>
 
-        <h1 className="font-bold text-3xl text-center mb-4 mt-0"> {/* antes: mb-6 mt-2 */}
+        <h1 className="font-bold text-3xl text-center mb-4 mt-0">
           Iniciar Sesión
         </h1>
-
 
         {error && (
           <div className="mb-4 text-sm text-red-600 bg-red-100 p-2 rounded">
@@ -96,7 +98,7 @@ function LoginPage() {
           <TextField
             label="Contraseña"
             placeholder="Contraseña"
-            type="password"
+            type={showPassword ? "text" : "password"} // Cambiar entre texto y password
             onChange={(e) => setPassword(e.target.value)}
             required
             fullWidth
@@ -104,6 +106,17 @@ function LoginPage() {
               startAdornment: (
                 <InputAdornment position="start">
                   <LockIcon />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)} // Cambiar el estado de visibilidad
+                    aria-label={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
+                  >
+                    {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                  </button>
                 </InputAdornment>
               ),
             }}
