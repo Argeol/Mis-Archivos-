@@ -1,8 +1,10 @@
-import React, { useState } from "react"; 
-import { Card } from "@/components/ui/card"; 
-import { FaHouseUser, FaCheckCircle, FaUsersCog, FaListAlt, FaBars } from "react-icons/fa"; 
-import GroupIcon from "@mui/icons-material/Group"; 
-import { useIsMobile } from "./useIsMobile"; 
+"use client"
+
+import { useState } from "react"
+import { Card } from "@/components/ui/card"
+import { FaHouseUser, FaHome, FaCheckCircle, FaUsersCog, FaListAlt, FaBars, FaTimes } from "react-icons/fa"
+import GroupIcon from "@mui/icons-material/Group"
+import { useIsMobile } from "./useIsMobile"
 
 const menuItems = [
   { href: "/dashboard/apprentice", icon: FaHouseUser, label: "Aprendiz" },
@@ -14,28 +16,25 @@ const menuItems = [
   },
   { href: "/dashboard/program", icon: FaUsersCog, label: "Programa" },
   { href: "/dashboard/responsible", icon: GroupIcon, label: "Responsables" },
-];
+]
 
 export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const isMobile = useIsMobile();
+  const [isOpen, setIsOpen] = useState(false)
+  const isMobile = useIsMobile()
 
   const handleMouseEnter = () => {
-    if (!isMobile) setIsOpen(true);
-  };
+    if (!isMobile) setIsOpen(true)
+  }
 
   const handleMouseLeave = () => {
-    if (!isMobile) setIsOpen(false);
-  };
+    if (!isMobile) setIsOpen(false)
+  }
 
   return (
     <>
       {/* Botón flotante solo en móvil cuando sidebar está cerrado */}
       {isMobile && !isOpen && (
-        <button
-          className="fixed top-4 left-4 z-50 bg-white shadow-md p-2 rounded-md"
-          onClick={() => setIsOpen(true)}
-        >
+        <button className="fixed top-4 left-4 z-50 bg-white shadow-md p-2 rounded-md" onClick={() => setIsOpen(true)}>
           <FaBars className="text-2xl text-gray-700" />
         </button>
       )}
@@ -49,40 +48,32 @@ export default function Sidebar() {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          {/* Logo */}
-          {isOpen ? (
-            <img
-              src="/assets/img/logo.webp"
-              alt="Bienesoft Logo Grande"
-              className="w-40 h-auto animate-pulse mx-auto hidden sm:block"
-            />
-          ) : (
-            <img
-              src="/assets/img/bienesoft.webp"
-              alt="Bienesoft Logo Pequeño"
-              className="w-10 h-auto mx-auto mb-4 hidden sm:block"
-            />
-          )}
-
-          {/* Espacio fantasma para evitar salto en móvil */}
-          <div className="block sm:hidden h-16" />
+          {/* Logo - Ahora visible en todos los dispositivos */}
+          <div className="flex justify-center mb-4">
+            {isOpen ? (
+              <img
+                src="/assets/img/logo.webp"
+                alt="Bienesoft Logo Grande"
+                className="w-40 h-auto animate-pulse mx-auto"
+              />
+            ) : (
+              <img src="/assets/img/bienesoft.webp" alt="Bienesoft Logo Pequeño" className="w-10 h-auto mx-auto" />
+            )}
+          </div>
 
           {/* Botón cerrar (solo en móvil) */}
           {isMobile && (
             <button
-              className="absolute top-4 right-4 z-50 text-xl"
+              className="absolute top-4 right-4 z-50 text-xl bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center"
               onClick={() => setIsOpen(false)}
+              aria-label="Cerrar menú"
             >
-              ✖️
+              <FaTimes className="text-gray-700" />
             </button>
           )}
 
           {/* Menú */}
-          <nav
-            className={`mt-5 flex flex-col ${
-              isOpen ? "gap-y-3 items-start" : "gap-y-6 items-center"
-            }`}
-          >
+          <nav className={`mt-5 flex flex-col ${isOpen ? "gap-y-3 items-start" : "gap-y-6 items-center"}`}>
             {menuItems.map(({ href, icon: Icon, label }) => (
               <a
                 key={href}
@@ -92,13 +83,7 @@ export default function Sidebar() {
                 }`}
               >
                 <Icon
-                  className={`text-gray-700 transition-all duration-200 ${
-                    isOpen
-                      ? "w5 h-5"
-                      : isMobile
-                      ? "w-5 h-5 mx-auto"
-                      : "w-5 h-5 mx-auto"
-                  }`}
+                  className={`text-gray-700 transition-all duration-200 ${isOpen ? "w-5 h-5" : "w-5 h-5 mx-auto"}`}
                 />
                 {isOpen && <span>{label}</span>}
               </a>
@@ -106,17 +91,19 @@ export default function Sidebar() {
           </nav>
 
           {/* Módulo para volver al dashboard */}
-          <div className="mt-60">
+          <div className="mt-auto pt-10">
             <a
-              href="http://192.168.184.38:3000/dashboard/"
-              className="flex items-center p-2 rounded-md text-gray-500 hover:bg-[#218EED] hover:text-white transition-colors"
+              href="/dashboard"
+              className={`flex items-center p-2 rounded-md text-gray-500 hover:bg-[#218EED] hover:text-white transition-colors ${
+                isOpen ? "space-x-3" : "flex-col"
+              }`}
             >
-              <FaHouseUser className="text-gray-700 transition-all duration-200 w-5 h-5 mx-auto" />
-              {isOpen && <span>Volver al Inicio de Modulos</span>}
+              <FaHome className="text-gray-700 " />
+              {isOpen && <span>Inicio</span>}
             </a>
           </div>
         </Card>
       )}
     </>
-  );
+  )
 }
