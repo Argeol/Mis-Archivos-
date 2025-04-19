@@ -70,7 +70,7 @@ builder.Services.AddScoped<DepartmentService>();
 // builder.Services.AddScoped<LocalityServices>();
 // builder.Services.AddScoped<AuthorizationResponsibleServices>();
 builder.Services.AddScoped<ResponsibleServices>();
-builder.Services.AddScoped<PermissionFSServices>();
+// builder.Services.AddScoped<PermissionFSServices>();
 // builder.Services.AddScoped<PermissionService>();
 builder.Services.AddScoped<MunicipalityService>();
 builder.Services.AddScoped<PermissionApprovalService>();

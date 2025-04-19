@@ -118,6 +118,10 @@ public class PermissionApprovalService
         if (permiso == null)
             return "Permiso no encontrado.";
 
+        if(permiso.Status == Status.Rechazado){
+            return "El permiso ya fue rechazado por un responsable.";
+            }
+        
         var aprendiz = await _context.apprentice
             .FirstOrDefaultAsync(a => a.Id_Apprentice == permiso.Id_Apprentice);
 

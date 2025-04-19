@@ -84,5 +84,13 @@ namespace bienesoft.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        [HttpGet("CountApprentices")]
+        public IActionResult CountApprentices(){
+            var count = _apprenticeService.CountApprentices();
+            return Ok(new { TotalAprendices = count });
+
+
+
+        }
     }
 }
