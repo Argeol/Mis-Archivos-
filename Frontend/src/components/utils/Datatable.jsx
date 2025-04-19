@@ -126,7 +126,31 @@ export default function DataTable({
                     }`}
                   >
                     {tableCell.map((cell, index) => (
-                      <TableCell key={index}>{row[cell]}</TableCell>
+                      <TableCell key={index}>
+                        {cell === "porcentaje" ? (
+                          <div className="flex flex-col items-center">
+                            {/* Barra de porcentaje */}
+                            <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
+                              <div
+                                className={`h-full rounded-full ${
+                                  row[cell] >= 100
+                                    ? "bg-green-600"
+                                    : row[cell] >= 75
+                                    ? "bg-yellow-500"
+                                    : "bg-red-500"
+                                }`}
+                                style={{ width: `${row[cell]}%` }}
+                              />
+                            </div>
+                            {/* Número debajo de la barra */}
+                            <span className="text-sm font-semibold">
+                              {Math.round(row[cell])}%
+                            </span>
+                          </div>
+                        ) : (
+                          row[cell] // Renderizar los demás valores normalmente
+                        )}
+                      </TableCell>
                     ))}
                     <TableCell className="text-center !pointer-events-auto">
                       <DropdownMenu>

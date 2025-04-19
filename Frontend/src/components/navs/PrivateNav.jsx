@@ -1,21 +1,18 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
-import { UserCircle } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import Sidebar from "./sidebar";
-// import { SunIcon, MoonIcon } from "@heroicons/react/24/solid";
-import { SunIcon, MoonIcon } from "lucide-react";
+import { usePathname } from "next/navigation"
+import { UserCircle } from "lucide-react"
+import { DropdownMenu, DropdownMenuItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
+import Sidebar from "./sidebar"
+import Dashboard from "./dashboard"
+
 
 function PrivateNav({ children }) {
-  const pathname = usePathname();
+  const pathname = usePathname()
+
+  // Determinar si estamos en la ruta principal del dashboard
+  const isMainDashboard = pathname === "/dashboard" || pathname === "/dashboard/"
 
   // Estado para manejar el tema
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
@@ -49,8 +46,27 @@ function PrivateNav({ children }) {
       {/* Contenedor principal */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Navbar superior con fondo glassmorphism */}
-        <nav className={`bg-white/60 backdrop-blur-md shadow-md px-6 py-3 flex justify-between items-center border-b border-slate-200 ${theme === "dark" ? "bg-gray-800" : ""}`}>
-          <div></div> {/* Aquí puedes poner un logo o algo más si lo necesitas */}
+
+        <nav className="bg-white/60 backdrop-blur-md shadow-md px-6 py-3 flex justify-between items-center border-b border-slate-200">
+          <div>
+            {/* Mostrar el título del módulo actual basado en la ruta */}
+            <h1 className="text-xl font-semibold text-gray-800 ms-20" >
+              {isMainDashboard
+                ? "Dashboard"
+                : pathname.includes("/apprentice")
+                  ? "Gestión de Aprendices"
+                  : pathname.includes("/file")
+                    ? "Gestión de Fichas"
+                    : pathname.includes("/permissionGeneral")
+                      ? "Gestión de Permisos"
+                      : pathname.includes("/program")
+                        ? "Gestión de Programas"
+                        : pathname.includes("/responsible")
+                          ? "Gestión de Responsables"
+                          : "Dashboard"}
+            </h1>
+          </div>
+
 
           {/* Menú desplegable de usuario */}
           <DropdownMenu>
@@ -62,7 +78,10 @@ function PrivateNav({ children }) {
                 <UserCircle className={`w-12 h-12 ${theme === "dark" ? "text-white" : "text-indigo-500"} hover:${theme === "dark" ? "text-indigo-700" : "text-indigo-500"} transition-colors`} />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 bg-white/90 backdrop-blur-md shadow-lg border border-slate-200">
+            <DropdownMenuContent
+              align="end"
+              className="w-48 bg-white/90 backdrop-blur-md shadow-lg border border-slate-200"
+            >
               <DropdownMenuItem asChild>
                 <a href= "#" 
                 onClick={() => alert("Sesión en desarrollo. Estamos trabajando en ello fuertemente. Gracias por su paciencia!")}
@@ -88,21 +107,14 @@ function PrivateNav({ children }) {
 
         {/* Contenido principal con scroll si es necesario */}
         <main className="flex-1 overflow-y-auto p-6 bg-white/80 backdrop-blur-md rounded-t-2xl shadow-inner">
-          {pathname === "/dashboard" && (
-            <div className="text-center">
-              <h1 className="text-3xl font-extrabold text-gray-800 drop-shadow-sm">
-                ¡Bienvenidos a nuestro Dashboard Bienesoft!
-              </h1>
-              <p className="text-lg text-gray-600 mt-2">
-                Aquí puedes hacer tus consultas, creaciones, eliminaciones y actualizaciones de datos.
-              </p>
-            </div>
-          )}
-          <div className="mt-6">{children}</div> {/* Aquí se renderiza el contenido dinámico */}
+
+          {/* Renderizar condicionalmente el Dashboard o el contenido específico del módulo */}
+          {isMainDashboard ? <Dashboard /> : <div className="animate-fadeIn">{children}</div>}
+
         </main>
       </div>
     </div>
-  );
+  )
 }
 
-export default PrivateNav;
+export default PrivateNav

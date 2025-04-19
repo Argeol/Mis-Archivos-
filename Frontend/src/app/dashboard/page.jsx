@@ -8,9 +8,10 @@ export default function Dashboard() {
   return (
     <>
     <div className="flex flex-col flex-1">
-      <PrivateNav title={titleAcudiente}>
+      <PrivateNav 
+      title={titleAcudiente} >
       </PrivateNav>
-        </div>
+    </div>
     </>
   );
 }

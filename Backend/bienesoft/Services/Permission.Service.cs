@@ -116,26 +116,60 @@ namespace Bienesoft.Services
             };
         }
 
+        //public IEnumerable<object> GetAllPermissions()
+        //{
+        //    return _context.permissionGN
+        //        .Include(p => p.Apprentic)
+        //        .Select(p => new
+        //        {
+        //            p.PermissionId,
+        //            p.Motive,
+        //            Fechadesolicitud = p.ApplicationDate.ToString("HH:mm yyyy-MM-dd"),
+        //            Fechalsalida = p.DepartureDate.ToString("HH:mm yyyy-MM-dd"),
+        //            Fechallegada = p.EntryDate.ToString("HH:mm yyyy-MM-dd"),
+        //            Estado = p.Status.ToString(),
+        //            NombreAprendiz = p.Apprentice.First_Name_Apprentice + " " + p.Apprentice.Last_Name_Apprentice,
+        //            p.Id_Apprentice
+        //        })
+        //        .ToList();
+        //}
         public IEnumerable<object> GetAllPermissions()
         {
-            return _context.permissionGN
-                .Include(p => p.Apprentice)
-                .Select(p => new
-                {
-                    p.PermissionId,
-                    p.Motive,
-                    p.Observation,
-                    p.Adress,
-                    p.Destination,
-                    Fechadesolicitud = p.ApplicationDate.ToString("HH:mm yyyy-MM-dd"),
-                    Fechalsalida = p.DepartureDate.ToString("HH:mm yyyy-MM-dd"),
-                    Fechallegada = p.EntryDate.ToString("HH:mm yyyy-MM-dd"),
-                    Estado = p.Status.ToString(),
-                    NombreAprendiz = p.Apprentice.First_Name_Apprentice + " " + p.Apprentice.Last_Name_Apprentice,
-                    p.Id_Apprentice
-                })
-                .ToList();
+            var permisos = _context.permissionGN
+                .Include(a => a.Apprentice)
+                .Include(p => p.Approvals)
+                .ToList(); // <-- Ejecuta la consulta y trae los datos a memoria
+
+            var resultado = permisos.Select(p => new
+            {
+                p.PermissionId,
+                p.Motive,
+                Fechadesolicitud = p.ApplicationDate.ToString("yyyy-MM-dd"),
+                Fechalsalida = p.DepartureDate.ToString("HH:mm yyyy-MM-dd"),
+                Fechallegada = p.EntryDate.ToString("HH:mm yyyy-MM-dd"),
+                Estado = p.Status.ToString(),
+                NombreAprendiz = p.Apprentice.First_Name_Apprentice + " " + p.Apprentice.Last_Name_Apprentice,
+                p.Id_Apprentice,
+                Porcentaje = CalcularPorcentajeAprobacion(p)
+            });
+
+            return resultado;
         }
+
+        private static double CalcularPorcentajeAprobacion(PermissionGN permiso)
+        {
+            if (permiso == null || permiso.Approvals == null || permiso.Approvals.Count == 0)
+                return 0;
+
+            string tipoAprendiz = permiso.Apprentice?.Tip_Apprentice?.ToLower();
+            int totalResponsables = tipoAprendiz == "interno" ? 4 : 3;
+            int aprobados = permiso.Approvals.Count(pa => pa.ApprovalStatus == ApprovalStatus.Aprobado);
+
+            double porcentaje = (double)aprobados / totalResponsables * 100;
+            return Math.Min(porcentaje, 100);
+
+        }
+
 
         // public async Task<bool> DeletePermissionAsync(int id)
         // {
