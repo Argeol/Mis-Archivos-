@@ -203,9 +203,11 @@ namespace Bienesoft.Services
 
             _context.SaveChanges();
         }
+    public int CountApprentices()
+    {
+        return _context.apprentice.Count();
 
-
-    }
+    }}
     // public async Task<bool> DeleteApprenticeAsync(int id)
     // {
     //     var apprentice = await _context.apprentice.FindAsync(id);

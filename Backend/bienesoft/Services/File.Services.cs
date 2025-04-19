@@ -88,6 +88,7 @@ namespace bienesoft.Services
          public async Task<List<FileModel?>> GetFileProgramAsync(int programId)
         {
             return await _context.file
+                .Include(a=>a.program)
                 .Where(m => m.Program_Id == programId)
                 .ToListAsync();
         }

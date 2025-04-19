@@ -97,7 +97,7 @@ namespace Bienesoft.Services
         public object GetPermissionById(int id)
         {
             var permiso = _context.permissionGN
-                .Include(p => p.Apprentice)
+                // .Include(p => p.Apprentice)
                 .FirstOrDefault(p => p.PermissionId == id);
 
             if (permiso == null) return null;
@@ -112,14 +112,14 @@ namespace Bienesoft.Services
                 permiso.Motive,
                 permiso.Observation,
                 Status = permiso.Status.ToString(),
-                Aprendiz = _apprenticeService.GetApprenticeById(permiso.Id_Apprentice)
+                // Aprendiz = _apprenticeService.GetApprenticeById(permiso.Id_Apprentice)
             };
         }
 
         //public IEnumerable<object> GetAllPermissions()
         //{
         //    return _context.permissionGN
-        //        .Include(p => p.Apprentice)
+        //        .Include(p => p.Apprentic)
         //        .Select(p => new
         //        {
         //            p.PermissionId,
@@ -136,7 +136,7 @@ namespace Bienesoft.Services
         public IEnumerable<object> GetAllPermissions()
         {
             var permisos = _context.permissionGN
-                .Include(p => p.Apprentice)
+                .Include(a => a.Apprentice)
                 .Include(p => p.Approvals)
                 .ToList(); // <-- Ejecuta la consulta y trae los datos a memoria
 
@@ -167,6 +167,7 @@ namespace Bienesoft.Services
 
             double porcentaje = (double)aprobados / totalResponsables * 100;
             return Math.Min(porcentaje, 100);
+
         }
 
 

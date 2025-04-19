@@ -55,11 +55,14 @@ export default function RegisterApprentice() {
   const { data: files = [] } = useQuery({
     queryKey: ["files", program_Id],
     queryFn: async () => {
-      const res = await axiosInstance.get(`Api/File/GetMunicipalitiesByDepartment/${program_Id}`);
+      if (!program_Id) return [];
+      const res = await axiosInstance.get(
+        `Api/File/GetFileProgram/${program_Id}`
+      );
       return res.data;
     },
   });
-const { data: program = [] } = useQuery({
+  const { data: program = [] } = useQuery({
     queryKey: ["program"],
     queryFn: async () => {
       const res = await axiosInstance.get("/Api/Program/GetProgram");
@@ -82,7 +85,6 @@ const { data: program = [] } = useQuery({
     mutationFn: async () => {
       const res = await axiosInstance.post("/api/Apprentice", formData);
       return res.data;
-      
     },
     onSuccess: (data) => {
       alert(data.message);
@@ -100,7 +102,7 @@ const { data: program = [] } = useQuery({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
- const handleDepartmentChange = (value) => {
+  const handleDepartmentChange = (value) => {
     const departmentId = parseInt(value);
     setDepartmentId(departmentId);
     setFormData((prev) => ({ ...prev, Id_municipality: 0 }));
@@ -111,9 +113,8 @@ const { data: program = [] } = useQuery({
     setProgramId(program_Id);
     setFormData((prev) => ({ ...prev, file_id: 0 }));
   };
-    
-  
-    const handleSubmit = async (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     mutation.mutate();
   };
@@ -302,23 +303,24 @@ const { data: program = [] } = useQuery({
             </SelectContent>
           </Select>
         </div>
-        <Select
-        onValueChange={(value) =>
-          setFormData({ ...formData, program_Id: parseInt(value) })
-        }
-      >
-      <SelectTrigger>
-        <SelectValue placeholder="Seleccionar Programa" />
-      </SelectTrigger>
-      <SelectContent>
-        {program.map((Program) => (
-          <SelectItem key={Program.program_Id} value={Program.program_Id.toString()}>
-            {Program.program_Name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-      </Select>
-
+        <div>
+          <Label>Programas</Label>
+          <Select onValueChange={handleprogramChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Seleccionar Programa" />
+            </SelectTrigger>
+            <SelectContent>
+              {program.map((Program) => (
+                <SelectItem
+                  key={Program.program_Id}
+                  value={Program.program_Id.toString()}
+                >
+                  {Program.program_Name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
         <div>
           <Label>Ficha</Label>
@@ -333,7 +335,7 @@ const { data: program = [] } = useQuery({
             <SelectContent>
               {files.map((file) => (
                 <SelectItem key={file.file_Id} value={file.file_Id.toString()}>
-                  {file.file_Id} - {file.programName}
+                  {file.file_Id} - {file.program.program_Name}
                 </SelectItem>
               ))}
             </SelectContent>
