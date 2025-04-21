@@ -89,7 +89,7 @@ export default function ApprenticeDashboard() {
           translations={translations}
           //ignorar los campos que no se van a mostrar en la tabla
           ignorar={["status_Apprentice"]}
-          //update del estado -->
+          //update del estado  -->
           currentStatus={"status_Apprentice"}
           updateEndpoint="/api/Apprentice"
           queryKey="aprendices"

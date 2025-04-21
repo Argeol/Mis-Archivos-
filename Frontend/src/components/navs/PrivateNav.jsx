@@ -27,6 +27,7 @@ function PrivateNav({ children }) {
       : "light"
   );
 
+
   return (
     <div
       className={`flex h-screen ${
@@ -56,7 +57,9 @@ function PrivateNav({ children }) {
                 ? "Gestión de Programas"
                 : pathname.includes("/responsible")
                 ? "Gestión de Responsables"
+
                 : "Contenido Principal"}
+
             </h1>
           </div>
 
@@ -102,6 +105,8 @@ function PrivateNav({ children }) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+
         </nav>
 
         {/* Contenido principal */}
@@ -117,4 +122,6 @@ function PrivateNav({ children }) {
   );
 }
 
+
 export default PrivateNav;
+
