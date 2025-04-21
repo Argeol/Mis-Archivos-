@@ -30,6 +30,7 @@ const recentPermissions = [
   { id: 4, apprentice: "Ana Martínez", program: "ADSO", date: "2025-04-13", status: "approved", avatar: "AM" },
 ]
 
+
 const stats = {
   totalApprentices: 245,
   activePermissions: 18,
