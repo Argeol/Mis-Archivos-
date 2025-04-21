@@ -68,8 +68,8 @@ export default function Dashboard() {
     state: "Estado",
   };
 
-  const fieldLabels = ["Id programa", "Programa", "Área", "Estado"];
-  const TableCell = ["program_Id", "program_Name", "area_Name", "state"];
+  const fieldLabels = ["Id programa", "Programa", "Área"];
+  const TableCell = ["program_Id", "program_Name", "area_Name"];
 
   return (
     <PrivateNav>
@@ -87,16 +87,20 @@ export default function Dashboard() {
           updateComponets={UpdateProgram}
           tableCell={TableCell}
           translations={translations}
-          customActions={(row) => (
-            <Button
-              onClick={() => handleChangeState(row.program_Id, row.state)}
-              className={`text-white px-3 py-1 rounded-md ${
-                row.state === "Activo" ? "bg-red-500" : "bg-green-500"
-              }`}
-            >
-              {row.state === "Activo" ? "Desactivar" : "Activar"}
-            </Button>
-          )}
+          currentStatus={"state"}
+          fieldName={"state"}
+          updateEndpoint={"/api/Program/UpdateProgram"}
+          queryKey={"programs"}
+          // customActions={(row) => (
+          //   <Button
+          //     onClick={() => handleChangeState(row.program_Id, row.state)}
+          //     className={`text-white px-3 py-1 rounded-md ${
+          //       row.state === "Activo" ? "bg-red-500" : "bg-green-500"
+          //     }`}
+          //   >
+          //     {row.state === "Activo" ? "Desactivar" : "Activar"}
+          //   </Button>
+          // )}
         />
       )}
     </PrivateNav>

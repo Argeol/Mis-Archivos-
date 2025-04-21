@@ -27,20 +27,6 @@ function PrivateNav({ children }) {
       : "light"
   );
 
-  // Cambiar el tema
-  const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    document.documentElement.setAttribute("data-theme", newTheme);
-  };
-
-  // Aplicar el tema al cargar la página
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      document.documentElement.setAttribute("data-theme", theme);
-    }
-  }, [theme]);
 
   return (
     <div
@@ -60,7 +46,7 @@ function PrivateNav({ children }) {
           <div>
             <h1 className="text-xl font-semibold text-gray-800 ms-20">
               {isMainDashboard
-                ? "Dashboard"
+                ? "Contenido Principal"
                 : pathname.includes("/apprentice")
                 ? "Gestión de Aprendices"
                 : pathname.includes("/file")
@@ -71,7 +57,9 @@ function PrivateNav({ children }) {
                 ? "Gestión de Programas"
                 : pathname.includes("/responsible")
                 ? "Gestión de Responsables"
-                : "Dashboard"}
+
+                : "Contenido Principal"}
+
             </h1>
           </div>
 
@@ -118,14 +106,7 @@ function PrivateNav({ children }) {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Botón para cambiar tema */}
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="ml-4">
-            {theme === "dark" ? (
-              <SunIcon className="w-5 h-5 text-yellow-500" />
-            ) : (
-              <MoonIcon className="w-5 h-5 text-blue-500" />
-            )}
-          </Button>
+
         </nav>
 
         {/* Contenido principal */}
@@ -141,4 +122,6 @@ function PrivateNav({ children }) {
   );
 }
 
+
 export default PrivateNav;
+

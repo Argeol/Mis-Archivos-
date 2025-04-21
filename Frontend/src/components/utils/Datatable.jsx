@@ -135,7 +135,7 @@ export default function DataTable({
                                 className={`h-full rounded-full ${
                                   row[cell] >= 100
                                     ? "bg-green-600"
-                                    : row[cell] >= 75
+                                    : row[cell] >= 50
                                     ? "bg-yellow-500"
                                     : "bg-red-500"
                                 }`}
