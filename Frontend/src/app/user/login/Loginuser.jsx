@@ -34,6 +34,7 @@ function LoginPage() {
       if (response.status === 200) {
         alert("token");
         router.push("../dashboard");
+        localStorage.setItem("email",response.data.email  )
       }
     },
     onError: (err) => {
