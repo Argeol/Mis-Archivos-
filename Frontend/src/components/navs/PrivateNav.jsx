@@ -98,7 +98,7 @@ function PrivateNav({ children }) {
                 </a>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <a href="/logout" className="flex items-center space-x-2">
+                <a href="/user/login" className="flex items-center space-x-2">
                   <span>🚪</span>
                   <span>Cerrar Sesión</span>
                 </a>

@@ -1,9 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Phone, Mail, MessageCircle } from 'lucide-react'
-import { FaMapMarkerAlt,FaWhatsapp } from 'react-icons/fa'
-
+import { Phone, Mail } from 'lucide-react'
+import { FaMapMarkerAlt, FaWhatsapp } from 'react-icons/fa'
 
 const ContactPage = () => {
   return (
@@ -21,13 +20,42 @@ const ContactPage = () => {
         Estamos aquí para ayudarte. No dudes en ponerte en contacto con nosotros a través de cualquiera de los siguientes medios.
       </motion.p>
 
-      <div className="flex justify-center">
-        <img src="/assets/img/mapa.png" alt="Mapa del centro" className="rounded-lg shadow-lg max-w-[500px] mx-auto" />
+      <div className="flex flex-col md:flex-row justify-center items-start gap-12">
+        {/* Imagen con título arriba */}
+        <div className="max-w-[500px] w-full flex flex-col items-center">
+          <h3 className="text-xl font-semibold mb-3 text-center text-gray-800">
+            Plano satelital del Centro Agropecuario La Granja
+          </h3>
+          <div className="w-full h-[300px]">
+            <img
+              src="/assets/img/mapa.png"
+              alt="Mapa del centro"
+              className="rounded-lg shadow-lg w-full h-full object-cover"
+            />
+          </div>
+        </div>
+
+        {/* Mapa con título arriba */}
+        <div className="max-w-[500px] w-full flex flex-col items-center">
+          <h3 className="text-xl font-semibold mb-3 text-center text-gray-800">
+            Ubicación del centro en Google Maps
+          </h3>
+          <div className="w-full h-[300px]">
+            <iframe
+              title="Google Maps"
+              src="https://www.google.com/maps?q=53C9%2BPV%2C%20Chicoral%20-%20Espinal%20Km%202%2C%20El%20Espinal%2C%20Tolima&output=embed"
+              className="rounded-lg shadow-lg w-full h-full"
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+        </div>
       </div>
 
       <section className="flex justify-center items-center gap-8 mb-12 mt-12">
         <motion.div
-          className="flex gap-6 justify-center w-full sm:w-auto"
+          className="flex gap-6 justify-center w-full sm:w-auto flex-wrap"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.5 }}
@@ -79,7 +107,6 @@ const ContactCard = ({ icon, title, content, link, isEmail }) => (
       {icon}
       <div className="flex flex-col w-full">
         <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
-        {/* Si es un correo, lo mostramos con un formato especial y sigue funcionando como link */}
         {isEmail ? (
           <a
             href={link}
@@ -88,16 +115,16 @@ const ContactCard = ({ icon, title, content, link, isEmail }) => (
             target="_blank"
             rel="noopener noreferrer"
           >
-            <div>{content.split('@')[0]}</div> {/* Parte antes de "@" */}
-            <div>@{content.split('@')[1]}</div> {/* Parte después de "@" */}
+            <div>{content.split('@')[0]}</div>
+            <div>@{content.split('@')[1]}</div>
           </a>
         ) : (
           <a
             href={link}
             className="text-xs text-gray-600 hover:text-blue-500"
             aria-label={title}
-            target="_blank" // Abre el enlace en una nueva pestaña
-            rel="noopener noreferrer" // Medida de seguridad recomendada
+            target="_blank"
+            rel="noopener noreferrer"
           >
             {content}
           </a>
