@@ -19,8 +19,8 @@ function ModalDialog({ TitlePage, RegisterComponets, }) {
         <DialogContent className="w-[95%] max-w-md sm:max-w-xl sm:rounded-xl max-h-[95vh] overflow-auto">
           <DialogHeader>
             <DialogTitle>Agrega {TitlePage}</DialogTitle>
-            <RegisterComponets></RegisterComponets>
-          </DialogHeader>
+            <RegisterComponets onSuccess={handleCloseForm} />
+            </DialogHeader>
         </DialogContent>
       </Dialog>
     </>

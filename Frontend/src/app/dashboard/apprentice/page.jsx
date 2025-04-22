@@ -16,7 +16,8 @@ export default function ApprenticeDashboard() {
     queryKey: ["aprendices"], // Nombre del caché
     queryFn: async () => {
       const response = await axiosInstance.get("/api/Apprentice/all");
-      if (!response.status === 200) throw new Error("Error al cargar los datos");
+
+      if (!response.status === 200) throw new Error(response?.data?.message);
       return response.data;
     },
   });
