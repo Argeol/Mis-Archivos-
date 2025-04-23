@@ -85,12 +85,18 @@ namespace bienesoft.Controllers
             }
         }
         [HttpGet("CountApprentices")]
-        public IActionResult CountApprentices(){
-            var count = _apprenticeService.CountApprentices();
-            return Ok(new { TotalAprendices = count });
-
-
-
+        public IActionResult CountApprentices()
+        {
+            try
+            {
+                var count = _apprenticeService.CountApprentices();
+                return Ok(new { TotalAprendices = count });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Error al contar los aprendices.", Details = ex.Message });
+            }
         }
+
     }
 }
