@@ -70,7 +70,7 @@ export default function ApprenticeDashboard() {
 
   return (
     <>
-      <PrivateNav>
+      <PrivateNav titlespage="Aprendiz">
         <ContecPage
           //para registrar
           registerComponets={RegisterApprentice}

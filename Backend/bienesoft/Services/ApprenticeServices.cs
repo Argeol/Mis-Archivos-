@@ -26,27 +26,30 @@ namespace Bienesoft.Services
         }
 
 
-        public async Task<Apprentice> CreateApprenticeAsync(Apprentice apprentice, string email)
+        public async Task<object> CreateApprenticeAsync(Apprentice apprentice, string email)
         {
-            var municipality = await _context.municipality.FindAsync(apprentice.id_municipality);
-            var file = await _context.file.FindAsync(apprentice.File_Id);
-
-            if (file == null)
-                throw new ArgumentException("La ficha no existe.");
-
-            if (municipality == null)
-                throw new ArgumentException("El municipio no existe en la base de datos.");
-
-            // Verificar si el correo ya existe
+            // Validar existencia de correo ANTES de todo
             if (await _userService.UserByEmail(email))
                 throw new ArgumentException("El correo ya está registrado.");
 
-            // Generar contraseña aleatoria
-            string plainPassword = PasswordGenerator.Generate(8); // Ej: "Abc123!@"
+            // Agregar aprendiz al contexto
+            _context.apprentice.Add(apprentice);
+
+            try
+            {
+                // Guardar aprendiz primero
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al guardar el aprendiz. Detalles: " + ex.Message);
+            }
+
+            // Crear credenciales después de guardar exitosamente el aprendiz
+            string plainPassword = PasswordGenerator.Generate(8);
             string salt = PasswordHasher.GenerateSalt();
             string hashedPassword = PasswordHasher.HashPassword(plainPassword, salt);
 
-            // Crear el usuario
             var user = new User
             {
                 Email = email,
@@ -60,18 +63,30 @@ namespace Bienesoft.Services
 
             await _userService.AddUserAsync(user);
 
-            // Asociar el ID del usuario al aprendiz
+            // Asociar el email (ya registrado) al aprendiz
             apprentice.Email_Apprentice = user.Email;
 
-            // Guardar aprendiz
-            _context.apprentice.Add(apprentice);
+            // Si necesitas actualizar el aprendiz con el email del usuario
             await _context.SaveChangesAsync();
 
-            // Enviar correo con la contraseña
-            await _GeneralFunction.SendWelcomeEmail(email, plainPassword);
+            string mensajeCorreo = "Correo enviado correctamente.";
 
-            return apprentice;
+            try
+            {
+                await _GeneralFunction.SendWelcomeEmail(email, plainPassword);
+            }
+            catch (Exception ex)
+            {
+                mensajeCorreo = "No se pudo enviar el correo, revisa tu conexión a internet. Detalles: " + ex.Message;
+            }
+
+            return new
+            {
+                aprendiz = apprentice,
+                mensajeCorreo
+            };
         }
+
         public object GetApprenticeById(int id)
         {
             return _context.apprentice
@@ -203,11 +218,12 @@ namespace Bienesoft.Services
 
             _context.SaveChanges();
         }
-    public int CountApprentices()
-    {
-        return _context.apprentice.Count();
+        public int CountApprentices()
+        {
+            return _context.apprentice.Count();
 
-    }}
+        }
+    }
     // public async Task<bool> DeleteApprenticeAsync(int id)
     // {
     //     var apprentice = await _context.apprentice.FindAsync(id);

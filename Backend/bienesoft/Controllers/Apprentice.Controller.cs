@@ -32,12 +32,13 @@ namespace bienesoft.Controllers
                 if (string.IsNullOrWhiteSpace(apprentice.Email_Apprentice))
                     return BadRequest("El campo Email_Apprentice es obligatorio.");
 
-                var result = await _apprenticeService.CreateApprenticeAsync(apprentice, apprentice.Email_Apprentice);
+                dynamic result = await _apprenticeService.CreateApprenticeAsync(apprentice, apprentice.Email_Apprentice);
 
                 return Ok(new
                 {
                     message = "Aprendiz registrado correctamente.",
-                    aprendiz = result
+                    detalle = result.mensajeCorreo,
+                    result.aprendiz
                 });
             }
             catch (ArgumentException ex)
@@ -46,10 +47,10 @@ namespace bienesoft.Controllers
             }
             catch (Exception ex)
             {
-                // Puedes loguear esto si quieres
                 return StatusCode(500, new { error = "Ocurrió un error inesperado.", detalle = ex.Message });
             }
         }
+
         [HttpGet("{id}")]
         public IActionResult GetApprenticeById(int id)
         {
@@ -85,12 +86,20 @@ namespace bienesoft.Controllers
             }
         }
         [HttpGet("CountApprentices")]
-        public IActionResult CountApprentices(){
-            var count = _apprenticeService.CountApprentices();
-            return Ok(new { TotalAprendices = count });
+        public IActionResult CountApprentices()
+        {
 
-
+            try
+            {
+                var count = _apprenticeService.CountApprentices();
+                return Ok(new { TotalAprendices = count });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Error al contar los aprendices.", Details = ex.Message });
+            }
 
         }
+
     }
 }
