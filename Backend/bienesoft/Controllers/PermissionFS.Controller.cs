@@ -1,134 +1,69 @@
-﻿using bienesoft.Funcions;
-using bienesoft.Models;
+﻿using bienesoft.Models;
 using bienesoft.Services;
-using Microsoft.AspNetCore.Authorization;
+using Bienesoft.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bienesoft.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize]
-    public class PermissionFSController : Controller
+    public class PermissionFSController : ControllerBase
     {
-        public IConfiguration _Configuration { get; set; }
-        public GeneralFunction GeneralFunction;
-        private readonly PermissionFSServices _permissionFSServices;
+        private readonly PermissionFSService _service;
 
-        public PermissionFSController(IConfiguration configuration, PermissionFSServices permissionFSServices)
+        public PermissionFSController(PermissionFSService service)
         {
-            _Configuration = configuration;
-            _permissionFSServices = permissionFSServices;
+            _service = service;
         }
 
-        [HttpPost("CreatePermissionFS")]
-        public IActionResult AddPermissionFS(PermissionFS permissionFS)
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
         {
-            try
-            {
-                _permissionFSServices.AddPermissionFS(permissionFS);
-                return Ok(new
-                {
-                    message = "Permiso creado con éxito"
-                });
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.ToString());
-                return StatusCode(500, ex.ToString());
-            }
+            var data = await _service.GetAllAsync();
+            return Ok(data);
         }
 
-        [HttpGet("GetPermissionFS")]
-        public IActionResult GetPermissionFS(int id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                var permissionFS = _permissionFSServices.GetById(id);
-                if (permissionFS == null)
-                {
-                    return NotFound("No Se Encontró El Permiso");
-                }
-                return Ok(permissionFS);
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
-            }
+            var result = await _service.GetByIdAsync(id);
+            if (result == null)
+                return NotFound(new { message = "Permiso no encontrado." });
+
+            return Ok(result);
         }
 
-        [HttpPost("UpdatePermissionFS")]
-        public IActionResult Update(int id, PermissionFS permissionFS)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] PermissionFS model)
         {
-            try
-            {
-                _permissionFSServices.UpdatePermissionFS(permissionFS);
-                return Ok("Permiso actualizado con éxito");
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
-            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _service.CreateAsync(model);
+            return CreatedAtAction(nameof(GetById), new { id = result.PermissionFS_Id }, result);
         }
 
-        [HttpDelete("DeletePermissionFS")]
-        public IActionResult Delete(int id)
+        // Aquí se cambia de PATCH a PUT
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] PermissionFS model)
         {
-            try
-            {
-                var permissionFS = _permissionFSServices.GetById(id);
-                if (permissionFS == null)
-                {
-                    return NotFound("El Permiso Con El Id " + id + " No Se Pudo Encontrar");
-                }
-                _permissionFSServices.Delete(id);
-                return Ok("Permiso Eliminado Con Éxito");
-            }
-            catch (KeyNotFoundException knFEx)
-            {
-                return NotFound(knFEx.Message);
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
-            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var updated = await _service.UpdateAsync(id, model);
+            if (updated == null)
+                return NotFound(new { message = "Permiso no encontrado o error en los datos." });
+
+            return Ok(updated);
         }
 
-        [HttpGet("AllPermissionFS")]
-        public ActionResult<IEnumerable<PermissionFS>> GetAllPermissionFS()
+        [HttpGet("export")]
+        public async Task<IActionResult> ExportToExcel()
         {
-            return Ok(_permissionFSServices.AllPermissionFS());
-        }
-
-        [HttpPut("UpdatePermissionFS")]
-        public IActionResult UpdatePermissionFS(PermissionFS permissionFS)
-        {
-            if (permissionFS == null)
-            {
-                return BadRequest("El modelo de permiso es nulo");
-            }
-
-            try
-            {
-                _permissionFSServices.UpdatePermissionFS(permissionFS);
-                return Ok("Permiso actualizado exitosamente");
-            }
-            catch (ArgumentNullException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
-            }
+            var content = await _service.ExportToExcelAsync();
+            return File(content,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "PermisosFS.xlsx");
         }
     }
 }
