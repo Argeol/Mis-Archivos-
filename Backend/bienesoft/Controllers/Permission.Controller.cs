@@ -19,7 +19,19 @@ namespace bienesoft.Controllers
         {
             _permissionService = permissionService;
         }
-
+        // [HttpPost("create")]
+        // public async Task<IActionResult> CreatePermission([FromBody] CreatePermissionRequest request)
+        // {
+        //     try
+        //     {
+        //         var response = await _permissionService.CreatePermissionAsync(request.Permission, request.ResponsablesSeleccionados);
+        //         return Ok(response); // Devuelve el objeto de respuesta
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return BadRequest(new { Success = false, Message = ex.Message });
+        //     }
+        // }
         [HttpPost("CrearPermiso")]
         public async Task<IActionResult> CreateApprentice(PermissionGN PermissionGN)
         {
@@ -32,6 +44,16 @@ namespace bienesoft.Controllers
             var Results = _permissionService.GetAllPermissions();
             return Ok(Results);
         }
+        [HttpGet("GetPermisoById/{id}")]
+        public IActionResult GetPermissionById(int id)
+        {
+            var Results = _permissionService.GetPermissionById(id);
+            if (Results == null)
+            {
+                return NotFound(new { message = "Permiso no encontrado" });
+            }
+            return Ok(Results);
+        }
         [HttpGet("exportar-aprobados")]
         public IActionResult ExportApproved()
         {
@@ -42,12 +64,12 @@ namespace bienesoft.Controllers
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         fileName);
         }
-        [HttpPut("UpdatePermiso")]
-        public async Task<IActionResult> UpdatePermission([FromQuery]int id, [FromBody] PermissionGN permiso)
+        [HttpPut("UpdatePermission/{id}")]
+        public async Task<IActionResult> UpdatePermission(int id, [FromBody] UpdatePermiso permiso)
         {
             var result = await _permissionService.UpdatePermissionAsync(id, permiso);
             return Ok(result);
-        }   
+        }
 
 
 

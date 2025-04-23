@@ -8,7 +8,6 @@ import axios from 'axios';
          // Autorizer 
 
          'Authorize': 'Bearer: '
-
      }
  });
 

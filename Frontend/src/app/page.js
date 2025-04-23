@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import PublicNav from "@/components/navs/PublicNav";
 import Footer from "@/components/navs/Footer";
@@ -13,7 +13,7 @@ export default function Home() {
       <PublicNav />
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-b from-white to-gray-100 flex items-center justify-center">
+        <section className="pt-20 py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-b from-white to-gray-100 flex items-center justify-center">
           <div className="container px-4 md:px-6 ">
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
@@ -25,8 +25,11 @@ export default function Home() {
                 </p>
               </div>
               <div className="space-x-4">
-                <Button size="lg" className="animate-gradient text-white bg-blue-500" ><a href="/user/login">Iniciar</a></Button>
-                <Button size="lg" variant="outline"><a href="/user/register">Registrarse</a>
+                <Button size="lg" className="animate-gradient text-white bg-blue-500">
+                  <a href="/user/login">Iniciar</a>
+                </Button>
+                <Button size="lg" variant="outline">
+                  <a href="/user/register">Registrarse</a>
                 </Button>
               </div>
             </div>
@@ -66,7 +69,7 @@ export default function Home() {
               <div>
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-4 ms-2">
                   ¿Por qué elegir Bienesoft?
-                </h2> 
+                </h2>
                 <p className="text-gray-500 md:text-lg mb-4 ms-2">
                   Bienesoft ofrece una solución completa y fácil de usar para la gestión de permisos de aprendices,
                   mejorando la eficiencia y reduciendo errores en el proceso.

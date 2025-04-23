@@ -15,8 +15,9 @@ export default function ApprenticeDashboard() {
   const { data: dataApprentice, isLoading, error } = useQuery({
     queryKey: ["aprendices"], // Nombre del caché
     queryFn: async () => {
-      const response = await axiosInstance.get("api/Apprentice/GetApprentices");
-      if (!response.status === 200) throw new Error("Error al cargar los datos");
+      const response = await axiosInstance.get("/api/Apprentice/all");
+
+      if (!response.status === 200) throw new Error(response?.data?.message);
       return response.data;
     },
   });
@@ -36,6 +37,7 @@ export default function ApprenticeDashboard() {
     if (error) return <p>Error: {error.message}</p>;
   
   const translations = {
+    id_Apprentice: "Documento",
     doc_apprentice: "Documento de Aprendiz",
     first_Name_Apprentice: "Nombre",
     last_Name_Apprentice: "Apellido",
@@ -57,8 +59,9 @@ export default function ApprenticeDashboard() {
     areaName: "Área",
   };
   
-  const fieldLabels = ["Nombre", "Apellido", "Teléfono", "Ficha"];
+  const fieldLabels = ["Documento","Nombre", "Apellido", "Teléfono", "Ficha"];
   const TableCell = [
+    "id_Apprentice",
     "first_Name_Apprentice",
     "last_Name_Apprentice",
     "phone_Apprentice",
@@ -67,21 +70,29 @@ export default function ApprenticeDashboard() {
 
   return (
     <>
-      <PrivateNav>
+      <PrivateNav titlespage="Aprendiz">
         <ContecPage
+          //para registrar
           registerComponets={RegisterApprentice}
+          //como se llama la tabla
           titlesPage={"Aprendiz"}
+          //como se llaman los camppos de la datatable
           titlesData={fieldLabels}
+          //la data que se va a mostrar del metodo get
           Data={dataApprentice}
+          //id de la tabla
           idKey="id_Apprentice"
-          deleteUrl="/api/Apprentice/DeleteApprentice"
-          deleteFunction={(id) => deleteMutation.mutate(id)}
+          // deleteFunction={(id) => deleteMutation.mutate(id)}
+          // Para el update del componente
           updateComponets={UpdateApprentice}
+          //lo que vas a mostrar en la tabla y el trslations es el la lista de como se van a llamar los campos visualmente
           tableCell={TableCell}
           translations={translations}
-          ignorar={["id_Apprentice","status_Apprentice"]}
+          //ignorar los campos que no se van a mostrar en la tabla
+          ignorar={["status_Apprentice"]}
+          //update del estado  -->
           currentStatus={"status_Apprentice"}
-          updateEndpoint="/api/Apprentice/UpdateApprentice"
+          updateEndpoint="/api/Apprentice"
           queryKey="aprendices"
         />
       </PrivateNav>

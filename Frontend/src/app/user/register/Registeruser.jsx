@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { motion } from "framer-motion";
 import TextField from "@mui/material/TextField";
@@ -9,9 +10,10 @@ import LockIcon from "@mui/icons-material/Lock";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-async function SendData(body) {
+// API Call como función
+async function registerUser(body) {
   const response = await axiosInstance.post("/api/User/CreateUser", body);
-  return response;
+  return response.data;
 }
 
 function Registeruser() {
@@ -20,21 +22,36 @@ function Registeruser() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [userType, setUserType] = useState("");
   const [alertMessage, setAlertMessage] = useState(null);
-  const [loading, setLoading] = useState(false); // Estado de carga
 
+  // React Query Mutation
+  const mutation = useMutation({
+    mutationFn: registerUser,
+    onSuccess: (data) => {
+      setAlertMessage({ type: "success", text: data.message });
+    },
+    onError: (error) => {
+      if (error.response?.status === 400) {
+        setAlertMessage({
+          type: "error",
+          text: error.response.data.message || "Solicitud inválida",
+        });
+      } else {
+        setAlertMessage({ type: "error", text: "Error al procesar la solicitud. Inténtalo más tarde." });
+      }
+    },
+  });
+
+  // Manejar envío de formulario
   async function handlerSubmit(event) {
     event.preventDefault();
-    setLoading(true); // Activar estado de carga
 
     if (!email || !password || !userType || !confirmPassword) {
       setAlertMessage({ type: "error", text: "Todos los campos son requeridos" });
-      setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
       setAlertMessage({ type: "error", text: "La contraseña y la confirmación no coinciden." });
-      setLoading(false);
       return;
     }
 
@@ -44,63 +61,40 @@ function Registeruser() {
       userType,
     };
 
-    try {
-      const response = await SendData(body);
-      setAlertMessage({ type: "success", text: response.data.message });
-    } catch (error) {
-      console.error(error);
-      if (error.response && error.response.status === 400) {
-        setAlertMessage({
-          type: "error",
-          text: error.response.data.message || "Solicitud inválida",
-        });
-      } else {
-        setAlertMessage({ type: "error", text: "Error al procesar la solicitud. Inténtalo más tarde." });
-      }
-    } finally {
-      setLoading(false); // Desactivar estado de carga
-    }
+    mutation.mutate(body);
   }
 
   return (
-    <>
-      <main>
-        <form
-          className="register-form shadow-2xl p-6 max-w-sm mx-auto my-5"
-          onSubmit={handlerSubmit}
-        >
-          <div className="flex items-center space-x-4 justify-center">
-            <h1 className="font-serif text-xl">Registrar Usuario</h1>
-            <motion.div
-              animate={{ y: [0, -5, 0], opacity: [1, 0.7, 1] }}
-              transition={{ repeat: Infinity, duration: 1 }}
-            >
-              <img
-                className="w-24 m-0 ms-20"
-                alt=""
-                src="/assets/img/bienesoft.png"
-              />
-            </motion.div>
-          </div>
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-r from-white to-white">
+      <form
+        className="w-full max-w-sm bg-white p-6 rounded-xl shadow-2xl"
+        onSubmit={handlerSubmit}
+      >
+        <div className="flex items-center space-x-4 justify-center mb-6">
+          <h1 className="font-serif text-2xl font-bold">Registrar Usuario</h1>
+          <motion.div
+            animate={{ y: [0, -5, 0], opacity: [1, 0.7, 1] }}
+            transition={{ repeat: Infinity, duration: 1 }}
+          >
+            <img className="w-16" alt="Logo" src="/assets/img/bienesoft.webp"/>
+          </motion.div>
+        </div>
 
-          {alertMessage && (
-            <Alert className={`mt-4 ${alertMessage.type === "success" ? "bg-green-100" : "bg-red-100"}`}>
-              <AlertTitle>{alertMessage.type === "success" ? "Éxito" : "Error"}</AlertTitle>
-              <AlertDescription>{alertMessage.text}</AlertDescription>
-            </Alert>
-          )}
+        {alertMessage && (
+          <Alert className={`mb-4 ${alertMessage.type === "success" ? "bg-green-100" : "bg-red-100"}`}>
+            <AlertTitle>{alertMessage.type === "success" ? "Éxito" : "Error"}</AlertTitle>
+            <AlertDescription>{alertMessage.text}</AlertDescription>
+          </Alert>
+        )}
 
+        <div className="space-y-4">
           <TextField
             label="Tipo de Usuario"
             value={userType}
             onChange={(e) => setUserType(e.target.value)}
-            id="userType"
-            name="userType"
-            required
             select
             fullWidth
-            variant="outlined"
-            className="mt-4"
+            required
           >
             <MenuItem value="Administrador">Administrador</MenuItem>
             <MenuItem value="Usuario">Aprendiz</MenuItem>
@@ -112,8 +106,6 @@ function Registeruser() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Correo electrónico"
-            id="email"
-            name="email"
             required
             fullWidth
             InputProps={{
@@ -123,8 +115,6 @@ function Registeruser() {
                 </InputAdornment>
               ),
             }}
-            variant="outlined"
-            className="mt-4"
           />
 
           <TextField
@@ -132,8 +122,6 @@ function Registeruser() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Escriba su contraseña"
-            id="password"
-            name="password"
             type="password"
             required
             fullWidth
@@ -144,8 +132,6 @@ function Registeruser() {
                 </InputAdornment>
               ),
             }}
-            variant="outlined"
-            className="mt-4"
           />
 
           <TextField
@@ -153,8 +139,6 @@ function Registeruser() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Repita su contraseña"
-            id="confirmPassword"
-            name="confirmPassword"
             type="password"
             required
             fullWidth
@@ -165,26 +149,24 @@ function Registeruser() {
                 </InputAdornment>
               ),
             }}
-            variant="outlined"
-            className="mt-4"
           />
+        </div>
 
-          <Button
-            type="submit"
-            className="mt-4 w-full bg-blue-500 text-white hover:bg-gray-400"
-            disabled={loading}
-          >
-            {loading ? "Registrando..." : "Registrar"}
-          </Button>
+        <Button
+          type="submit"
+          className="mt-4 bg-blue-500 text-white hover:bg-gray-400 transition-colors duration-200 rounded-md mx-auto block"
+          disabled={mutation.isLoading}
+        >
+          {mutation.isLoading ? "Registrando..." : "Registrar"}
+        </Button>
 
-          <div className="links-container mt-4 text-center">
-            <a className="link text-blue-500 hover:underline" href="/user/login">
-              Ya tengo una cuenta
-            </a>
-          </div>
-        </form>
-      </main>
-    </>
+        <div className="text-center mt-4">
+          <a className="text-blue-500 hover:underline" href="/user/login">
+            Ya tengo una cuenta
+          </a>
+        </div>
+      </form>
+    </main>
   );
 }
 

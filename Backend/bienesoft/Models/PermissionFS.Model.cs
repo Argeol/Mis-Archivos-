@@ -1,3 +1,4 @@
+
 ﻿using bienesoft.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -53,3 +54,4 @@ namespace Bienesoft.Models
         No= 2
     }
 }
+

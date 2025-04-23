@@ -48,6 +48,5 @@ namespace Bienesoft.Controllers
             var data = _approvalService.GetPendingApprovalsBy(permissionId);
             return Ok(data);
         }
-
     }
 }

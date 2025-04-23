@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 const tips = ["Activo", "Inactivo"];
 
@@ -68,19 +69,29 @@ export default function RegisterResponsible() {
   console.log(roles)
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
+    <form onSubmit={handleSubmit} className="space-y-4 p-8">
+    <div>
+      <Label htmlFor="nom_Responsible">Nombre del Responsable</Label>
       <Input
         name="nom_Responsible"
         placeholder="Nombre del Responsable"
         onChange={handleChange}
         required
       />
+    </div>
+  
+    <div>
+      <Label htmlFor="ape_Responsible">Apellido del Responsable</Label>
       <Input
         name="ape_Responsible"
         placeholder="Apellido del Responsable"
         onChange={handleChange}
         required
       />
+    </div>
+  
+    <div>
+      <Label htmlFor="tel_Responsible">Teléfono</Label>
       <Input
         name="tel_Responsible"
         placeholder="Teléfono"
@@ -88,25 +99,30 @@ export default function RegisterResponsible() {
         onChange={handleChange}
         required
       />
+    </div>
+  
+    <div>
+      <Label htmlFor="roleId">Rol</Label>
       <Select
         onValueChange={(value) =>
           setFormData({ ...formData, roleId: parseInt(value) })
         }
       >
         <SelectTrigger>
-          <SelectValue placeholder="Seleccionar Ficha" />
+          <SelectValue placeholder="Seleccionar rol" />
         </SelectTrigger>
         <SelectContent>
           {roles.map((role) => (
-            <SelectItem 
-            key={role.id_role} 
-            value={role.id_role.toString()}
-            >
+            <SelectItem key={role.id_role} value={role.id_role.toString()}>
               {role.name_role}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
+    </div>
+  
+    {/* <div>
+      <Label htmlFor="state">Estado</Label>
       <Select
         onValueChange={(value) => setFormData({ ...formData, state: value })}
       >
@@ -121,9 +137,12 @@ export default function RegisterResponsible() {
           ))}
         </SelectContent>
       </Select>
-      <Button type="submit" disabled={mutation.isLoading}>
-        {mutation.isLoading ? "Registrando..." : "Registrar"}
-      </Button>
-    </form>
+    </div> */}
+  
+    <Button type="submit" disabled={mutation.isLoading}>
+      {mutation.isLoading ? "Registrando..." : "Registrar"}
+    </Button>
+  </form>
+  
   );
 }

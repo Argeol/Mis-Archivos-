@@ -18,7 +18,7 @@ namespace bienesoft.Models
         public DbSet<Department> department { get; set; }
         public DbSet<Locality> locality { get; set; }
         // public DbSet<AuthorizationResponsible> authorizationResponsible { get; set; }
-        public DbSet<PermissionFS> permissionFS { get; set; }
+        // public DbSet<PermissionFS> permissionFS { get; set; }
         // public DbSet<Responsible> responsible { get; set; }
         public DbSet<PermissionGN> permissionGN { get; set; }
         public DbSet<PermissionApproval> permissionApproval { get; set; }
@@ -65,7 +65,7 @@ namespace bienesoft.Models
             modelBuilder.Entity<Municipality>()
                 .HasMany(m => m.apprentice)  // Un municipio tiene muchos aprendices
                 .WithOne(a => a.Municipality) // Un aprendiz tiene un municipio
-                .HasForeignKey(a => a.Id_Municipality)
+                .HasForeignKey(a => a.id_municipality)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Apprentice>()

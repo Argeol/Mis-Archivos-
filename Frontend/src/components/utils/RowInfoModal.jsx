@@ -27,11 +27,14 @@ export default function RowInfoModal({
             Object.entries(selectedRow)
               .filter(([key]) => !ignorar?.includes(key))
               .map(([key, value]) => (
-                <div key={key} className="bg-gray-100 rounded-xl p-3 shadow-sm">
+                <div
+                  key={key}
+                  className="bg-gray-100 rounded-xl p-3 shadow-sm max-w-full sm:max-w-[32rem]"
+                >
                   <p className="text-sm text-gray-500 font-medium">
                     {translations[key] || key}
                   </p>
-                  <p className="text-base text-gray-800">
+                  <p className="text-base text-gray-800 break-words whitespace-pre-wrap">
                     {value?.toString()}
                   </p>
                 </div>

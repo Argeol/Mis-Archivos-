@@ -2,6 +2,7 @@
 using bienesoft.models;
 using bienesoft.Models;
 using bienesoft.Services;
+using Bienesoft.utils;
 using Microsoft.AspNetCore.Authorization; // Añadir esto
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -36,7 +37,8 @@ namespace bienesoft.Controllers
             try
             {
                 var user = _UserServices.GetByEmailAsync(login.Email).Result;
-                if (user == null || !BCrypt.Net.BCrypt.Verify(login.HashedPassword + user.Salt, user.HashedPassword))
+                var hashedInput = PasswordHasher.HashPassword(login.HashedPassword, user.Salt);
+                if (hashedInput != user.HashedPassword)
                 {
                     return Unauthorized(new { message = "Credenciales incorrectas." });
                 }
@@ -45,7 +47,7 @@ namespace bienesoft.Controllers
                 var claims = new ClaimsIdentity(new[]
                 {
             new Claim("User", user.Email)
-                 });
+                });
 
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
