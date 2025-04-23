@@ -1,129 +1,70 @@
-﻿// using bienesoft.Models;
-// using bienesoft.Services;
-// using Microsoft.AspNetCore.Mvc;
 
-// namespace bienesoft.Controllers
-// {
-//     [Route("api/[controller]")]
-//     [ApiController]
-//     public class PermissionFSController : ControllerBase
-//     {
-//         private readonly PermissionFSServices _permissionFSServices;
+﻿using bienesoft.Models;
+using bienesoft.Services;
+using Bienesoft.Models;
+using Microsoft.AspNetCore.Mvc;
 
-//         public PermissionFSController(PermissionFSServices permissionFSServices)
-//         {
-//             _permissionFSServices = permissionFSServices;
-//         }
+namespace bienesoft.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class PermissionFSController : ControllerBase
+    {
+        private readonly PermissionFSService _service;
 
-//         [HttpGet]
-//         public IActionResult GetAllPermissionFS()
-//         {
-//             try
-//             {
-//                 var permissions = _permissionFSServices.AllPermissionFSWithApprentice();
-//                 return Ok(permissions);
-//             }
-//             catch (Exception ex)
-//             {
-//                 return StatusCode(500, new { error = ex.Message });
-//             }
-//         }
+        public PermissionFSController(PermissionFSService service)
+        {
+            _service = service;
+        }
 
-//         [HttpGet("{id}")]
-//         public IActionResult GetPermissionFSById(int id)
-//         {
-//             try
-//             {
-//                 var permission = _permissionFSServices.GetByIdWithApprentice(id);
-//                 if (permission == null)
-//                     return NotFound(new { message = "PermissionFS no encontrado" });
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var data = await _service.GetAllAsync();
+            return Ok(data);
+        }
 
-//                 return Ok(permission);
-//             }
-//             catch (Exception ex)
-//             {
-//                 return StatusCode(500, new { error = ex.Message });
-//             }
-//         }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await _service.GetByIdAsync(id);
+            if (result == null)
+                return NotFound(new { message = "Permiso no encontrado." });
 
-//         [HttpPost]
-//         public IActionResult AddPermissionFS([FromBody] PermissionFS permissionFS)
-//         {
-//             try
-//             {
-//                 if (permissionFS == null)
-//                     return BadRequest(new { message = "El objeto PermissionFS es nulo" });
+            return Ok(result);
+        }
 
-//                 _permissionFSServices.AddPermissionFS(permissionFS);
-//                 return CreatedAtAction(nameof(GetPermissionFSById), new { id = permissionFS.PermissionFS_Id }, permissionFS);
-//             }
-//             catch (Exception ex)
-//             {
-//                 return StatusCode(500, new { error = ex.Message });
-//             }
-//         }
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] PermissionFS model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-//         [HttpPut("{id}")]
-//         public IActionResult UpdatePermissionFS(int id, [FromBody] PermissionFS permissionFS)
-//         {
-//             try
-//             {
-//                 if (id != permissionFS.PermissionFS_Id)
-//                     return BadRequest(new { message = "El ID en la URL no coincide con el ID del cuerpo" });
+            var result = await _service.CreateAsync(model);
+            return CreatedAtAction(nameof(GetById), new { id = result.PermissionFS_Id }, result);
+        }
 
-//                 _permissionFSServices.UpdatePermissionFS(permissionFS);
-//                 return NoContent();
-//             }
-//             catch (Exception ex)
-//             {
-//                 return StatusCode(500, new { error = ex.Message });
-//             }
-//         }
+        // Aquí se cambia de PATCH a PUT
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] PermissionFS model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-//         [HttpPatch("{id}")]
-//         public IActionResult UpdateSingleField(int id, [FromBody] Dictionary<string, object> updateData)
-//         {
-//             try
-//             {
-//                 _permissionFSServices.UpdateSingleField(id, updateData);
-//                 return Ok(new { message = "Campo actualizado exitosamente" });
-//             }
-//             catch (KeyNotFoundException ex)
-//             {
-//                 return NotFound(new { message = ex.Message });
-//             }
-//             catch (Exception ex)
-//             {
-//                 return StatusCode(500, new { error = ex.Message });
-//             }
-//         }
+            var updated = await _service.UpdateAsync(id, model);
+            if (updated == null)
+                return NotFound(new { message = "Permiso no encontrado o error en los datos." });
 
-//         [HttpDelete("{id}")]
-//         public IActionResult DeletePermissionFS(int id)
-//         {
-//             try
-//             {
-//                 _permissionFSServices.Delete(id);
-//                 return NoContent();
-//             }
-//             catch (Exception ex)
-//             {
-//                 return StatusCode(500, new { error = ex.Message });
-//             }
-//         }
+            return Ok(updated);
+        }
 
-//         [HttpGet("Export")]
-//         public IActionResult ExportPermissionFS()
-//         {
-//             try
-//             {
-//                 var excelStream = _permissionFSServices.ExportPermissionFSToExcel();
-//                 return File(excelStream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PermissionsFS.xlsx");
-//             }
-//             catch (Exception ex)
-//             {
-//                 return StatusCode(500, new { error = ex.Message });
-//             }
-//         }
-//     }
-// }
+        [HttpGet("export")]
+        public async Task<IActionResult> ExportToExcel()
+        {
+            var content = await _service.ExportToExcelAsync();
+            return File(content,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "PermisosFS.xlsx");
+        }
+    }
+}
