@@ -13,6 +13,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+
+
 
 const genders = ["masculino", "femenino", "otro"];
 const addressTypes = ["Barrio", "Vereda", "Corregimiento", "Comuna"];
@@ -88,13 +91,10 @@ export default function RegisterApprentice({ onSuccess }) {
       return res.data;
     },
     onSuccess: (data) => {
-      console.log("DATA", data); // Para confirmar
-
-      alert(data.message); // ✅ Mostrar mensaje
-
+      toast.success(`${data.message}\n${data.detalle}`);
+    
       setIsModalOpen(false);
       if (onSuccess) onSuccess(); // Ejecuta callback externo si existe
-
       queryClient.invalidateQueries(["apprentices"]);
     },
     onError: (error) => {
@@ -104,7 +104,7 @@ export default function RegisterApprentice({ onSuccess }) {
         error.message ||
         "Error desconocido.";
 
-      alert(errorMessage); // Mostrar el mensaje de error
+      toast(errorMessage); // Mostrar el mensaje de error
     },
   });
 
@@ -135,9 +135,12 @@ export default function RegisterApprentice({ onSuccess }) {
       <form
         onSubmit={handleSubmit}
         onKeyDown={(e) => {
-          a;
-          if (e.key === "Enter" && step < 4);
+          if (e.key === "Enter" && step < 4) {
+            e.preventDefault(); // evita enviar el form por accidente
+            setStep(step + 1); // opcional, si quieres avanzar con Enter
+          }
         }}
+        
         className="p-4 rounded-2xl bg-white space-y-6"
       >
         {/* Paso 1: Datos personales */}
@@ -466,8 +469,14 @@ export default function RegisterApprentice({ onSuccess }) {
             >
               Siguiente
             </Button>
-          ) : (
-            <Button type="submit">Registrar Aprendiz</Button>
+          ) 
+          : (
+            <Button
+            type="button"
+            onClick={handleSubmit} // 👈 Aquí le das control total
+          >
+            Registrar Aprendiz 
+          </Button>
           )}
         </div>
       </form>
