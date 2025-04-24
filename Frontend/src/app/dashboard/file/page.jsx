@@ -37,10 +37,10 @@ export default function FileDashboard() {
   const TableCell = ["file_Id", "programName", "apprentice_count"];
 
   return (
-    <PrivateNav>
+    <PrivateNav titlespage="Fichas">
       <ContecPage
         registerComponets={RegisterFile}
-        titlesPage={"Ficha"}
+        titlesPage={"Fichas"}
         titlesData={fieldLabels}
         Data={dataFile}
         idKey="file_Id"

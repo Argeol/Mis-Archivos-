@@ -70,12 +70,12 @@ export default function ApprenticeDashboard() {
 
   return (
     <>
-      <PrivateNav titlespage="Aprendiz">
+      <PrivateNav titlespage="Aprendices">
         <ContecPage
           //para registrar
           registerComponets={RegisterApprentice}
           //como se llama la tabla
-          titlesPage={"Aprendiz"}
+          titlesPage={"Aprendices"}
           //como se llaman los camppos de la datatable
           titlesData={fieldLabels}
           //la data que se va a mostrar del metodo get
