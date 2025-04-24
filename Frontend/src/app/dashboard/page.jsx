@@ -25,6 +25,7 @@ import { Progress } from "@/components/ui/progress"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { useTotalApprentices } from "@/app/dashboard/apprentice/totalApprentices"
 
+
 // Datos de ejemplo para permisos recientes
 const recentPermissions = [
   { id: 1, apprentice: "Carlos Mendoza", program: "ADSO", date: "2025-04-16", status: "approved", avatar: "CM" },
@@ -129,7 +130,6 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-
           <Card className="overflow-hidden">
             <CardContent className="p-3 sm:p-6">
               <div className="flex items-center justify-between">

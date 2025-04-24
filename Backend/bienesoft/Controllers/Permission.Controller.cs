@@ -44,6 +44,16 @@ namespace bienesoft.Controllers
             var Results = _permissionService.GetAllPermissions();
             return Ok(Results);
         }
+
+        [HttpGet("resumen")]
+        public async Task<IActionResult> ObtenerResumen()
+        {
+            var resumen = await _permissionService.ObtenerResumenPermisosAsync();
+            return Ok(resumen);
+        }
+
+
+
         [HttpGet("GetPermisoById/{id}")]
         public IActionResult GetPermissionById(int id)
         {

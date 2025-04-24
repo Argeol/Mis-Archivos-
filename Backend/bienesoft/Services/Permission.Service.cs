@@ -115,24 +115,28 @@ namespace Bienesoft.Services
                 // Aprendiz = _apprenticeService.GetApprenticeById(permiso.Id_Apprentice)
             };
         }
+        public async Task<object> ObtenerResumenPermisosAsync()
+        {
+            var hoy = DateTime.Today;
 
-        //public IEnumerable<object> GetAllPermissions()
-        //{
-        //    return _context.permissionGN
-        //        .Include(p => p.Apprentic)
-        //        .Select(p => new
-        //        {
-        //            p.PermissionId,
-        //            p.Motive,
-        //            Fechadesolicitud = p.ApplicationDate.ToString("HH:mm yyyy-MM-dd"),
-        //            Fechalsalida = p.DepartureDate.ToString("HH:mm yyyy-MM-dd"),
-        //            Fechallegada = p.EntryDate.ToString("HH:mm yyyy-MM-dd"),
-        //            Estado = p.Status.ToString(),
-        //            NombreAprendiz = p.Apprentice.First_Name_Apprentice + " " + p.Apprentice.Last_Name_Apprentice,
-        //            p.Id_Apprentice
-        //        })
-        //        .ToList();
-        //}
+            var permisosPendientes = await _context.permissionGN
+                .Where(p => p.Status == Status.Pendiente)
+                .CountAsync();
+
+            var permisosAprobadosActivos = await _context.permissionGN
+                .Where(p =>
+                    p.Status == Status.Aprobado &&
+                    p.DepartureDate <= hoy &&
+                    p.EntryDate >= hoy
+                )
+                .CountAsync();
+
+            return new
+            {
+                pendientes = permisosPendientes,
+                aprobadosActivos = permisosAprobadosActivos
+            };
+        }
         public IEnumerable<object> GetAllPermissions()
         {
             var permisos = _context.permissionGN
