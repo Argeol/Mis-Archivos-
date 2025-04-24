@@ -51,10 +51,10 @@ export default function PermissionDashboard() {
   const fieldLabels = ["Fecha","Aprendiz", "Fecha Salida", "Fecha Llegada", "Estado"];
   const tableCell = ["fechadesolicitud","nombreAprendiz", "fechalsalida", "fechallegada","porcentaje"]  
   return (
-    <PrivateNav>
+    <PrivateNav titlespage="Permisos">
       <ContecPage
         registerComponets={RegisterPermission} // Puedes poner null si no lo tienes
-        titlesPage="Permiso"
+        titlesPage="Permisos"
         titlesData={fieldLabels}
         Data={dataPermissions}
         idKey="permissionId"
