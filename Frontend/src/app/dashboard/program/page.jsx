@@ -48,10 +48,10 @@ export default function Dashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["programs"]);
-      alert("✅ Estado cambiado con éxito.");
+      alert("Estado cambiado con éxito.");
     },
     onError: () => {
-      alert("❌ Error al cambiar el estado.");
+      alert("Error al cambiar el estado.");
     },
   });
 
@@ -72,7 +72,7 @@ export default function Dashboard() {
   const TableCell = ["program_Id", "program_Name", "area_Name"];
 
   return (
-    <PrivateNav>
+    <PrivateNav titlespage="Programas">
       {isLoading ? (
         <Spinner />
       ) : error ? (

@@ -220,9 +220,9 @@ namespace Bienesoft.Services
         }
         public int CountApprentices()
         {
-            return _context.apprentice.Count();
-
+            return _context.apprentice.Count(a => a.Status_Apprentice == "Activo");
         }
+
     }
     // public async Task<bool> DeleteApprenticeAsync(int id)
     // {

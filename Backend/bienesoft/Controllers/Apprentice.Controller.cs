@@ -88,7 +88,6 @@ namespace bienesoft.Controllers
         [HttpGet("CountApprentices")]
         public IActionResult CountApprentices()
         {
-
             try
             {
                 var count = _apprenticeService.CountApprentices();
@@ -98,8 +97,8 @@ namespace bienesoft.Controllers
             {
                 return StatusCode(500, new { Message = "Error al contar los aprendices.", Details = ex.Message });
             }
-
         }
+
 
     }
 }

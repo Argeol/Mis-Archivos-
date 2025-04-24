@@ -55,10 +55,10 @@ export default function ResponsibleDashboard() {
   ];
 
   return (
-    <PrivateNav>
+    <PrivateNav titlespage="Responsables">
       <ContecPage
         registerComponets={RegisterResponsible}
-        titlesPage={"Responsable"}
+        titlesPage={"Responsables"}
         titlesData={fieldLabels}
         Data={dataResponsible}
         idKey="responsible_Id"
