@@ -1,21 +1,16 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import PrivateNav from "@/components/navs/PrivateNav";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Users, FileCheck, Clock, Calendar, Plus } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useTotalApprentices } from "@/app/dashboard/apprentice/totalApprentices";
-import { usePermissionSummary } from "@/app/dashboard/permissionGeneral/ResumenPermission";
+import { useState, useEffect } from "react"
+import PrivateNav from "@/components/navs/PrivateNav"
+import { Card, CardContent, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
+import { Users, FileCheck, Clock, Plus, CalendarDays, Clock3, CalendarCheck } from "lucide-react"
+import { Progress } from "@/components/ui/progress"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { useTotalApprentices } from "@/app/dashboard/apprentice/totalApprentices"
+import { usePermissionSummary } from "@/app/dashboard/permissionGeneral/ResumenPermission"
+import { Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from "recharts"
 
 // Datos de ejemplo para permisos recientes
 const recentPermissions = [
@@ -51,59 +46,55 @@ const recentPermissions = [
     status: "approved",
     avatar: "AM",
   },
-];
+]
 
 export default function DashboardPage() {
-  const titleAcudiente = "Acudiente";
-  const { data: totalApprentices, isLoading: loadingApprentices } =
-    useTotalApprentices();
-  const { data: permissionSummary, isLoading: loadingSummary } = usePermissionSummary();
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredPermissions, setFilteredPermissions] =
-    useState(recentPermissions);
-  const [activeTab, setActiveTab] = useState("overview");
-  const isMobile = useIsMobile();
+  const { data: totalApprentices, isLoading: loadingApprentices } = useTotalApprentices()
+  const { data: permissionSummary, isLoading: loadingSummary } = usePermissionSummary()
+  const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [filteredPermissions, setFilteredPermissions] = useState(recentPermissions)
+  const [activeTab, setActiveTab] = useState("overview")
+  const isMobile = useIsMobile()
 
   const stats = {
     totalApprentices: totalApprentices ?? 0,
     activePermissions: permissionSummary?.aprobadosActivos ?? 0,
     pendingApprovals: permissionSummary?.pendientes ?? 0,
-    permissionsToday: 4,
-    permissionsThisWeek: 23,
-    permissionsThisMonth: 86,
-  };
+    permissionsToday: permissionSummary?.permisosHoy ?? 0,
+    permissionsThisWeek: permissionSummary?.permisosSemana ?? 0,
+    permissionsThisMonth: permissionSummary?.permisosMes ?? 0,
+  }
 
-  const MAX_APPRENTICES = 1300; // 100% = capacidad total
-  const progressApprentices = Math.min(
-    Math.round((stats.totalApprentices / MAX_APPRENTICES) * 100),
-    100
-  );
-  const CAN_ACTIVOS = 320;
-  const progressactivePermissions = Math.min(
-    Math.round((stats.activePermissions / CAN_ACTIVOS) * 100),
-    100
-  );
-  const CAN_PENDIENTES = 320;
-  const progresspendientesPermissions = Math.min(Math.round((stats.pendingApprovals / CAN_PENDIENTES) * 100),
-  100);
+  const MAX_APPRENTICES = 1300 // 100% = capacidad total
+  const progressApprentices = Math.min(Math.round((stats.totalApprentices / MAX_APPRENTICES) * 100), 100)
+  const CAN_ACTIVOS = 320
+  const progressactivePermissions = Math.min(Math.round((stats.activePermissions / CAN_ACTIVOS) * 100), 100)
+  const CAN_PENDIENTES = 320
+  const progresspendientesPermissions = Math.min(Math.round((stats.pendingApprovals / CAN_PENDIENTES) * 100), 100)
+  const COLORS = ["#4ade80", "#60a5fa", "#facc15"]
+
+  const chartData = [
+    { name: "Hoy", value: stats.permissionsToday },
+    { name: "Semana", value: stats.permissionsThisWeek },
+    { name: "Mes", value: stats.permissionsThisMonth },
+  ]
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+      setLoading(false)
+    }, 1000)
+    return () => clearTimeout(timer)
+  }, [])
 
   const currentDate = new Date().toLocaleDateString("es-ES", {
     weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric",
-  });
+  })
 
-  const formattedDate =
-    currentDate.charAt(0).toUpperCase() + currentDate.slice(1);
+  const formattedDate = currentDate.charAt(0).toUpperCase() + currentDate.slice(1)
 
   return (
     <PrivateNav titlespage="Contenido Principal">
@@ -140,17 +131,13 @@ export default function DashboardPage() {
               <CardContent className="p-3 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-500">
-                      Total Aprendices
-                    </p>
+                    <p className="text-xs sm:text-sm font-medium text-gray-500">Total Aprendices</p>
                     <h3 className="text-xl sm:text-2xl font-bold mt-1">
                       {loadingApprentices ? "..." : stats.totalApprentices}
                     </h3>
                     {/* Mostrar solo el porcentaje */}
                     {!loadingApprentices && (
-                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                        {progressApprentices}%
-                      </p>
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1">{progressApprentices}%</p>
                     )}
                   </div>
                   <div className="bg-blue-100 p-2 sm:p-3 rounded-full">
@@ -166,7 +153,6 @@ export default function DashboardPage() {
                     indicatorClassName="bg-[#218EED]"
                   />
                 </div>
-
               </CardContent>
             </Card>
 
@@ -174,16 +160,12 @@ export default function DashboardPage() {
               <CardContent className="p-3 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-500">
-                      Permisos Activos
-                    </p>
+                    <p className="text-xs sm:text-sm font-medium text-gray-500">Permisos Activos</p>
                     <h3 className="text-xl sm:text-2xl font-bold mt-1">
                       {loadingSummary ? "..." : stats.activePermissions}
                     </h3>
                     {!loadingSummary && (
-                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                        {progressactivePermissions}%
-                      </p>
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1">{progressactivePermissions}%</p>
                     )}
                   </div>
                   <div className="bg-green-100 p-2 sm:p-3 rounded-full">
@@ -198,7 +180,6 @@ export default function DashboardPage() {
                     indicatorClassName=" bg-green-600"
                   />
                 </div>
-
               </CardContent>
             </Card>
 
@@ -206,16 +187,12 @@ export default function DashboardPage() {
               <CardContent className="p-3 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-500">
-                      Pendientes
-                    </p>
+                    <p className="text-xs sm:text-sm font-medium text-gray-500">Pendientes</p>
                     <h3 className="text-xl sm:text-2xl font-bold mt-1">
                       {loadingSummary ? "..." : stats.pendingApprovals}
                     </h3>
                     {!loadingSummary && (
-                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                        {progresspendientesPermissions}%
-                      </p>
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1">{progresspendientesPermissions}%</p>
                     )}
                   </div>
                   <div className="bg-amber-100 p-2 sm:p-3 rounded-full">
@@ -230,70 +207,72 @@ export default function DashboardPage() {
                     indicatorClassName="bg-amber-600"
                   />
                 </div>
-
               </CardContent>
             </Card>
           </div>
 
           {/* Tabs de resumen */}
-          <Tabs
-            defaultValue="overview"
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="mb-6"
-          >
+          <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="mb-6">
             <TabsContent value="overview">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-                <div className="space-y-4 sm:space-y-6">
-                  <Card className="overflow-hidden">
-                    <CardHeader className="p-4">
-                      <CardTitle className="text-lg">
-                        Resumen de Permisos
-                      </CardTitle>
-                      <CardDescription className="text-xs sm:text-sm">
-                        Actividad de permisos reciente
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="p-4">
-                      <div className="space-y-4">
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-gray-500" />
-                            <span className="text-xs sm:text-sm">Hoy</span>
-                          </div>
-                          <span className="font-medium text-sm">
-                            {stats.permissionsToday}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-gray-500" />
-                            <span className="text-xs sm:text-sm">
-                              Esta semana
-                            </span>
-                          </div>
-                          <span className="font-medium text-sm">
-                            {stats.permissionsThisWeek}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-gray-500" />
-                            <span className="text-xs sm:text-sm">Este mes</span>
-                          </div>
-                          <span className="font-medium text-sm">
-                            {stats.permissionsThisMonth}
-                          </span>
-                        </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Gráfico Simplificado */}
+                <Card className="p-4">
+                  <CardTitle className="text-lg mb-4">Actividad de Permisos Solicitados</CardTitle>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <PieChart>
+                      <Pie
+                        data={chartData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                        nameKey="name"
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      >
+                        {chartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value) => [`${value} permisos`, "Cantidad"]} />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </Card>
+
+                {/* Resumen con íconos */}
+                <Card className="p-4 space-y-4">
+                  <CardTitle className="text-lg">Resumen de Permisos</CardTitle>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex items-center justify-between text-green-700">
+                      <div className="flex items-center gap-2">
+                        <CalendarDays className="w-5 h-5" />
+                        <span>Diligenciados hoy</span>
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                      <span className="font-semibold">{stats.permissionsToday}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-blue-700">
+                      <div className="flex items-center gap-2">
+                        <Clock3 className="w-5 h-5" />
+                        <span>Esta semana</span>
+                      </div>
+                      <span className="font-semibold">{stats.permissionsThisWeek}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-yellow-700">
+                      <div className="flex items-center gap-2">
+                        <CalendarCheck className="w-5 h-5" />
+                        <span>Este mes</span>
+                      </div>
+                      <span className="font-semibold">{stats.permissionsThisMonth}</span>
+                    </div>
+                  </div>
+                </Card>
               </div>
             </TabsContent>
           </Tabs>
         </main>
       </div>
     </PrivateNav>
-  );
+  )
 }

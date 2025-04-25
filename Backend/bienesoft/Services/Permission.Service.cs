@@ -115,9 +115,33 @@ namespace Bienesoft.Services
                 // Aprendiz = _apprenticeService.GetApprenticeById(permiso.Id_Apprentice)
             };
         }
+        //public async Task<object> ObtenerResumenPermisosAsync()
+        //{
+        //    var hoy = DateTime.Today;
+
+        //    var permisosPendientes = await _context.permissionGN
+        //        .Where(p => p.Status == Status.Pendiente)
+        //        .CountAsync();
+
+        //    var permisosAprobadosActivos = await _context.permissionGN
+        //        .Where(p =>
+        //            p.Status == Status.Aprobado &&
+        //            p.DepartureDate <= hoy &&
+        //            p.EntryDate >= hoy
+        //        )
+        //        .CountAsync();
+
+        //    return new
+        //    {
+        //        pendientes = permisosPendientes,
+        //        aprobadosActivos = permisosAprobadosActivos
+        //    };
+        //}
         public async Task<object> ObtenerResumenPermisosAsync()
         {
             var hoy = DateTime.Today;
+            var inicioSemana = hoy.AddDays(-(int)hoy.DayOfWeek + (int)DayOfWeek.Monday);
+            var inicioMes = new DateTime(hoy.Year, hoy.Month, 1);
 
             var permisosPendientes = await _context.permissionGN
                 .Where(p => p.Status == Status.Pendiente)
@@ -131,12 +155,29 @@ namespace Bienesoft.Services
                 )
                 .CountAsync();
 
+            // Conteos por fecha de diligenciamiento (ApplicationDate)
+            var diligenciadosHoy = await _context.permissionGN
+                .Where(p => p.ApplicationDate.Date == hoy)
+                .CountAsync();
+
+            var diligenciadosSemana = await _context.permissionGN
+                .Where(p => p.ApplicationDate.Date >= inicioSemana)
+                .CountAsync();
+
+            var diligenciadosMes = await _context.permissionGN
+                .Where(p => p.ApplicationDate.Date >= inicioMes)
+                .CountAsync();
+
             return new
             {
                 pendientes = permisosPendientes,
-                aprobadosActivos = permisosAprobadosActivos
+                aprobadosActivos = permisosAprobadosActivos,
+                PermisosHoy = diligenciadosHoy,
+                PermisosSemana = diligenciadosSemana,
+                PermisosMes = diligenciadosMes
             };
         }
+
         public IEnumerable<object> GetAllPermissions()
         {
             var permisos = _context.permissionGN
