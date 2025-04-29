@@ -58,9 +58,7 @@ CREATE TABLE `apprentice` (
 
 LOCK TABLES `apprentice` WRITE;
 /*!40000 ALTER TABLE `apprentice` DISABLE KEYS */;
-
-INSERT INTO `apprentice` VALUES (341222,'Luz','melon turco ','2008-05-26','femenino','guiopinedaargeol59@gmail.com','12','Comuna','3134562312','Activo',0,961,2824123,'externo','melancolico ','top','3202171414','Ronaldo@gmail.com'),(28241234,'Rosa','melano','2025-04-07','femenino','fg@gmail.com','santuario','Vereda','3134562312','Activo',0,555,67,'externo','rosalba','pineda','3202171414','rosalba@mail.com'),(28948910,'Oscar','Guio ','1990-04-02','femenino','adolfo@gmail.com','Carrera 4','Corregimiento','3245896760','Activo',0,223,56,'externo','Argeol','Pineda','3202171414','Ronaldo@gmail.com'),(110561142,'argeol','guio pineda ','2005-09-26','masculino','guioqeee@gmial.com','cr3 ','Vereda','3245896760','Activo',0,121,67,'externo','melancolico ','top','3132212333','gui@gmail.com'),(1105611421,'argeol','guio','2025-04-12','femenino','guiopinedaargeol79@gmail.com','barrio miramar ','Vereda','3134562312','Activo',0,321,54,'externo','rosalba','pineda','320217141422','rosalba@mail.com');
-
+INSERT INTO `apprentice` VALUES (999,'argeolwee','guio','2025-04-01','masculino','guiopinedaargsseol79@gmail.com','www','Corregimiento','3134562312','Activo',0,577,31,'externo','camilo esperanza','pineda','3202171414','rosalba@mail.com'),(1105611421,'Argeol','Guio Pineda','2005-09-26','masculino','guiopinedaargeol79@gmail.com','santuario','Vereda','3245896760','Activo',0,138,2824123,'interno','Maritza ','top','3202171414','Ronaldo@gmail.com');
 /*!40000 ALTER TABLE `apprentice` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -187,9 +185,7 @@ CREATE TABLE `permissionApproval` (
   KEY `fk_permissionApproval_1_idx` (`ResponsibleId`),
   CONSTRAINT `fk_permissionApproval_1` FOREIGN KEY (`ResponsibleId`) REFERENCES `responsible` (`Responsible_Id`),
   CONSTRAINT `permissionApproval_ibfk_1` FOREIGN KEY (`PermissionId`) REFERENCES `permissionGN` (`PermissionId`) ON DELETE CASCADE
-
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -198,9 +194,6 @@ CREATE TABLE `permissionApproval` (
 
 LOCK TABLES `permissionApproval` WRITE;
 /*!40000 ALTER TABLE `permissionApproval` DISABLE KEYS */;
-
-INSERT INTO `permissionApproval` VALUES (17,21,9,'2025-04-12 18:28:01','Aprobado'),(19,22,10,'2025-04-13 23:51:23','Aprobado'),(20,21,10,'2025-04-14 00:02:47','Aprobado'),(21,21,20,'2025-04-14 00:03:12','Aprobado'),(22,21,19,'2025-04-14 00:03:54','Aprobado'),(23,22,9,'2025-04-14 00:05:34','Aprobado'),(24,22,20,'2025-04-14 00:10:38','Aprobado'),(25,25,9,'2025-04-14 00:16:00','Aprobado'),(26,22,22,'2025-04-18 22:15:50','Rechazado'),(27,25,22,'2025-04-18 22:18:23','Rechazado'),(28,25,10,'2025-04-18 22:20:20','Aprobado'),(29,25,20,'2025-04-18 22:21:10','Aprobado');
-
 /*!40000 ALTER TABLE `permissionApproval` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -225,9 +218,7 @@ CREATE TABLE `permissionGN` (
   PRIMARY KEY (`PermissionId`),
   KEY `fk_permissionGN_1_idx` (`Id_apprentice`),
   CONSTRAINT `fk_permissionGN_1` FOREIGN KEY (`Id_apprentice`) REFERENCES `apprentice` (`id_apprentice`)
-
 ) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -236,9 +227,6 @@ CREATE TABLE `permissionGN` (
 
 LOCK TABLES `permissionGN` WRITE;
 /*!40000 ALTER TABLE `permissionGN` DISABLE KEYS */;
-
-INSERT INTO `permissionGN` VALUES (21,'2025-04-07 01:02:00','2025-04-08 13:02:00','2025-04-11 22:48:18','melano','hospital santa lucia','cita medica','ars','Aprobado',28241234),(22,'2025-04-13 10:00:00','2025-04-13 14:00:00','2025-04-12 19:21:38','Calle Ficticia 123','Hotel ABC','Reunión de trabajo','Permiso solicitado para el evento','Rechazado',28241234),(23,'2025-04-13 01:38:10','2025-04-13 01:38:10','2025-04-13 01:38:10','Calle 123','Casa','Motivo personal','Sin observación','Pendiente',28241234),(24,'2025-04-15 08:16:00','2026-05-16 10:16:00','2025-04-13 19:17:14','Espinal ','Clinica ','Cita medica ','Corazón ❤️ 222','Pendiente',28241234),(25,'2025-04-15 07:00:00','2025-04-18 16:00:00','2025-04-14 00:15:46','Ibagué ','Finca','Familiar ','Se murió mi gato ','Rechazado',110561142);
-
 /*!40000 ALTER TABLE `permissionGN` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -310,9 +298,7 @@ CREATE TABLE `responsible` (
   PRIMARY KEY (`Responsible_Id`),
   KEY `fk_Responsible_1_idx` (`RoleId`),
   CONSTRAINT `fk_Responsible_1` FOREIGN KEY (`RoleId`) REFERENCES `role` (`Id_role`)
-
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -321,9 +307,7 @@ CREATE TABLE `responsible` (
 
 LOCK TABLES `responsible` WRITE;
 /*!40000 ALTER TABLE `responsible` DISABLE KEYS */;
-
 INSERT INTO `responsible` VALUES (9,'Fabian Rmirez','Gomez',3102023455,1,'Activo'),(10,'Jorge','Andrade',3102345632,3,'Activo'),(19,'Gabriel Jose ','Diaz Arias ',3202938128,2,'Activo'),(20,'Cristian Camilo ','Tique Tique',3120349124,4,'Activo'),(21,'Juana Valentina  ','Devia Lopez',3102023455,1,'Inactivo'),(22,'Santiago ','Matinez Guzman ',3103122345,2,'Activo'),(23,'Argeol','Guio Pineda ',3245896760,4,'Activo'),(24,'Rosa ','Chacon',3245876613,4,'Activo');
-
 /*!40000 ALTER TABLE `responsible` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -365,16 +349,20 @@ CREATE TABLE `user` (
   `HashedPassword` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `Salt` varchar(255) DEFAULT NULL,
   `SessionCount` int NOT NULL DEFAULT '0',
-  `TokJwt` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `TokJwt` varchar(500) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `Blockade` bit(1) NOT NULL DEFAULT b'0',
   `UserType` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `Asset` bit(1) NOT NULL DEFAULT b'1',
   `ResetToken` varchar(300) DEFAULT NULL,
   `ResetTokenExpiration` datetime DEFAULT NULL,
-  PRIMARY KEY (`User_Id`)
-
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
+  `Id_Apprentice` int unsigned DEFAULT NULL,
+  `Responsible_Id` int DEFAULT NULL,
+  PRIMARY KEY (`User_Id`),
+  KEY `fk_user_1_idx` (`Id_Apprentice`),
+  KEY `fk_user_2_idx` (`Responsible_Id`),
+  CONSTRAINT `fk_user_1` FOREIGN KEY (`Id_Apprentice`) REFERENCES `apprentice` (`id_apprentice`),
+  CONSTRAINT `fk_user_2` FOREIGN KEY (`Responsible_Id`) REFERENCES `responsible` (`Responsible_Id`)
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -383,9 +371,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-
-INSERT INTO `user` VALUES (3,'guiopinedaargeol79@gmail.com','jnZIuPjPo/qx5E6c8ofJ0d+/pXHwXY+C9yPqz7dNn9U=','G1jsNW26ILEID3MSgaq6gA==',0,NULL,_binary '\0','Aprendiz',_binary '',NULL,NULL),(4,'fg@gmail.com','hmwBg5g5SGQfj/U0zYgEJCuyfWgyqgH+m4dKJXcwxIA=','sekS5oBAQ0rVow64B7vSbg==',0,NULL,_binary '\0','Aprendiz',_binary '',NULL,NULL),(5,'adolfo@gmail.com','JxJRwOWE/62ttbaA4/VCSRKVkygUq2mVD2RrkLmfs5U=','1qCAU4cuw79OyMfiTn7WBQ==',0,NULL,_binary '\0','Aprendiz',_binary '',NULL,NULL),(6,'guioqeee@gmial.com','gT/CBc/C0pwKCoN7QAjxnplsKuN527NeuFb+uXJ6t8s=','EAOc1BYXs+9/cAknKozBog==',0,NULL,_binary '\0','Aprendiz',_binary '',NULL,NULL);
-
+INSERT INTO `user` VALUES (25,'guiopinedaargsseol79@gmail.com','UGSwdcz293xCGMbJw7bwU1bmCHoC4UDMjek6JQyVfSk=','ke1LKJJOE5rjGPEylIc0jQ==',0,NULL,_binary '\0','Aprendiz',_binary '',NULL,NULL,999,NULL),(26,'guiopinedaargeol79@gmail.com','yxX/2YYkroWkvrWlKUKrdvMfNkDo5rq41nV/JjU35iA=','Q3lkElTy2/6PR5TOcdmnBw==',0,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imd1aW9waW5lZGFhcmdlb2w3OUBnbWFpbC5jb20iLCJyb2xlIjoiQXByZW5kaXoiLCJhdWQiOiJCaWVuZXNvZnRDbGllbnQiLCJpc3MiOiJCaWVuZXNvZnRBUEkiLCJleHAiOjE3NDU5MzY0ODQsImlhdCI6MTc0NTkzNDY4NCwiSWRfQXBwcmVudGljZSI6IjExMDU2MTE0MjEiLCJGdWxsTmFtZSI6IkFyZ2VvbCBHdWlvIFBpbmVkYSIsIm5iZiI6MTc0NTkzNDY4NH0.ohKRwbh4FrGZRleUIt7R3RKNRdc4QABATDWD1SjQNJE',_binary '\0','Aprendiz',_binary '',NULL,NULL,1105611421,NULL);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -398,6 +384,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
-
--- Dump completed on 2025-04-21  7:29:25
-
+-- Dump completed on 2025-04-29  9:25:25
