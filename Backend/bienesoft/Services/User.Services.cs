@@ -123,7 +123,7 @@ namespace bienesoft.Services
 
         public async Task AddUserAsync(User user)
         {
-            await _context.user.AddAsync(user);
+            _context.user.Add(user);
             await _context.SaveChangesAsync();
         }
 
@@ -183,27 +183,17 @@ namespace bienesoft.Services
             await _context.SaveChangesAsync();
         }
 
+        // 🔹 Nuevo método para obtener un usuario por correo electrónico
         public async Task<User> GetByEmailAsync(string email)
         {
             return await _context.user
-                .Where(u => u.Email == email)
-                .Select(u => new User
-                {
-                    User_Id = u.User_Id,
-                    Email = u.Email,
-                    HashedPassword = u.HashedPassword ?? string.Empty, // Asegurarse de que no sea NULL
-                    Salt = u.Salt ?? string.Empty, // Asegurarse de que no sea NULL
-                    SessionCount = u.SessionCount,
-                    TokJwt = u.TokJwt ?? string.Empty, // Asegurarse de que no sea NULL
-                    Blockade = u.Blockade,
-                    UserType = u.UserType,
-                    Asset = u.Asset, // Asegurarse de que no sea NULL
-                    ResetToken = u.ResetToken ?? string.Empty, // Asegurarse de que no sea NULL
-                    ResetTokenExpiration = u.ResetTokenExpiration ?? DateTime.UtcNow // Si es NULL, asigna la fecha actual
-                })
-                .FirstOrDefaultAsync();
+                .Include(u => u.Apprentice) // 👈 Aquí sí traes el aprendiz asociado
+                .FirstOrDefaultAsync(u => u.Email == email);
         }
 
+
+
+        // 🔹 Verifica si el usuario existe por correo electrónico
 
         public async Task<bool> UserByEmail(string email)
         {

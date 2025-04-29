@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using bienesoft.models;
 
 namespace bienesoft.Models
 {
@@ -32,6 +33,7 @@ namespace bienesoft.Models
         public string? State { get; set; } = "Activo";
 
         public ICollection<PermissionApproval>? PermissionApprovals { get; set; }
+        public ICollection<User>? Users { get; set; }
     }
 
     public class UpdateResponsible

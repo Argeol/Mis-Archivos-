@@ -1,10 +1,12 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using bienesoft.Models;
 
 namespace bienesoft.models
 {
-        [Table("user", Schema = "bienesoft")]
+    [Table("user", Schema = "bienesoft")]
     public class User
     {
         [Key]
@@ -23,13 +25,11 @@ namespace bienesoft.models
         [DisplayName("Hashed Password")]
         public string HashedPassword { get; set; }
 
-
         [DisplayName("Salt")]
         public string? Salt { get; set; } = null; // O usa un valor predeterminado como "default_salt"
 
         [DisplayName("Token JWT")]
         public string? TokJwt { get; set; } = null; // O algún valor de token predeterminado
-
 
         [DefaultValue(0)]
         [DisplayName("Session Count")]
@@ -47,9 +47,20 @@ namespace bienesoft.models
         [DefaultValue(true)]
         [DisplayName("Active")]
         public bool Asset { get; set; }
-         //reset pass 
-        public string? ResetToken { get; set; }= null;
+
+        // Reset pass
+        public string? ResetToken { get; set; } = null;
         public DateTime? ResetTokenExpiration { get; set; }
+
+        // Relaciones con Apprentice y Responsible
+        public int? Id_Apprentice { get; set; }
+        
+        [ForeignKey("Id_Apprentice")]
+        public Apprentice? Apprentice { get; set; }
+
+        public int? Responsible_Id { get; set; }
+        [ForeignKey("Responsible_Id")]
+        public ResponsibleModel? Responsible { get; set; }
     }
 
     public class ResetPassUser
@@ -64,9 +75,10 @@ namespace bienesoft.models
         public string Email { get; set; }
         public string HashedPassword { get; set; }
     }
-     public class ResetPasswordModel
+
+    public class ResetPasswordModel
     {
-        public string? Token { get; set; }= null;
-        public string? NewPassword { get; set; }= null; 
+        public string? Token { get; set; } = null;
+        public string? NewPassword { get; set; } = null; 
     }
 }

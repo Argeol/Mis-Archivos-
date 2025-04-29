@@ -44,10 +44,40 @@ namespace bienesoft.Controllers
                 }
 
                 var key = Encoding.UTF8.GetBytes(_jwtSettings.keysecret);
-                var claims = new ClaimsIdentity(new[]
+                var claimsList = new List<Claim>
                 {
-            new Claim("User", user.Email)
-                });
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Role, user.UserType),
+                    new Claim("aud", "BienesoftClient"),
+                    new Claim("iss", "BienesoftAPI"),
+                    new Claim("exp", DateTimeOffset.UtcNow.AddMinutes(Convert.ToDouble(_jwtSettings.JWTExpireTime)).ToUnixTimeSeconds().ToString()),
+                    new Claim("iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString())
+                };
+
+                switch (user.UserType)
+                {
+                    case "Aprendiz":
+                        if (user.Apprentice != null)
+                        {
+                            claimsList.Add(new Claim("Id_Apprentice", user.Id_Apprentice?.ToString() ?? ""));
+                            claimsList.Add(new Claim("FullName", $"{user.Apprentice.First_Name_Apprentice} {user.Apprentice.Last_Name_Apprentice}"));
+                        }
+                        break;
+
+                    case "Responsable":
+                        if (user.Responsible != null)
+                        {
+                            claimsList.Add(new Claim("Responsible_Id", user.Responsible_Id?.ToString() ?? ""));
+                            claimsList.Add(new Claim("FullName", $"{user.Responsible.Nom_Responsible} {user.Responsible.Ape_Responsible}"));
+                        }
+                        break;
+
+                    case "Administrador":
+                        // No agregamos nada extra
+                        break;
+                }
+
+                var claims = new ClaimsIdentity(claimsList);
 
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
@@ -71,6 +101,48 @@ namespace bienesoft.Controllers
             }
         }
 
+        [HttpPost("Register")]
+        public async Task<IActionResult> Register([FromBody] User newUser)
+        {
+            try
+            {
+                // Verifica si el correo ya está en uso
+                var existingUser = await _UserServices.GetByEmailAsync(newUser.Email);
+                if (existingUser != null)
+                {
+                    return BadRequest(new { message = "El correo ya está registrado." });
+                }
+
+                // Generar salt y encriptar contraseña
+                var salt = PasswordHasher.GenerateSalt();
+                var hashedPassword = PasswordHasher.HashPassword(newUser.HashedPassword, salt);
+
+                var user = new User
+                {
+                    Email = newUser.Email,
+                    HashedPassword = hashedPassword,
+                    Salt = salt,
+                    UserType = newUser.UserType,
+                    SessionCount = 0,
+                    Blockade = false,
+                    Asset = true,
+                    TokJwt = null,
+                    ResetToken = null,
+                    ResetTokenExpiration = null,
+                    Id_Apprentice = newUser.Id_Apprentice,
+                    Responsible_Id = newUser.Responsible_Id
+                };
+
+                await _UserServices.AddUserAsync(user);
+
+                return Ok(new { message = "Usuario registrado correctamente." });
+            }
+            catch (Exception ex)
+            {
+                GeneralFunction.Addlog(ex.ToString());
+                return StatusCode(500, "Error interno del servidor.");
+            }
+        }
 
         //[Authorize] // Protección de la ruta con JWT
         //[HttpGet("ProtectedRoute")]

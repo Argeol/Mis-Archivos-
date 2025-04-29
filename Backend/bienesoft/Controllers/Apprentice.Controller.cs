@@ -1,12 +1,15 @@
-﻿using bienesoft.Funcions;
+﻿using System.Security.Claims;
+using bienesoft.Funcions;
 using bienesoft.models;
 using bienesoft.Models;
 using bienesoft.Services;
 using Bienesoft.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bienesoft.Controllers
 {
+
     [ApiController]
     [Route("api/[controller]")]
     public class ApprenticeController : ControllerBase
@@ -51,14 +54,27 @@ namespace bienesoft.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetApprenticeById(int id)
+        [Authorize(Roles = "Aprendiz")]
+        [HttpGet("GetApprenticeById")]
+        public IActionResult GetApprenticeById()
         {
-            var apprentice = _apprenticeService.GetApprenticeById(id);
+            try{
+
+            // Sacamos el Id_Apprentice del token
+            var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
+            
+            var idApprentice = int.Parse(idApprenticeClaim);
+            
+            var apprentice = _apprenticeService.GetApprenticeById(idApprentice);
             if (apprentice == null)
                 return NotFound(new { message = "Aprendiz no encontrado" });
 
             return Ok(apprentice);
+            }
+            catch (Exception ex)
+            {
+                GeneralFunction.Addlog(ex.ToString());
+                return StatusCode(500, ex.ToString());            }
         }
 
         [HttpGet("all")]
@@ -68,12 +84,25 @@ namespace bienesoft.Controllers
             return Ok(list);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateApprentice(int id, [FromBody] UpdateApprentice model)
+        [Authorize(Roles = "Aprendiz")]
+        [HttpPut("update-profile")] // Opcional: cambia el endpoint si quieres
+        public IActionResult UpdateApprentice([FromBody] UpdateApprentice model)
         {
             try
             {
+                // Sacamos el Id_Apprentice del token
+                var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
+
+                if (string.IsNullOrEmpty(idApprenticeClaim))
+                {
+                    return Unauthorized(new { message = "No se encontró el Id_Apprentice en el token." });
+                }
+                //se trasforma el idApprenticeClaim a numero entero
+                int id = int.Parse(idApprenticeClaim);
+
+                // Ahora sí, actualizas
                 _apprenticeService.UpdateApprentice(id, model);
+
                 return Ok(new { message = "Aprendiz actualizado exitosamente" });
             }
             catch (KeyNotFoundException ex)
@@ -85,6 +114,7 @@ namespace bienesoft.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
         [HttpGet("CountApprentices")]
         public IActionResult CountApprentices()
         {
@@ -98,7 +128,13 @@ namespace bienesoft.Controllers
                 return StatusCode(500, new { Message = "Error al contar los aprendices.", Details = ex.Message });
             }
         }
-
+        [Authorize(Roles = "Aprendiz")]
+        [HttpGet("apprendiz-only")]
+        public IActionResult GetApprenticeData()
+        {
+            var userRole = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
+            return Ok($"Role encontrado: {userRole}. Solo el aprendiz puede ver esto.");
+        }
 
     }
 }
