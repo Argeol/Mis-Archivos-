@@ -32,9 +32,10 @@ function LoginPage() {
     onMutate: () => setLoading(true),
     onSuccess: (response) => {
       if (response.status === 200) {
-        alert("token");
-        router.push("../dashboard");
-        localStorage.setItem("email",response.data.email  )
+        const token = response.data.message; // Captura el token
+        localStorage.setItem("token", token);
+        alert("¡Inicio de sesión exitoso!");
+        router.push("/dashboard");
       }
     },
     onError: (err) => {
