@@ -5,6 +5,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -12,12 +13,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { BookOpen } from "lucide-react";
+
 
 export default function UpdateProgram({ id }) {
   const queryClient = useQueryClient();
   const [programName, setProgramName] = useState("");
   const [areaId, setAreaId] = useState("");
-
+  
   // ✅ Obtener lista de áreas
   const { data: areas = [] } = useQuery({
     queryKey: ["areas"],
@@ -89,35 +93,70 @@ export default function UpdateProgram({ id }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-8 space-y-4">
-      {isLoadingProgram ? (
-        <p className="text-center text-blue-500">Cargando datos...</p>
-      ) : (
-        <>
-          <Input
-            name="program_Name"
-            value={programName}
-            placeholder="Nombre del programa"
-            onChange={(e) => setProgramName(e.target.value)}
-            required
-          />
-          <Select value={areaId} onValueChange={(value) => setAreaId(value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Seleccionar Área" />
-            </SelectTrigger>
-            <SelectContent>
-              {areas.map((area) => (
-                <SelectItem key={area.area_Id} value={area.area_Id.toString()}>
-                  {area.area_Name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+    <Card className="w-full max-w-2xl mx-auto shadow-lg border-blue-600/20 border-2">
+      <form onSubmit={handleSubmit}>
+        <CardContent className="space-y-6 pt-6">
+          {isLoadingProgram ? (
+            <p className="text-center text-blue-500">Cargando datos...</p>
+          ) : (
+            <>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-[#218EED]" />
+                  <Label htmlFor="program_Name" className="font-medium">
+                    Nombre del Programa
+                  </Label>
+                </div>
+                <Input
+                  id="program_Name"
+                  name="program_Name"
+                  value={programName}
+                  onChange={(e) => setProgramName(e.target.value)}
+                  placeholder="Nombre del programa"
+                  className="border-blue-200 focus-visible:ring-blue-500"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-[#218EED]" />
+                  <Label htmlFor="areaId" className="font-medium">
+                    Área
+                  </Label>
+                </div>
+                <Select
+                  value={areaId}
+                  onValueChange={(value) => setAreaId(value)}
+                  required
+                >
+                  <SelectTrigger className="border-blue-200 focus:ring-blue-500">
+                    <SelectValue placeholder={programData.area_Name|| "Sin programa seleccionado"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {areas.map((area) => (
+                      <SelectItem
+                        key={area.area_Id}
+                        value={area.area_Id.toString()}
+                      >
+                        {area.area_Name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </>
+          )}
+        </CardContent>
+
+        <CardFooter className="dark:bg-green-900/20 border-blue-100 dark:border-blue-800 flex justify-end ">
           <Button type="submit" disabled={updateMutation.isLoading}>
-            {updateMutation.isLoading ? "Actualizando..." : "Actualizar"}
+            {updateMutation.isLoading
+              ? "Actualizando..."
+              : "Actualizar Programa"}
           </Button>
-        </>
-      )}
-    </form>
+        </CardFooter>
+      </form>
+    </Card>
   );
 }

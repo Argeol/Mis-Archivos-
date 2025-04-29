@@ -81,7 +81,7 @@ export default function DataTable({
   const [responsibleName, setResponsibleName] = useState("");
 
   return (
-    <Card className="w-full max-w-5xl mx-auto p-4">
+    <Card className="w-full max-w-5xl mx-auto p-4 my-7">
       <CardHeader>
         <CardTitle className="text-center text-xl font-semibold">
           Lista de {TitlePage}

@@ -216,7 +216,7 @@ export default function DashboardPage() {
             <TabsContent value="overview">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Gráfico Simplificado */}
-                <Card className="p-4">
+                {/* <Card className="p-4">
                   <CardTitle className="text-lg mb-4">Actividad de Permisos Solicitados</CardTitle>
                   <ResponsiveContainer width="100%" height={250}>
                     <PieChart>
@@ -229,37 +229,37 @@ export default function DashboardPage() {
                         fill="#8884d8"
                         dataKey="value"
                         nameKey="name"
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        label={({  percent }) => ` ${(percent * 100).toFixed(0)}%`}
                       >
                         {chartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]}/>
                         ))}
                       </Pie>
                       <Tooltip formatter={(value) => [`${value} permisos`, "Cantidad"]} />
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer>
-                </Card>
+                </Card> */}
 
                 {/* Resumen con íconos */}
                 <Card className="p-4 space-y-4">
                   <CardTitle className="text-lg">Resumen de Permisos</CardTitle>
                   <div className="space-y-3 text-sm">
-                    <div className="flex items-center justify-between text-green-700">
+                    <div className="flex items-center justify-between ">
                       <div className="flex items-center gap-2">
                         <CalendarDays className="w-5 h-5" />
                         <span>Diligenciados hoy</span>
                       </div>
                       <span className="font-semibold">{stats.permissionsToday}</span>
                     </div>
-                    <div className="flex items-center justify-between text-blue-700">
+                    <div className="flex items-center justify-between ">
                       <div className="flex items-center gap-2">
                         <Clock3 className="w-5 h-5" />
                         <span>Esta semana</span>
                       </div>
                       <span className="font-semibold">{stats.permissionsThisWeek}</span>
                     </div>
-                    <div className="flex items-center justify-between text-yellow-700">
+                    <div className="flex items-center justify-between ">
                       <div className="flex items-center gap-2">
                         <CalendarCheck className="w-5 h-5" />
                         <span>Este mes</span>

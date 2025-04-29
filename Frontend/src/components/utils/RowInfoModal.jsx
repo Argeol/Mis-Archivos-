@@ -29,7 +29,7 @@ export default function RowInfoModal({
               .map(([key, value]) => (
                 <div
                   key={key}
-                  className="bg-gray-100 rounded-xl p-3 shadow-sm max-w-full sm:max-w-[32rem]"
+                  className="bg-blue-50 rounded-xl p-3 shadow-sm max-w-full sm:max-w-[32rem] "
                 >
                   <p className="text-sm text-gray-500 font-medium">
                     {translations[key] || key}
