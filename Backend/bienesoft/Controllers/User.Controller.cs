@@ -53,8 +53,10 @@ namespace bienesoft.Controllers
                     new Claim("exp", DateTimeOffset.UtcNow.AddMinutes(Convert.ToDouble(_jwtSettings.JWTExpireTime)).ToUnixTimeSeconds().ToString()),
                     new Claim("iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString())
                 };
+                Console.WriteLine($"user.UserType = '{user.UserType}'");
 
                 switch (user.UserType)
+
                 {
                     case "Aprendiz":
                         if (user.Apprentice != null)

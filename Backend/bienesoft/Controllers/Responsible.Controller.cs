@@ -24,20 +24,30 @@ namespace bienesoft.Controllers
             GeneralFunction = new GeneralFunction(_Configuration);
         }
         [HttpPost("CreateResponsible")]
-        public IActionResult AddResponsible(ResponsibleModel responsible)
+        public async Task<IActionResult> CreateResponsible([FromBody] ResponsibleModel responsible)
         {
             try
             {
-                _ResponsibleServices.AddResponsible(responsible);
+
+                if (string.IsNullOrWhiteSpace(responsible.Email_Responsible))
+                    return BadRequest("El campo Email es obligatorio.");
+
+                dynamic result = await _ResponsibleServices.CreateResponsibleAsync(responsible, responsible.Email_Responsible);
+
                 return Ok(new
                 {
-                    message = "Responsable creado con exito"
+                    message = "Responsable resgistrado correctamente.",
+                    detalle = result.mensajeCorreo, 
+                    result.responsable
                 });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new {error = ex.Message});
             }
             catch (Exception ex)
             {
-                GeneralFunction.Addlog(ex.ToString());
-                return StatusCode(500, ex.ToString());
+                return StatusCode(500, new {error = "Ocurrio un error inesperado.", detalle = ex.Message});
             }
 
         }
@@ -50,17 +60,28 @@ namespace bienesoft.Controllers
             return Ok(responsibles);
         }
 
-        [HttpGet("{Id}")]
-
-        public IActionResult GetResponsible(int Id) 
+        [Authorize(Roles = "Responsable")]
+        [HttpGet("GetResponsibleID")]
+        public IActionResult GetResponsibleById()
         {
-            var responsible = _ResponsibleServices.GetResponsibleById(Id);
-
-            if (responsible == null)
+            try
             {
-                return NotFound();
+                //Sacamos el Responsable_Id del token
+                var idResponsibleClaim = User.Claims.FirstOrDefault(r => r.Type == "Responsible_Id")?.Value;
+
+                var idResponsible = int.Parse(idResponsibleClaim);  
+
+                var responsible = _ResponsibleServices.GetResponsibleById(idResponsible);
+                if (responsible == null)
+                    return NotFound(new { message = "Responsable no encontrado" });
+
+                return Ok(responsible);
             }
-            return Ok(responsible);
+            catch (Exception ex) 
+            {
+                GeneralFunction.Addlog(ex.ToString());
+                return StatusCode(500, ex.ToString());
+            }
         }
 
 
