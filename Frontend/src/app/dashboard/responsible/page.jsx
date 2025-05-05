@@ -34,7 +34,7 @@ export default function ResponsibleDashboard() {
   //   },
   // });
 
-    if (isLoading) return <LoadingPage />;
+  if (isLoading) return <LoadingPage />;
 
   const translations = {
     nom_Responsible: "Nombre",
