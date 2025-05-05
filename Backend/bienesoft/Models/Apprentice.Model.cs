@@ -47,13 +47,13 @@ namespace bienesoft.Models
         public string Tip_Apprentice { get; set; } = "interno";
 
 
-        [Required, StringLength(100)]
+        [Required, StringLength(45)]
         public string nom_responsible { get; set; } = string.Empty;
 
-        [Required, StringLength(100)]
+        [Required, StringLength(45)]
         public string ape_responsible { get; set; } = string.Empty;
 
-        [Required, Phone, StringLength(20)]
+        [Required, Phone, StringLength(12)]
         public string tel_responsible { get; set; } = string.Empty;
 
         [Required, EmailAddress]

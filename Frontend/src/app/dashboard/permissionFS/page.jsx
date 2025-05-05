@@ -1,101 +1,83 @@
 "use client";
-import axiosInstance from "@/lib/axiosInstance";
-import React, { useState } from "react";
 
-const PermissionFSForm = () => {
-  const [formData, setFormData] = useState({
-    Apprentice_Id: "",
+import { useQuery } from "@tanstack/react-query";
+import PrivateNav from "@/components/navs/PrivateNav";
+import ContecPage from "@/components/utils/ContectPage";
+import axiosInstance from "@/lib/axiosInstance";
+import LoadingPage from "@/components/utils/LoadingPage";
+import RegisterPermissionFS from "./RegisterPermissionFS";
+import { FaFileExcel } from "react-icons/fa"; // Icono de Excel
+import ExportExcelButton from "./ButtonExelFS";
+
+export default function PermissionFSDashboard() {
+  const { data: dataPermissionFS, isLoading } = useQuery({
+    queryKey: ["permissionFS"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/api/PermissionFS");
+      if (res.status !== 200) throw new Error("Error al cargar permisos FS");
+      return res.data;
+    },
   });
 
-  const [errors, setErrors] = useState({});
+  if (isLoading) return <LoadingPage />;
 
-  //   const handleChange = (e) => {
-  //     const { name, value } = e.target;
-  //     setFormData({ ...formData, [name]: value });
-  //   };
+  const fieldLabels = [
+    "Destino", "Fecha Diligenciado", "Fecha Salida", "Fecha Entrada", 
+    "Día Salida", "Alojamiento", "SENA/Empresa", "Dirección", "Aprendiz"
+  ];
 
-  //   const validate = () => {
-  //     const newErrors = {};
-  //     if (!formData.Nom_Locality) {
-  //       newErrors.Nom_Locality = "El campo Nombre de la Localidad es requerido.";
-  //     } else if (formData.Nom_Locality.length > 50) {
-  //       newErrors.Nom_Locality =
-  //         "El campo Nombre de la Localidad tiene un límite de 50 caracteres.";
-  //     }
+  const tableCell = [
+    "destino", "fec_Diligenciado", "fec_Salida", "fec_Entrada", 
+    "dia_Salida", "alojamiento", "sen_Empresa", "direccion", "apprentice.nombre"
+  ];
 
-  //     if (!formData.Tip_Locality) {
-  //       newErrors.Tip_Locality = "El campo Tipo de Localidad es requerido.";
-  //     } else if (formData.Tip_Locality.length > 30) {
-  //       newErrors.Tip_Locality =
-  //         "El campo Tipo de Localidad tiene un límite de 30 caracteres.";
-  //     }
+  const translations = {
+    destino: "Destino",
+    fec_Diligenciado: "Fecha Diligenciado",
+    fec_Salida: "Fecha Salida",
+    fec_Entrada: "Fecha Entrada",
+    dia_Salida: "Día de salida",
+    alojamiento: "Alojamiento",
+    sen_Empresa: "¿SENA o empresa?",
+    direccion: "Dirección",
+    "apprentice.nombre": "Nombre del aprendiz"
+  };
 
-  //     if (!formData.Id_Department) {
-  //       newErrors.Id_Department = "El campo Departamento es requerido.";
-  //     }
-
-  //     setErrors(newErrors);
-  //     return Object.keys(newErrors).length === 0;
-  //   };
-  async function handleSubmit(e) {
-    e.preventDefault();
+  const handleExport = async () => {
     try {
-      const response = await axiosInstance.post(
-        "api/PermissionFS/CreatePermissionFS",
-        formData
-      );
-      if (response.status === 200) {
-        alert("Permiso creado con éxito");
-      }
-    } catch (error) {
-      alert("Hubo un error <-");
-    }
-  }
+      const response = await axiosInstance.get("/api/PermissionFS/export", {
+        responseType: "arraybuffer",
+      });
 
-  //   const handleSubmit = (e) => {
-  //     e.preventDefault();
-  //     if (validate()) {
-  //       console.log("Formulario enviado con datos:", formData);
-  //     }
-  //   };
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "PermisosFS.xlsx";
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error al exportar a Excel:", error);
+    }
+  };
 
   return (
-    <>
-      <form
-        className="max-w-md mx-auto  mt-40 bg-white shadow-md rounded-lg"
-        onSubmit={handleSubmit}
-      >
-
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 font-medium mb-2"
-            htmlFor="Apprentice_Id"
-          >
-            APRENDIZ (ID):
-          </label>
-          <input
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            type="number"
-            name="Apprentice_Id"
-            id="Apprentice_Id"
-            value={formData.Apprentice_Id}
-            onChange={(e) =>setFormData({ ...formData, Apprentice_Id: e.target.value })
-            }
-          />
-          {errors.Apprentice_Id && (
-            <span className="text-red-500 text-sm">{errors.Apprentice_Id}</span>
-          )}
-        </div>
-
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200"
-        >
-          Enviar
-        </button>
-      </form>
-    </>
+    <PrivateNav titlespage="Permisos Fin de Semana">
+      <ContecPage
+        registerComponets={RegisterPermissionFS}
+        titlesPage="Permisos FS"
+        titlesData={fieldLabels}
+        Data={dataPermissionFS}
+        idKey="permissionFS_Id"
+        tableCell={tableCell}
+        translations={translations}
+        ignorar={["permissionFS_Id"]}
+        inf="apprentice.id_Apprentice"
+        botonExtra={<ExportExcelButton/>}
+      />
+    </PrivateNav>
   );
-};
-
-export default PermissionFSForm;
+}

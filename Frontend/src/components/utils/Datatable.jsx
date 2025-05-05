@@ -54,6 +54,7 @@ export default function DataTable({
   updateEndpoint,
   queryKey,
   inf,
+  botonExtra
 }) {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -94,6 +95,14 @@ export default function DataTable({
             className="sm:max-w-xs"
           />
         </div>
+        {botonExtra &&(
+        <div className="mb-4 flex justify-end">
+          {botonExtra}
+        </div>
+        )
+      }
+
+
         {RegisterComponets && (
           <ModalDialog
             className="w-full max-w-mda sm:max-w-xl sm:rounded-lg"
