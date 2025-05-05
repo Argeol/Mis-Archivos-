@@ -97,8 +97,11 @@
 //         } 
 //     }
 // }
+using bienesoft.Funcions;
 using bienesoft.models;
 using bienesoft.Models;
+using bienesoft.ProductionDTOs;
+using Bienesoft.utils;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -110,48 +113,104 @@ namespace bienesoft.Services
     public class UserServices
     {
         private readonly AppDbContext _context;
+        //private readonly UserServices _userService;
+        public GeneralFunction _GeneralFunction;
 
-        public UserServices(AppDbContext context)
+        public UserServices(AppDbContext context, GeneralFunction generalFunction)
         {
             _context = context;
+            //_userService = userServices;
+            _GeneralFunction = generalFunction;
         }
+
+        public async Task<string>
+            CreateUserAsync(string email)
+        {
+            if (await UserByEmail(email))
+                throw new ArgumentException("El correo ya está registrado.");
+
+         
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                string plainPassword = PasswordGenerator.Generate(8);
+                string salt = PasswordHasher.GenerateSalt();
+                string hashedPassword = PasswordHasher.HashPassword(plainPassword, salt);
+                var user = new User
+                {
+                    Email = email,
+                    HashedPassword = hashedPassword,
+                    Salt = salt,
+                    UserType = "Administrador",
+                    SessionCount = 0,
+                    Blockade = false,
+                    Asset = true
+                };
+
+                 _context.user.Add(user);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                string mensajeCorreo = "Correo enviado correctamente.";
+                try
+                {
+                    await _GeneralFunction.SendWelcomeEmail(email, plainPassword);
+                }
+                catch (Exception ex)
+                {
+                    mensajeCorreo = "No se pudo enviar el correo, revisa tu conexión a internet. Detalles: " + ex.Message;
+                }
+
+                return mensajeCorreo;
+
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("No se pudo crear el usuario. Detalles: " + ex.Message);
+            }
+        }
+
+
+
+
+
 
         public async Task<IEnumerable<User>> AllUsersAsync()
         {
             return await _context.user.ToListAsync();
         }
 
-        public async Task AddUserAsync(User user)
+        public IEnumerable<object> GetUsers()
         {
-            _context.user.Add(user);
-            await _context.SaveChangesAsync();
+            return _context.user
+                .Select(u => new
+                {
+                    u.Email,
+                    u.UserType,
+                })
+                .ToList();
         }
 
-        public async Task<User> GetByIdAsync(int id)
+        public async Task DeleteByEmailAsync(string email)
         {
-            return await _context.user.FirstOrDefaultAsync(p => p.User_Id == id);
+            var user = await _context.user.FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null)
+                throw new KeyNotFoundException("No se encontró ningún usuario con el correo: " + email);
+
+            try
+            {
+                _context.user.Remove(user);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("No se pudo eliminar el usuario: " + ex.Message);
+            }
         }
 
-        public async Task DeleteAsync(int id)
-        {
-            var user = await GetByIdAsync(id);
-            if (user != null)
-            {
-                try
-                {
-                    _context.user.Remove(user);
-                    await _context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("No se pudo eliminar el usuario: " + ex.Message);
-                }
-            }
-            else
-            {
-                throw new KeyNotFoundException("El usuario con el ID " + id + " no se pudo encontrar.");
-            }
-        }
 
         public async Task UpdateUserAsync(User user)
         {

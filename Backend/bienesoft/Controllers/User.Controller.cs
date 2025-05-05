@@ -1,6 +1,7 @@
 ﻿using bienesoft.Funcions;
 using bienesoft.models;
 using bienesoft.Models;
+using bienesoft.ProductionDTOs;
 using bienesoft.Services;
 using Bienesoft.utils;
 using Microsoft.AspNetCore.Authorization; // Añadir esto
@@ -102,47 +103,42 @@ namespace bienesoft.Controllers
                 return StatusCode(500, "Ocurrió un error en el servidor.");
             }
         }
-
-        [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody] User newUser)
+        [HttpPost]
+        public async Task<IActionResult> CreateUser([FromQuery] string email)
         {
             try
             {
-                // Verifica si el correo ya está en uso
-                var existingUser = await _UserServices.GetByEmailAsync(newUser.Email);
-                if (existingUser != null)
-                {
-                    return BadRequest(new { message = "El correo ya está registrado." });
-                }
-
-                // Generar salt y encriptar contraseña
-                var salt = PasswordHasher.GenerateSalt();
-                var hashedPassword = PasswordHasher.HashPassword(newUser.HashedPassword, salt);
-
-                var user = new User
-                {
-                    Email = newUser.Email,
-                    HashedPassword = hashedPassword,
-                    Salt = salt,
-                    UserType = newUser.UserType,
-                    SessionCount = 0,
-                    Blockade = false,
-                    Asset = true,
-                    TokJwt = null,
-                    ResetToken = null,
-                    ResetTokenExpiration = null,
-                    Id_Apprentice = newUser.Id_Apprentice,
-                    Responsible_Id = newUser.Responsible_Id
-                };
-
-                await _UserServices.AddUserAsync(user);
-
-                return Ok(new { message = "Usuario registrado correctamente." });
+                var result = await _UserServices.CreateUserAsync(email);
+                return Ok(result);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                GeneralFunction.Addlog(ex.ToString());
-                return StatusCode(500, "Error interno del servidor.");
+                return StatusCode(500, new { message = "Error al crear el usuario.", details = ex.Message });
+            }
+        }
+
+
+
+
+
+
+        // GET: api/Users
+        [Authorize(Roles = "Administrador")]
+        [HttpGet]
+        public IActionResult GetUsers()
+        {
+            try
+            {
+                var users = _UserServices.GetUsers();
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener los usuarios.", details = ex.Message });
             }
         }
 
@@ -191,28 +187,7 @@ namespace bienesoft.Controllers
             }
         }
 
-        // Este método de crear usuario es público
-        [HttpPost("CreateUser")]
-        public async Task<IActionResult> CreateUser(User user)
-        {
-            try
-            {
-                string salt = BCrypt.Net.BCrypt.GenerateSalt();
-                user.HashedPassword = BCrypt.Net.BCrypt.HashPassword(user.HashedPassword + salt);
-                user.Salt = salt;
-                user.TokJwt = "";
-
-                await _UserServices.AddUserAsync(user);
-                return Ok(new { message = "Usuario creado con éxito" });
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.ToString());
-                return StatusCode(500, ex.ToString());
-            }
-        }
-
-
+        [Authorize(Roles = "Administrador")]
         [HttpGet("AllUsers")]
         //[Authorize]
         public async Task<ActionResult<IEnumerable<User>>> AllUsers()
@@ -222,70 +197,25 @@ namespace bienesoft.Controllers
         }
 
 
-        [HttpGet("GetUser/{id}")]
-        //[Authorize]
-        public async Task<IActionResult> GetUser(int id)
+        [HttpDelete("{email}")]
+        public async Task<IActionResult> DeleteUser(string email)
         {
             try
             {
-                var user = await _UserServices.GetByIdAsync(id);
-                if (user == null)
-                {
-                    return NotFound("No se encontró el usuario");
-                }
-                return Ok(user);
+                await _UserServices.DeleteByEmailAsync(email);
+                return Ok(new { message = "Usuario eliminado correctamente." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
+                return StatusCode(500, new { message = "Error al eliminar el usuario.", details = ex.Message });
             }
         }
 
-
-        [HttpDelete("DeleteUser/{id}")]
-        //[Authorize]
-        public async Task<IActionResult> Delete(int id)
-        {
-            try
-            {
-                var userToDelete = await _UserServices.GetByIdAsync(id);
-                if (userToDelete == null)
-                {
-                    return NotFound($"El usuario con el ID {id} no se pudo encontrar");
-                }
-                await _UserServices.DeleteAsync(id);
-                return Ok("Usuario eliminado con éxito");
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
-            }
-        }
-
-        [HttpPut("UpdateUser")]
-        //[Authorize]
-        public async Task<IActionResult> Update(User user)
-        {
-            if (user == null)
-            {
-                return BadRequest("El modelo de usuario es nulo");
-            }
-
-            try
-            {
-                await _UserServices.UpdateUserAsync(user);
-                return Ok("Usuario actualizado exitosamente");
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
-            }
-        }
-
-
+        [Authorize(Roles = "Administrador")]
         [HttpGet("AllUsersInRange")]
         //[Authorize]
         public async Task<ActionResult<IEnumerable<User>>> GetAllInRange(int inicio, int fin)
