@@ -34,6 +34,9 @@ namespace bienesoft.Models
 
         public ICollection<PermissionApproval>? PermissionApprovals { get; set; }
         public ICollection<User>? Users { get; set; }
+
+        [Required, EmailAddress]
+        public string Email_Responsible { get; set; } = string.Empty;
     }
 
     public class UpdateResponsible

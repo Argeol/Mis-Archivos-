@@ -247,6 +247,7 @@ namespace bienesoft.Services
         {
             return await _context.user
                 .Include(u => u.Apprentice) // 👈 Aquí sí traes el aprendiz asociado
+                .Include(u=> u.Responsible)
                 .FirstOrDefaultAsync(u => u.Email == email);
         }
 
