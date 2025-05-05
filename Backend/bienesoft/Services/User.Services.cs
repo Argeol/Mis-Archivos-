@@ -100,6 +100,7 @@
 using bienesoft.Funcions;
 using bienesoft.models;
 using bienesoft.Models;
+using bienesoft.ProductionDTOs;
 using Bienesoft.utils;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -122,20 +123,20 @@ namespace bienesoft.Services
             _GeneralFunction = generalFunction;
         }
 
-        public async Task<object> CreateUserAsync(string email, string userType)
+        public async Task<string>
+            CreateUserAsync(string email)
         {
-            // Validar existencia de correo antes de abrir la transacción
             if (await UserByEmail(email))
                 throw new ArgumentException("El correo ya está registrado.");
+
+         
 
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Crear credenciales para el nuevo usuario
                 string plainPassword = PasswordGenerator.Generate(8);
                 string salt = PasswordHasher.GenerateSalt();
                 string hashedPassword = PasswordHasher.HashPassword(plainPassword, salt);
-
                 var user = new User
                 {
                     Email = email,
@@ -144,15 +145,13 @@ namespace bienesoft.Services
                     UserType = "Administrador",
                     SessionCount = 0,
                     Blockade = false,
-                    Asset = true,
+                    Asset = true
                 };
 
-                _context.user.Add(user);
-                await _context.SaveChangesAsync(); // Guardar usuario
-
+                 _context.user.Add(user);
+                await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                // Enviar correo fuera de la transacción
                 string mensajeCorreo = "Correo enviado correctamente.";
                 try
                 {
@@ -163,11 +162,8 @@ namespace bienesoft.Services
                     mensajeCorreo = "No se pudo enviar el correo, revisa tu conexión a internet. Detalles: " + ex.Message;
                 }
 
-                return new
-                {
-                    usuario = user,
-                    mensajeCorreo
-                };
+                return mensajeCorreo;
+
             }
             catch (Exception ex)
             {
@@ -175,6 +171,10 @@ namespace bienesoft.Services
                 throw new Exception("No se pudo crear el usuario. Detalles: " + ex.Message);
             }
         }
+
+
+
+
 
 
         public async Task<IEnumerable<User>> AllUsersAsync()

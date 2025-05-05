@@ -12,6 +12,8 @@ namespace Bienesoft.Controllers
     [ApiController]
     [Route("api/[controller]")]
 
+
+    [Authorize(Roles = "Administrador")]
     public class AreaController : Controller
     {
         public IConfiguration _Configuration { get; set; }

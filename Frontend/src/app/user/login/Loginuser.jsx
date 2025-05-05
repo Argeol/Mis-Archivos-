@@ -138,12 +138,6 @@ function LoginPage() {
           <a href="/user/reset" className="text-blue-600 hover:underline">
             ¿Olvidaste tu contraseña?
           </a>
-          <div className="flex space-x-2">
-            <span className="text-gray-500">¿No tienes cuenta?</span>
-            <a href="/user/register" className="text-blue-600 hover:underline">
-              Crear cuenta
-            </a>
-          </div>
         </div>
       </form>
     </main>

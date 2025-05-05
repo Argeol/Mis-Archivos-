@@ -1,6 +1,7 @@
 ﻿using bienesoft.Funcions;
 using bienesoft.models;
 using bienesoft.Models;
+using bienesoft.ProductionDTOs;
 using bienesoft.Services;
 using Bienesoft.utils;
 using Microsoft.AspNetCore.Authorization; // Añadir esto
@@ -100,13 +101,12 @@ namespace bienesoft.Controllers
                 return StatusCode(500, "Ocurrió un error en el servidor.");
             }
         }
-
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] User user)
+        public async Task<IActionResult> CreateUser([FromQuery] string email)
         {
             try
             {
-                var result = await _UserServices.CreateUserAsync(user.Email, user.UserType);
+                var result = await _UserServices.CreateUserAsync(email);
                 return Ok(result);
             }
             catch (ArgumentException ex)
@@ -119,7 +119,13 @@ namespace bienesoft.Controllers
             }
         }
 
+
+
+
+
+
         // GET: api/Users
+        [Authorize(Roles = "Administrador")]
         [HttpGet]
         public IActionResult GetUsers()
         {
@@ -179,7 +185,7 @@ namespace bienesoft.Controllers
             }
         }
 
-
+        [Authorize(Roles = "Administrador")]
         [HttpGet("AllUsers")]
         //[Authorize]
         public async Task<ActionResult<IEnumerable<User>>> AllUsers()
@@ -207,7 +213,7 @@ namespace bienesoft.Controllers
             }
         }
 
-
+        [Authorize(Roles = "Administrador")]
         [HttpGet("AllUsersInRange")]
         //[Authorize]
         public async Task<ActionResult<IEnumerable<User>>> GetAllInRange(int inicio, int fin)

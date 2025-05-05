@@ -27,6 +27,7 @@ namespace bienesoft.Controllers
             // Asignar la instancia del GeneralFunction al servicio
             // GeneralFunction = new GeneralFunction(_configuration);
         }
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         public async Task<IActionResult> CreateApprentice([FromBody] Apprentice apprentice)
         {
@@ -54,7 +55,7 @@ namespace bienesoft.Controllers
             }
         }
 
-        [Authorize(Roles = "Aprendiz")]
+        [Authorize(Roles = "Administrador")]
         [HttpGet("GetApprenticeById")]
         public IActionResult GetApprenticeById()
         {
@@ -77,6 +78,7 @@ namespace bienesoft.Controllers
                 return StatusCode(500, ex.ToString());            }
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpGet("all")]
         public IActionResult GetApprentices()
         {
@@ -84,7 +86,7 @@ namespace bienesoft.Controllers
             return Ok(list);
         }
 
-        [Authorize(Roles = "Aprendiz")]
+        [Authorize(Roles = "Administrador")]
         [HttpPut("update-profile")] // Opcional: cambia el endpoint si quieres
         public IActionResult UpdateApprentice([FromBody] UpdateApprentice model)
         {
@@ -115,6 +117,7 @@ namespace bienesoft.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpGet("CountApprentices")]
         public IActionResult CountApprentices()
         {

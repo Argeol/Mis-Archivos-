@@ -16,7 +16,7 @@ namespace bienesoft.Models
         public DbSet<ProgramModel> program { get; set; }
         public DbSet<User> user { get; set; }
         public DbSet<Department> department { get; set; }
-        public DbSet<Locality> locality { get; set; }
+        
         // public DbSet<AuthorizationResponsible> authorizationResponsible { get; set; }
         public DbSet<PermissionFS> permissionFS { get; set; }
         // public DbSet<Responsible> responsible { get; set; }
