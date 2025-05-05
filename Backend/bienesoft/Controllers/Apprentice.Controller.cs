@@ -58,18 +58,18 @@ namespace bienesoft.Controllers
         [HttpGet("GetApprenticeById")]
         public IActionResult GetApprenticeById()
         {
-            try{
-
-            // Sacamos el Id_Apprentice del token
-            var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
+            try
+            {
+                // Sacamos el Id_Apprentice del token
+                var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
             
-            var idApprentice = int.Parse(idApprenticeClaim);
+                var idApprentice = int.Parse(idApprenticeClaim);
             
-            var apprentice = _apprenticeService.GetApprenticeById(idApprentice);
-            if (apprentice == null)
-                return NotFound(new { message = "Aprendiz no encontrado" });
+                var apprentice = _apprenticeService.GetApprenticeById(idApprentice);
+                if (apprentice == null)
+                    return NotFound(new { message = "Aprendiz no encontrado" });
 
-            return Ok(apprentice);
+                return Ok(apprentice);
             }
             catch (Exception ex)
             {
