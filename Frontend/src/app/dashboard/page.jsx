@@ -5,6 +5,7 @@ import PrivateNav from "@/components/navs/PrivateNav";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import {
   Users,
   FileCheck,
@@ -27,41 +28,9 @@ import {
   Legend,
 } from "recharts";
 import { useAuthUser } from "../user/login/useCurrentUser";
+import LoadingPage from "@/components/utils/LoadingPage";
+
 // Datos de ejemplo para permisos recientes
-const recentPermissions = [
-  {
-    id: 1,
-    apprentice: "Carlos Mendoza",
-    program: "ADSO",
-    date: "2025-04-16",
-    status: "approved",
-    avatar: "CM",
-  },
-  {
-    id: 2,
-    apprentice: "Laura Gómez",
-    program: "Contabilidad",
-    date: "2025-04-15",
-    status: "pending",
-    avatar: "LG",
-  },
-  {
-    id: 3,
-    apprentice: "Miguel Ángel",
-    program: "Mecatrónica",
-    date: "2025-04-14",
-    status: "rejected",
-    avatar: "MA",
-  },
-  {
-    id: 4,
-    apprentice: "Ana Martínez",
-    program: "ADSO",
-    date: "2025-04-13",
-    status: "approved",
-    avatar: "AM",
-  },
-];
 
 export default function DashboardPage() {
   const { data: totalApprentices, isLoading: loadingApprentices } =
@@ -70,12 +39,11 @@ export default function DashboardPage() {
     usePermissionSummary();
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredPermissions, setFilteredPermissions] =
-    useState(recentPermissions);
+
   const [activeTab, setActiveTab] = useState("overview");
   const isMobile = useIsMobile();
   const user = useAuthUser();
-  
+
   const stats = {
     totalApprentices: totalApprentices ?? 0,
     activePermissions: permissionSummary?.aprobadosActivos ?? 0,
@@ -142,19 +110,28 @@ export default function DashboardPage() {
               <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800 drop-shadow-sm">
                 Bienvenido a BIENESOFT, {user.fullName} ({user.role})
               </h1>
-              
+
+              {user.role === "Aprendiz" && (
+                <div className="mt-4">
+                  {/* Aquí contenido exclusivo para Aprendices */}
+                </div>
+              )}
+
               <p className="text-sm sm:text-base text-gray-600 mt-1">
                 {formattedDate} • Sistema de Gestión de Permisos
               </p>
             </div>
             <div className="mt-4 md:mt-0 flex flex-wrap sm:flex-nowrap gap-2">
-              <Button
-                size="sm"
-                className="bg-[#218EED] hover:bg-[#1a70bd] flex items-center gap-2 text-xs sm:text-sm w-full sm:w-auto"
-              >
-                <Plus size={16} />
-                <span>Nuevo Permiso</span>
-              </Button>
+              <Link href="/dashboard/permissionGeneral" passHref>
+                <Button
+                  size="sm"
+                  className="bg-[#218EED] hover:bg-[#1a70bd] flex items-center gap-2 text-xs sm:text-sm w-full sm:w-auto"
+                >
+                  <Plus size={16} />
+                  <p>Nuevo Permiso </p>
+                  {/* if (isLoading) return <LoadingPage />; */}
+                </Button>
+              </Link>
             </div>
           </div>
 
