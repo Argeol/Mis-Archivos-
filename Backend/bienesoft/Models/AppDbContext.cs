@@ -16,7 +16,7 @@ namespace bienesoft.Models
         public DbSet<ProgramModel> program { get; set; }
         public DbSet<User> user { get; set; }
         public DbSet<Department> department { get; set; }
-        public DbSet<Locality> locality { get; set; }
+        
         // public DbSet<AuthorizationResponsible> authorizationResponsible { get; set; }
         public DbSet<PermissionFS> permissionFS { get; set; }
         // public DbSet<Responsible> responsible { get; set; }
@@ -112,7 +112,17 @@ namespace bienesoft.Models
                 .Property(p => p.Status)
                 .HasConversion<string>();
 
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Responsible)
+                .WithMany(r => r.Users)
+                .HasForeignKey(u => u.Responsible_Id)
+                .OnDelete(DeleteBehavior.SetNull);
 
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Apprentice)       // Un User puede tener un Apprentice
+                .WithMany()                      // Un Apprentice no necesita tener una lista de Users (si no se requiere)
+                .HasForeignKey(u => u.Id_Apprentice)  // La clave foránea en User
+                .OnDelete(DeleteBehavior.SetNull);  // Si el Apprentice se elimina, se pone null en la relación
 
             base.OnModelCreating(modelBuilder);
         }

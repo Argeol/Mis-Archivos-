@@ -27,69 +27,75 @@ namespace Bienesoft.Services
 
 
         public async Task<object> CreateApprenticeAsync(Apprentice apprentice, string email)
-        {
-            // Validar existencia de correo ANTES de todo
+{
+            // Validar existencia de correo ANTES de abrir la transacción
             if (await _userService.UserByEmail(email))
                 throw new ArgumentException("El correo ya está registrado.");
 
-            // Agregar aprendiz al contexto
-            _context.apprentice.Add(apprentice);
-
+            // Comenzamos una transacción
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Guardar aprendiz primero
-                await _context.SaveChangesAsync();
+                // Agregar aprendiz y guardar
+                _context.apprentice.Add(apprentice);
+                await _context.SaveChangesAsync(); // Guardar aprendiz
+
+                // El ID del aprendiz ya debería estar disponible ahora
+                var apprenticeId = apprentice.Id_Apprentice;
+
+                // Crear credenciales para el nuevo usuario
+                string plainPassword = PasswordGenerator.Generate(8);
+                string salt = PasswordHasher.GenerateSalt();
+                string hashedPassword = PasswordHasher.HashPassword(plainPassword, salt);
+
+                var user = new User
+                {
+                    Email = email,
+                    HashedPassword = hashedPassword,
+                    Salt = salt,
+                    UserType = "Aprendiz",
+                    SessionCount = 0,
+                    Blockade = false,
+                    Asset = true,
+                    Id_Apprentice = apprenticeId,  // Asociar al aprendiz creado
+                };
+
+                // Agregar usuario al contexto y guardar
+                _context.user.Add(user);
+                await _context.SaveChangesAsync(); // Guardar usuario
+
+                // Confirmar transacción porque todo salió bien
+                await transaction.CommitAsync();
+
+                // Enviar correo fuera de la transacción
+                string mensajeCorreo = "Correo enviado correctamente.";
+                try
+                {
+                    await _GeneralFunction.SendWelcomeEmail(email, plainPassword);
+                }
+                catch (Exception ex)
+                {
+                    mensajeCorreo = "No se pudo enviar el correo, revisa tu conexión a internet. Detalles: " + ex.Message;
+                }
+
+                return new
+                {
+                    aprendiz = apprentice,
+                    mensajeCorreo
+                };
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al guardar el aprendiz. Detalles: " + ex.Message);
+                // Si algo falla, hacemos rollback
+                await transaction.RollbackAsync();
+                throw new Exception("No se pudo completar el registro. Detalles: " + ex.Message);
             }
+}
 
-            // Crear credenciales después de guardar exitosamente el aprendiz
-            string plainPassword = PasswordGenerator.Generate(8);
-            string salt = PasswordHasher.GenerateSalt();
-            string hashedPassword = PasswordHasher.HashPassword(plainPassword, salt);
-
-            var user = new User
-            {
-                Email = email,
-                HashedPassword = hashedPassword,
-                Salt = salt,
-                UserType = "Aprendiz",
-                SessionCount = 0,
-                Blockade = false,
-                Asset = true
-            };
-
-            await _userService.AddUserAsync(user);
-
-            // Asociar el email (ya registrado) al aprendiz
-            apprentice.Email_Apprentice = user.Email;
-
-            // Si necesitas actualizar el aprendiz con el email del usuario
-            await _context.SaveChangesAsync();
-
-            string mensajeCorreo = "Correo enviado correctamente.";
-
-            try
-            {
-                await _GeneralFunction.SendWelcomeEmail(email, plainPassword);
-            }
-            catch (Exception ex)
-            {
-                mensajeCorreo = "No se pudo enviar el correo, revisa tu conexión a internet. Detalles: " + ex.Message;
-            }
-
-            return new
-            {
-                aprendiz = apprentice,
-                mensajeCorreo
-            };
-        }
 
         public object GetApprenticeById(int id)
         {
-            return _context.apprentice
+           var apprentice =  _context.apprentice
                 .Include(a => a.Municipality)
                     .ThenInclude(m => m.Department)
                 .Include(a => a.File)
@@ -121,6 +127,8 @@ namespace Bienesoft.Services
                     a.Status_Apprentice
                 })
                 .FirstOrDefault();
+
+            return apprentice;
         }
 
         public IEnumerable<object> GetApprentices()

@@ -13,6 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { CalendarIcon, Users, BookOpen, ClipboardList } from "lucide-react"
 
 const statusOptions = ["Activa", "Inactiva"];
 
@@ -65,39 +67,111 @@ export default function RegisterFile() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
-      <Label>ID de Ficha</Label>
-      <Input name="file_Id" placeholder="ID de la Ficha" onChange={handleChange} required />
+    <Card className="w-full max-w-2xl mx-auto shadow-lg border-blue-600/20 border-2">
+      <form onSubmit={handleSubmit}>
+        <CardContent className="space-y-6 pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-[#218EED]" />
+                <Label htmlFor="file_Id" className="font-medium">
+                  Codigo de Ficha
+                </Label>
+              </div>
+              <Input
+                id="file_Id"
+                name="file_Id"
+                placeholder="Ej: 2567890"
+                onChange={handleChange}
+                className="border-blue-200 focus-visible:ring-blue-500"
+                required
+              />
+            </div>
 
-      <Label>Cantidad de Aprendices</Label>
-      <Input name="apprentice_count" type="number" placeholder="Cantidad" onChange={handleChange} required />
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-[#218EED]" />
+                <Label htmlFor="apprentice_count" className="font-medium">
+                  Cantidad de Aprendices
+                </Label>
+              </div>
+              <Input
+                id="apprentice_count"
+                name="apprentice_count"
+                type="number"
+                placeholder="Ej: 25"
+                onChange={handleChange}
+                className="border-blue-200 focus-visible:ring-blue-500"
+                required
+              />
+            </div>
+          </div>
 
-      <Label>Fecha de Inicio</Label>
-      <Input name="start_Date" type="date" onChange={handleChange} required />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4 text-[#218EED]" />
+                <Label htmlFor="start_Date" className="font-medium">
+                  Fecha de Inicio
+                </Label>
+              </div>
+              <Input
+                id="start_Date"
+                name="start_Date"
+                type="date"
+                onChange={handleChange}
+                className="border-blue-200 focus-visible:ring-blue-500"
+                required
+              />
+            </div>
 
-      <Label>Fecha de Finalización</Label>
-      <Input name="end_Date" type="date" onChange={handleChange} required />
-      <Select
-        onValueChange={(value) =>
-          setFormData({ ...formData, program_Id: parseInt(value) })
-        }
-      >
-      <SelectTrigger>
-        <SelectValue placeholder="Seleccionar Programa" />
-      </SelectTrigger>
-      <SelectContent>
-        {program.map((Program) => (
-          <SelectItem key={Program.program_Id} value={Program.program_Id.toString()}>
-            {Program.program_Name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-      </Select>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4 text-[#218EED]" />
+                <Label htmlFor="end_Date" className="font-medium">
+                  Fecha de Finalización
+                </Label>
+              </div>
+              <Input
+                id="end_Date"
+                name="end_Date"
+                type="date"
+                onChange={handleChange}
+                className="border-blue-200 focus-visible:ring-blue-500"
+                required
+              />
+            </div>
+          </div>
 
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <BookOpen className="h-4 w-4 text-[#218EED]" />
+              <Label className="font-medium">Programa de Formación</Label>
+            </div>
+            <Select
+              onValueChange={(value) => setFormData({ ...formData, program_Id: Number.parseInt(value) })}
+              required
+            >
+              <SelectTrigger className="border-blue-200 focus:ring-blue-500">
+                <SelectValue placeholder="Seleccionar Programa" />
+              </SelectTrigger>
+              <SelectContent>
+                {program.map((Program) => (
+                  <SelectItem key={Program.program_Id} value={Program.program_Id.toString()}>
+                    {Program.program_Name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
 
-      <Button type="submit" disabled={mutation.isLoading}>
-        {mutation.isLoading ? "Registrando..." : "Registrar Ficha"}
-      </Button>
-    </form>
+        <CardFooter className=" dark:bg-green-900/20  border-blue-100 dark:border-blue-800 flex justify-end pt-5">
+          <Button type="submit" disabled={mutation.isLoading} >
+            {mutation.isLoading ? "Registrando..." : "Registrar Ficha"}
+          </Button>
+        </CardFooter> 
+      </form>
+    </Card>
   );
 }

@@ -1,4 +1,5 @@
 using bienesoft.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -6,6 +7,8 @@ namespace bienesoft.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
+    [Authorize(Roles = "Administrador")]
     public class MunicipalityController : ControllerBase
     {
         private readonly MunicipalityService _municipalityService;

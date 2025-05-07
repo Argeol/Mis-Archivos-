@@ -8,6 +8,7 @@ namespace bienesoft.Models
 {
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
+    using bienesoft.models;
 
     public class Apprentice
     {
@@ -68,6 +69,7 @@ namespace bienesoft.Models
         public Municipality? Municipality { get; set; }
         public FileModel? File { get; set; }
         public ICollection<PermissionGN>? PermissionGN { get; set; }
+        // public ICollection<User>? User { get; set; }
     }
 
     public class UpdateApprentice

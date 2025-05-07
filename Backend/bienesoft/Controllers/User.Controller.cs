@@ -1,6 +1,7 @@
 ﻿using bienesoft.Funcions;
 using bienesoft.models;
 using bienesoft.Models;
+using bienesoft.ProductionDTOs;
 using bienesoft.Services;
 using Bienesoft.utils;
 using Microsoft.AspNetCore.Authorization; // Añadir esto
@@ -44,10 +45,42 @@ namespace bienesoft.Controllers
                 }
 
                 var key = Encoding.UTF8.GetBytes(_jwtSettings.keysecret);
-                var claims = new ClaimsIdentity(new[]
+                var claimsList = new List<Claim>
                 {
-            new Claim("User", user.Email)
-                });
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Role, user.UserType),
+                    new Claim("aud", "BienesoftClient"),
+                    new Claim("iss", "BienesoftAPI"),
+                    new Claim("exp", DateTimeOffset.UtcNow.AddMinutes(Convert.ToDouble(_jwtSettings.JWTExpireTime)).ToUnixTimeSeconds().ToString()),
+                    new Claim("iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString())
+                };
+                Console.WriteLine($"user.UserType = '{user.UserType}'");
+
+                switch (user.UserType)
+
+                {
+                    case "Aprendiz":
+                        if (user.Apprentice != null)
+                        {
+                            claimsList.Add(new Claim("Id_Apprentice", user.Id_Apprentice?.ToString() ?? ""));
+                            claimsList.Add(new Claim("FullName", $"{user.Apprentice.First_Name_Apprentice} {user.Apprentice.Last_Name_Apprentice}"));
+                        }
+                        break;
+
+                    case "Responsable":
+                        if (user.Responsible != null)
+                        {
+                            claimsList.Add(new Claim("Responsible_Id", user.Responsible_Id?.ToString() ?? ""));
+                            claimsList.Add(new Claim("FullName", $"{user.Responsible.Nom_Responsible} {user.Responsible.Ape_Responsible}"));
+                        }
+                        break;
+
+                    case "Administrador":
+                        // No agregamos nada extra
+                        break;
+                }
+
+                var claims = new ClaimsIdentity(claimsList);
 
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
@@ -70,7 +103,44 @@ namespace bienesoft.Controllers
                 return StatusCode(500, "Ocurrió un error en el servidor.");
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> CreateUser([FromQuery] string email)
+        {
+            try
+            {
+                var result = await _UserServices.CreateUserAsync(email);
+                return Ok(result);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al crear el usuario.", details = ex.Message });
+            }
+        }
 
+
+
+
+
+
+        // GET: api/Users
+        [Authorize(Roles = "Administrador")]
+        [HttpGet]
+        public IActionResult GetUsers()
+        {
+            try
+            {
+                var users = _UserServices.GetUsers();
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener los usuarios.", details = ex.Message });
+            }
+        }
 
         //[Authorize] // Protección de la ruta con JWT
         //[HttpGet("ProtectedRoute")]
@@ -117,28 +187,7 @@ namespace bienesoft.Controllers
             }
         }
 
-        // Este método de crear usuario es público
-        [HttpPost("CreateUser")]
-        public async Task<IActionResult> CreateUser(User user)
-        {
-            try
-            {
-                string salt = BCrypt.Net.BCrypt.GenerateSalt();
-                user.HashedPassword = BCrypt.Net.BCrypt.HashPassword(user.HashedPassword + salt);
-                user.Salt = salt;
-                user.TokJwt = "";
-
-                await _UserServices.AddUserAsync(user);
-                return Ok(new { message = "Usuario creado con éxito" });
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.ToString());
-                return StatusCode(500, ex.ToString());
-            }
-        }
-
-
+        [Authorize(Roles = "Administrador")]
         [HttpGet("AllUsers")]
         //[Authorize]
         public async Task<ActionResult<IEnumerable<User>>> AllUsers()
@@ -148,70 +197,25 @@ namespace bienesoft.Controllers
         }
 
 
-        [HttpGet("GetUser/{id}")]
-        //[Authorize]
-        public async Task<IActionResult> GetUser(int id)
+        [HttpDelete("{email}")]
+        public async Task<IActionResult> DeleteUser(string email)
         {
             try
             {
-                var user = await _UserServices.GetByIdAsync(id);
-                if (user == null)
-                {
-                    return NotFound("No se encontró el usuario");
-                }
-                return Ok(user);
+                await _UserServices.DeleteByEmailAsync(email);
+                return Ok(new { message = "Usuario eliminado correctamente." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
+                return StatusCode(500, new { message = "Error al eliminar el usuario.", details = ex.Message });
             }
         }
 
-
-        [HttpDelete("DeleteUser/{id}")]
-        //[Authorize]
-        public async Task<IActionResult> Delete(int id)
-        {
-            try
-            {
-                var userToDelete = await _UserServices.GetByIdAsync(id);
-                if (userToDelete == null)
-                {
-                    return NotFound($"El usuario con el ID {id} no se pudo encontrar");
-                }
-                await _UserServices.DeleteAsync(id);
-                return Ok("Usuario eliminado con éxito");
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
-            }
-        }
-
-        [HttpPut("UpdateUser")]
-        //[Authorize]
-        public async Task<IActionResult> Update(User user)
-        {
-            if (user == null)
-            {
-                return BadRequest("El modelo de usuario es nulo");
-            }
-
-            try
-            {
-                await _UserServices.UpdateUserAsync(user);
-                return Ok("Usuario actualizado exitosamente");
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
-            }
-        }
-
-
+        [Authorize(Roles = "Administrador")]
         [HttpGet("AllUsersInRange")]
         //[Authorize]
         public async Task<ActionResult<IEnumerable<User>>> GetAllInRange(int inicio, int fin)

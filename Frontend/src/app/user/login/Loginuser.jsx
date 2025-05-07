@@ -32,9 +32,10 @@ function LoginPage() {
     onMutate: () => setLoading(true),
     onSuccess: (response) => {
       if (response.status === 200) {
-        alert("token");
-        router.push("../dashboard");
-        localStorage.setItem("email",response.data.email  )
+        const token = response.data.message; // Captura el token
+        localStorage.setItem("token", token);
+        alert("¡Inicio de sesión exitoso!");
+        router.push("/dashboard");
       }
     },
     onError: (err) => {
@@ -137,12 +138,6 @@ function LoginPage() {
           <a href="/user/reset" className="text-blue-600 hover:underline">
             ¿Olvidaste tu contraseña?
           </a>
-          <div className="flex space-x-2">
-            <span className="text-gray-500">¿No tienes cuenta?</span>
-            <a href="/user/register" className="text-blue-600 hover:underline">
-              Crear cuenta
-            </a>
-          </div>
         </div>
       </form>
     </main>

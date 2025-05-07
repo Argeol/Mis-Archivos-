@@ -15,7 +15,7 @@ namespace bienesoft.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize(Roles = "Administrador")]
     public class ProgramController : ControllerBase
     {
         public IConfiguration _Configuration { get; set; }

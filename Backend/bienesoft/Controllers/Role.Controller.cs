@@ -1,11 +1,14 @@
 ﻿using bienesoft.Funcions;
 using bienesoft.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bienesoft.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+
+    [Authorize(Roles = "Administrador")]
     public class RoleController : Controller
     {
         public IConfiguration _Configuration { get; set; }
