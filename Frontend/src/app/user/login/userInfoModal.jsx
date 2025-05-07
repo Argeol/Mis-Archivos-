@@ -1,42 +1,53 @@
-"use client"
+"use client";
 
-import { useEffect, useRef } from "react"
-import { useUserInfo } from "./useUserInfo"
-import { useAuthUser } from "./useCurrentUser"
-import { X, ChevronRight, Shield, Mail, Calendar, UserIcon } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Separator } from "@/components/ui/separator"
+import { useEffect, useRef } from "react";
+import { useUserInfo } from "./useUserInfo";
+import { useAuthUser } from "./useCurrentUser";
+import {
+  X,
+  ChevronRight,
+  Shield,
+  Mail,
+  Calendar,
+  UserIcon,
+  GraduationCap,
+  ShieldCheck,
+  UserCheck
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
 
 const UserInfoModal = ({ open, onClose }) => {
-  const modalRef = useRef(null)
-  const user = useAuthUser()
-  const { data, isLoading, error } = useUserInfo()
-  const userData = data?.data
-  const translations = data?.translations
+  const modalRef = useRef(null);
+  const user = useAuthUser();
+  const { data, isLoading, error } = useUserInfo();
+  const userData = data?.data;
+  const translations = data?.translations;
 
   // Manejar tecla Escape para cerrar el modal
   useEffect(() => {
     const handleEscapeKey = (e) => {
       if (e.key === "Escape" && typeof onClose === "function") {
-        onClose()
+        onClose();
       }
-    }
+    };
 
-    document.addEventListener("keydown", handleEscapeKey)
-    return () => document.removeEventListener("keydown", handleEscapeKey)
-  }, [onClose])
+    document.addEventListener("keydown", handleEscapeKey);
+    return () => document.removeEventListener("keydown", handleEscapeKey);
+  }, [onClose]);
 
   // No renderizar nada si el modal no está abierto
-  if (!open) return null
+  if (!open) return null;
 
   // Función para cerrar el modal al hacer clic en el fondo
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
-      onClose()
+      onClose();
     }
-  }
+  };
 
   // Función para obtener un icono basado en la clave
   const getIconForKey = (key) => {
@@ -48,10 +59,10 @@ const UserInfoModal = ({ open, onClose }) => {
       date: <Calendar className="h-5 w-5 text-emerald-500" />,
       fecha: <Calendar className="h-5 w-5 text-emerald-500" />,
       // Puedes agregar más mapeos según tus datos
-    }
+    };
 
-    return iconMap[key] || <ChevronRight className="h-5 w-5 text-slate-400" />
-  }
+    return iconMap[key] || <ChevronRight className="h-5 w-5 text-slate-400" />;
+  };
 
   const renderContent = () => {
     if (isLoading)
@@ -72,37 +83,55 @@ const UserInfoModal = ({ open, onClose }) => {
             </div>
           ))}
         </div>
-      )
+      );
 
     if (error)
       return (
         <div className="p-6 rounded-xl bg-red-50 border-l-4 border-blue-500 my-4">
           <h3 className="text-blue-700 font-semibold text-lg">Error</h3>
           <p className="text-blue-600 mt-1">
-            {error.message || "No se pudo cargar la información. Intente nuevamente más tarde."}
+            {error.message ||
+              "No se pudo cargar la información. Intente nuevamente más tarde."}
           </p>
         </div>
-      )
+      );
 
     if (!userData || Object.keys(userData).length === 0)
       return (
         <div className="p-6 rounded-xl bg-slate-50 border-l-4 border-slate-300 my-4">
           <h3 className="text-slate-700 font-semibold">Sin datos</h3>
-          <p className="text-slate-600 mt-1">No hay información disponible para mostrar.</p>
+          <p className="text-slate-600 mt-1">
+            No hay información disponible para mostrar.
+          </p>
         </div>
-      )
+      );
+
+    const getRoleIcon = (role) => {
+      switch (role) {
+        case "Aprendiz":
+          return <GraduationCap className="h-4.3 w-4.3 text-blue-500 mr-1" />;
+        case "Administrador":
+          return <ShieldCheck className="h-3.5 w-3.5 text-red-500 mr-1" />;
+        case "Responsable":
+          return <UserCheck className="h-3.5 w-3.5 text-green-500 mr-1" />;
+        default:
+          return <ShieldCheck className="h-3.5 w-3.5 text-slate-400 mr-1" />;
+      }
+    };
 
     return (
       <div className="space-y-6">
         <div className="flex items-center space-x-3">
-          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-rose-400 to-orange-300 flex items-center justify-center text-white font-bold text-lg shadow-sm">
-            {(userData.name?.[0] || userData.nombre?.[0] || "U").toUpperCase()}
-          </div>
+        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-200 to-[#068EED] flex items-center justify-center text-white font-serif text-xl shadow-sm">
+  {(user?.fullName[0] || "U").toUpperCase()}
+</div>
           <div>
-            <h3 className="text-lg font-medium">{userData.name || userData.nombre || "Usuario"}</h3>
+            <h3 className="text-lg font-medium">{"Usuario"}</h3>
             <div className="flex items-center mt-0.5">
-              <Shield className="h-3.5 w-3.5 text-slate-400 mr-1" />
-              <span className="text-sm text-slate-500">{user?.role || "Usuario"}</span>
+              {getRoleIcon(user?.role)}
+              <span className="text-sm text-slate-500">
+                {user?.role || "Usuario"}
+              </span>
             </div>
           </div>
         </div>
@@ -115,16 +144,20 @@ const UserInfoModal = ({ open, onClose }) => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {getIconForKey(key)}
-                  <span className="text-sm font-medium text-slate-500">{translations?.[key] || key}</span>
+                  <span className="text-sm font-medium text-slate-500">
+                    {translations?.[key] || key}
+                  </span>
                 </div>
               </div>
-              <p className="mt-1 text-slate-800 font-medium pl-7 break-words">{String(value) || "-"}</p>
+              <p className="mt-1 text-slate-800 font-medium pl-7 break-words">
+                {String(value) || "-"}
+              </p>
             </div>
           ))}
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div
@@ -140,8 +173,11 @@ const UserInfoModal = ({ open, onClose }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-white border-b">
-          <h2 id="modal-title" className="text-xl font-semibold flex items-center gap-2">
-            <span className="bg-gradient-to-r from-rose-300 to-blue-500 bg-clip-text text-transparent">
+          <h2
+            id="modal-title"
+            className="text-xl font-semibold flex items-center gap-2"
+          >
+            <span className="bg-gradient-to-r from-slate-600 to-[#088EED] bg-clip-text text-transparent">
               Información de {user?.role || "Usuario"}
             </span>
           </h2>
@@ -156,19 +192,21 @@ const UserInfoModal = ({ open, onClose }) => {
           </Button>
         </div>
 
-        <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">{renderContent()}</CardContent>
+        <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+          {renderContent()}
+        </CardContent>
 
         <div className="p-4 border-t bg-slate-50 flex justify-end">
           <Button
             onClick={onClose}
-            className="bg-gradient-to-r from-rose-500 to-blue-500 hover:from-rose-600 hover:to-blue-600 text-white px-6 shadow-md hover:shadow-lg transition-all"
+            className="bg-gradient-to-r from-slate-600 to-blue-600 hover:from-slate-700 hover:to-blue-700 text-white px-6 shadow-md hover:shadow-lg transition-all"
           >
             Cerrar
           </Button>
         </div>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default UserInfoModal
+export default UserInfoModal;

@@ -31,10 +31,9 @@
         file_Id: "Codigo de Ficha",
         programName: "Programa de Formacion",
         areaName: "Area",
-        status_Apprentice: "Estado de Aprendiz",
       };
 
-      ignorar=["id_municipality"]
+      ignorar=["id_municipality","status_Apprentice"]
 
     } else if (role === 'Responsable') {
       url = '/api/Responsible/GetResponsibleID';
