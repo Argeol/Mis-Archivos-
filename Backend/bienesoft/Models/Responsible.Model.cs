@@ -17,7 +17,7 @@ namespace bienesoft.Models
 
         [DisplayName("Apellido del responsable")]
         [Required(ErrorMessage = "El campo {0} es requerido")]
-        [StringLength(50, ErrorMessage = "El campo {0} tiene un límite de {1} caracteres.")]
+        [StringLength(45, ErrorMessage = "El campo {0} tiene un límite de {1} caracteres.")]
         public string? Ape_Responsible { get; set; }
 
         [DisplayName("Teléfono del responsable")]
