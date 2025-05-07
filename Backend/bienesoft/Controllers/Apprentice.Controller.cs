@@ -55,7 +55,7 @@ namespace bienesoft.Controllers
             }
         }
 
-        [Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Aprendiz")]
         [HttpGet("GetApprenticeById")]
         public IActionResult GetApprenticeById()
         {
@@ -86,7 +86,7 @@ namespace bienesoft.Controllers
             return Ok(list);
         }
 
-        [Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Aprendiz,Administrador")]  
         [HttpPut("update-profile")] // Opcional: cambia el endpoint si quieres
         public IActionResult UpdateApprentice([FromBody] UpdateApprentice model)
         {
@@ -117,7 +117,6 @@ namespace bienesoft.Controllers
             }
         }
 
-        [Authorize(Roles = "Administrador")]
         [HttpGet("CountApprentices")]
         public IActionResult CountApprentices()
         {
@@ -131,13 +130,13 @@ namespace bienesoft.Controllers
                 return StatusCode(500, new { Message = "Error al contar los aprendices.", Details = ex.Message });
             }
         }
-        [Authorize(Roles = "Aprendiz")]
-        [HttpGet("apprendiz-only")]
-        public IActionResult GetApprenticeData()
-        {
-            var userRole = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
-            return Ok($"Role encontrado: {userRole}. Solo el aprendiz puede ver esto.");
-        }
+        // [Authorize(Roles = "Aprendiz")]
+        // [HttpGet("apprendiz-only")]
+        // public IActionResult GetApprenticeData()
+        // {
+        //     var userRole = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
+        //     return Ok($"Role encontrado: {userRole}. Solo el aprendiz puede ver esto.");
+        // }
 
     }
 }
