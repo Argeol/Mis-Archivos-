@@ -158,3 +158,4 @@ app.UseAuthorization();             // Autorización de roles, políticas, etc.
 app.MapControllers();                // Mapear controladores
 
 app.Run();
+    
