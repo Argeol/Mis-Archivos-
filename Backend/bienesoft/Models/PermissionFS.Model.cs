@@ -45,6 +45,8 @@ namespace Bienesoft.Models
 
         [NotMapped]
         public SenaEmpresaEnum SenaEmpresaEnum => Enum.Parse<SenaEmpresaEnum>(Sen_Empresa);
+
+        public DateTime Fec_Diligenciado { get; set; }
     }
 
     // Enum para 'Dia_Salida'

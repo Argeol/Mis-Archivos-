@@ -3,7 +3,6 @@ using Bienesoft.Models;
 using Bienesoft.Services;
 using ClosedXML.Excel;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
 
 namespace bienesoft.Services
 {
@@ -24,7 +23,7 @@ namespace bienesoft.Services
                 .Include(p => p.Apprentice)
                 .ToListAsync();
 
-            return permissions.Select(p => new
+            var result = permissions.Select(p => new
             {
                 p.PermissionFS_Id,
                 p.Apprentice_Id,
@@ -35,10 +34,10 @@ namespace bienesoft.Services
                 p.Alojamiento,
                 p.Sen_Empresa,
                 p.Direccion,
-                ApprenticeInfo = p.Apprentice != null
-                    ? _apprenticeService.GetApprenticeById(p.Apprentice_Id)
-                    : null
+                ApprenticeInfo = p.Apprentice
             });
+
+            return result;
         }
 
         public async Task<object> GetByIdAsync(int id)
@@ -60,29 +59,16 @@ namespace bienesoft.Services
                 permission.Alojamiento,
                 permission.Sen_Empresa,
                 permission.Direccion,
-                ApprenticeInfo = permission.Apprentice != null
-                    ? _apprenticeService.GetApprenticeById(permission.Apprentice_Id)
-                    : null
+                ApprenticeInfo = permission.Apprentice
             };
         }
 
         public async Task<PermissionFS> CreateAsync(PermissionFS model)
         {
-            var newPermission = new PermissionFS
-            {
-                Apprentice_Id = model.Apprentice_Id,
-                Destino = model.Destino,
-                Fec_Salida = model.Fec_Salida,
-                Fec_Entrada = model.Fec_Entrada,
-                Dia_Salida = model.Dia_Salida,
-                Alojamiento = model.Alojamiento,
-                Sen_Empresa = model.Sen_Empresa,
-                Direccion = model.Direccion
-            };
-
-            _context.permissionFS.Add(newPermission);
+            model.Fec_Diligenciado = DateTime.Now.Date; 
+            _context.permissionFS.Add(model);
             await _context.SaveChangesAsync();
-            return newPermission;
+            return model;
         }
 
         public async Task<PermissionFS> UpdateAsync(int id, PermissionFS model)
@@ -109,8 +95,8 @@ namespace bienesoft.Services
 
             var permisos = await _context.permissionFS
                 .Include(p => p.Apprentice)
-                .ThenInclude(a => a.File)
-                .ThenInclude(f => f.program)
+                    .ThenInclude(a => a.File)
+                        .ThenInclude(f => f.program)
                 .ToListAsync();
 
             // Encabezados
@@ -134,17 +120,16 @@ namespace bienesoft.Services
             foreach (var p in permisos)
             {
                 var apprentice = p.Apprentice;
-
-                string fullName = apprentice.First_Name_Apprentice + " " + apprentice.Last_Name_Apprentice;
+                string fullName = apprentice?.First_Name_Apprentice + " " + apprentice?.Last_Name_Apprentice;
 
                 worksheet.Cell(row, 1).Value = p.Apprentice_Id;
                 worksheet.Cell(row, 2).Value = fullName;
                 worksheet.Cell(row, 3).Value = p.Destino;
-                worksheet.Cell(row, 4).Value = apprentice.File?.program?.Program_Name;
-                worksheet.Cell(row, 5).Value = apprentice.File?.File_Id;
-                worksheet.Cell(row, 6).Value = apprentice.Phone_Apprentice;
-                worksheet.Cell(row, 7).Value = apprentice.nom_responsible;
-                worksheet.Cell(row, 8).Value = apprentice.tel_responsible;
+                worksheet.Cell(row, 4).Value = apprentice?.File?.program?.Program_Name;
+                worksheet.Cell(row, 5).Value = apprentice?.File?.File_Id;
+                worksheet.Cell(row, 6).Value = apprentice?.Phone_Apprentice;
+                worksheet.Cell(row, 7).Value = apprentice?.nom_responsible;
+                worksheet.Cell(row, 8).Value = apprentice?.tel_responsible;
                 worksheet.Cell(row, 9).Value = p.Fec_Salida.ToString("yyyy-MM-dd");
                 worksheet.Cell(row, 10).Value = p.Fec_Entrada.ToString("yyyy-MM-dd");
                 worksheet.Cell(row, 11).Value = p.Dia_Salida.ToString();
