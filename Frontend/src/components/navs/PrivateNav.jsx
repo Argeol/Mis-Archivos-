@@ -29,7 +29,7 @@ function PrivateNav({ children, titlespage }) {
   const userToken =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const authUser = useAuthUser();
-  const { data: userData, isLoading } = useUserInfo(authUser?.role, userToken);
+  const { data: userData } = useUserInfo(authUser?.role, userToken);
 
   return (
     <div
@@ -64,7 +64,7 @@ function PrivateNav({ children, titlespage }) {
           )}
           <UserInfoModal
             open={isModalOpen}
-            onOpenChange={setIsModalOpen}
+            onClose={() => setIsModalOpen(false)} 
             user={userData}
           />
           <DropdownMenu>
@@ -76,10 +76,7 @@ function PrivateNav({ children, titlespage }) {
             <DropdownMenuContent align="end" className="w-full">
               <DropdownMenuItem
                 className="font-medium cursor-pointer"
-                onClick={() => {
-                  console.log("Abrir modal");
-                  setIsModalOpen(true);
-                }} // Abrir modal al hacer clic
+                onClick={() => setIsModalOpen(true)}
               >
                 <div className="flex space-x-2">
                   <User className="h-4 w-4" />
@@ -101,7 +98,6 @@ function PrivateNav({ children, titlespage }) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button onClick={() => setIsModalOpen(true)}>Probar Modal</Button>
         </nav>
         {/* Aquí inyectamos el contenido del dashboard */}
         <div className="flex-1 overflow-y-auto">{children}</div>
