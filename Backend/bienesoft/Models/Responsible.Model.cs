@@ -48,6 +48,8 @@ namespace bienesoft.Models
         public int? RoleId { get; set; }
         public string? State { get; set; } = "Activo";
 
+        public string Email_Responsible { get; set; } = string.Empty;
+
     }
 
     
