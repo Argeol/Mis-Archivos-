@@ -163,7 +163,35 @@ namespace bienesoft.Controllers
                 GeneralFunction.Addlog(ex.Message);
                 return StatusCode(500, new { error = ex.Message });
             }
+
         }
+            [HttpGet("GetResponsiblesByRole/roleid=1")]
+            public async Task<IActionResult> GetResponsiblesByRole1()
+            {
+                var result = await _ResponsibleServices.GetResponsiblesByRoleIdAsync(1);
+                return Ok(result);
+            }
+
+            [HttpGet("GetResponsiblesByRole/roleid=2")]
+            public async Task<IActionResult> GetResponsiblesByRole2()
+            {
+                var result = await _ResponsibleServices.GetResponsiblesByRoleIdAsync(2);
+                return Ok(result);
+            }
+
+            [HttpGet("GetResponsiblesByRole/roleid=3")]
+            public async Task<IActionResult> GetResponsiblesByRole3()
+            {
+                var result = await _ResponsibleServices.GetResponsiblesByRoleIdAsync(3);
+                return Ok(result);
+            }
+
+            [HttpGet("GetResponsiblesByRole/roleid=4")]
+            public async Task<IActionResult> GetResponsiblesByRole4()
+            {
+                var result = await _ResponsibleServices.GetResponsiblesByRoleIdAsync(4);
+                return Ok(result);
+            }
 
     }
 }
