@@ -54,7 +54,7 @@ namespace bienesoft.models
 
         // Relaciones con Apprentice y Responsible
         public int? Id_Apprentice { get; set; }
-        
+
         [ForeignKey("Id_Apprentice")]
         public Apprentice? Apprentice { get; set; }
 
@@ -79,7 +79,14 @@ namespace bienesoft.models
     public class ResetPasswordModel
     {
         public string? Token { get; set; } = null;
-        public string? NewPassword { get; set; } = null; 
+        public string? NewPassword { get; set; } = null;
     }
-
+    public class UserDataDto
+    {
+        public string Email { get; set; }
+        public string Role { get; set; }
+        public string FullName { get; set; }
+        public string IdApprentice { get; set; }
+        public string ResponsibleId { get; set; }
+    }
 }

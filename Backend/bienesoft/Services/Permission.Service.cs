@@ -1,5 +1,7 @@
+using bienesoft.models;
 using bienesoft.Models;
 using ClosedXML.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 namespace Bienesoft.Services
 {
@@ -13,12 +15,13 @@ namespace Bienesoft.Services
             _context = context;
             _apprenticeService = apprenticeService;
         }
-
-        public async Task<PermissionGN> CreatePermissionAsync(PermissionGN permission)
+       
+        public async Task<PermissionGN> CreatePermissionAsync(PermissionGN permission, int Id)
         {
-            var apprentice = await _context.apprentice.FindAsync(permission.Id_Apprentice);
+            var apprentice = await _context.apprentice.FindAsync(Id);
             if (apprentice == null)
                 throw new ArgumentException("El aprendiz no existe.");
+            permission.Id_Apprentice = Id; // 🔐 Importante: asignarlo tú
 
             _context.permissionGN.Add(permission);
             await _context.SaveChangesAsync();

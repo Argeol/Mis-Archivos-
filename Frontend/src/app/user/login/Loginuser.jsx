@@ -15,7 +15,9 @@ import { useMutation } from "@tanstack/react-query";
 
 
 async function Login(credentials) {
-  const response = await axiosInstance.post("/api/User/Login", credentials);
+  const response = await axiosInstance.post("/api/User/Login", credentials, {
+    withCredentials: true, // 👈 Asegúrate de incluir esto por si acaso
+  });
   return response;
 }
 
@@ -32,10 +34,8 @@ function LoginPage() {
     onMutate: () => setLoading(true),
     onSuccess: (response) => {
       if (response.status === 200) {
-        const token = response.data.message; // Captura el token
-        localStorage.setItem("token", token);
         alert("¡Inicio de sesión exitoso!");
-        router.push("/dashboard");
+        router.push("/dashboard"); // Ya no necesitas guardar el token
       }
     },
     onError: (err) => {

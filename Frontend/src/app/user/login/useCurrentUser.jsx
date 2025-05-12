@@ -1,19 +1,27 @@
-// hooks/useAuthUser.ts
-export const useAuthUser = () => {
-  const token = localStorage.getItem("token");
+import axiosInstance from "@/lib/axiosInstance";
+import { useQuery } from "@tanstack/react-query";
 
-  if (!token) return null;
-
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1])); // decodifica el JWT
-    return {
-      email: payload.email,
-      role: payload.role,
-      fullName: payload.FullName,
-      responsibleId: payload.Responsible_Id,
-    };
-  } catch (err) {
-    console.error("Error decodificando token:", err);
-    return null;
+const fetchUserData = async () => {
+  const response = await axiosInstance.get("/api/User/Me", {
+    withCredentials: true,
+  });
+  if (response.status === 200) {
+    return response.data;
+  } else {
+    throw new Error("No se pudo obtener los datos del usuario.");
   }
+};
+
+export const useAuthUser = () => {
+  const { data, error, isLoading } = useQuery({
+    queryKey: ["userData"], // ahora se usa así
+    queryFn: fetchUserData,
+    retry: false, // opcional: no reintenta si falla
+  });
+
+  return {
+    userData: data,
+    loading: isLoading,
+    error: error ? error.message : null,
+  };
 };

@@ -54,6 +54,24 @@ namespace bienesoft.Controllers
                 return StatusCode(500, new { error = "Ocurrió un error inesperado.", detalle = ex.Message });
             }
         }
+        [Authorize(Roles = "Administrador")]
+        [HttpGet("GetApprenticeByIdAdmi/{id}")]
+        public IActionResult GetApprenticeById(int id)
+        {
+            try
+            {
+                var apprentice = _apprenticeService.GetApprenticeById(id);
+                if (apprentice == null)
+                    return NotFound(new { message = "Aprendiz no encontrado" });
+
+                return Ok(apprentice);
+            }
+            catch (Exception ex)
+            {
+                GeneralFunction.Addlog(ex.ToString());
+                return StatusCode(500, ex.ToString());
+            }
+        }
 
         [Authorize(Roles = "Aprendiz")]
         [HttpGet("GetApprenticeById")]

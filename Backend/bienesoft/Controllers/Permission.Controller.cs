@@ -4,6 +4,8 @@ using Bienesoft.ProductionDTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using bienesoft.Models;
+using Microsoft.AspNetCore.Authorization;
+
 
 
 namespace bienesoft.Controllers
@@ -32,12 +34,16 @@ namespace bienesoft.Controllers
         //         return BadRequest(new { Success = false, Message = ex.Message });
         //     }
         // }
+        [Authorize(Roles = "Aprendiz")]
         [HttpPost("CrearPermiso")]
         public async Task<IActionResult> CreateApprentice(PermissionGN PermissionGN)
         {
-            var Results = await _permissionService.CreatePermissionAsync(PermissionGN);
+            var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
+            var Id = Convert.ToInt32(idApprenticeClaim); 
+            var Results = await _permissionService.CreatePermissionAsync(PermissionGN, Id);
             return Ok(new { message = Results });
         }
+        
         [HttpGet("GetPermiso")]
         public IActionResult GetActionResult()
         {
@@ -80,14 +86,5 @@ namespace bienesoft.Controllers
             var result = await _permissionService.UpdatePermissionAsync(id, permiso);
             return Ok(result);
         }
-
-
-
-
-
-
-
-
-
     }
 }
