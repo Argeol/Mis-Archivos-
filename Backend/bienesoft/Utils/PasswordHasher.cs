@@ -31,6 +31,11 @@ namespace Bienesoft.utils
             var hashOfInput = HashPassword(inputPassword, salt);
             return hashOfInput == storedHash;
         }
+
+        internal static string HashPassword(object password, string? salt)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 
