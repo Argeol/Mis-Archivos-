@@ -11,7 +11,7 @@ namespace bienesoft.Controllers
     [ApiController]
     [Route("api/[controller]")]
 
-    [Authorize(Roles = "Administrador")]
+    //[Authorize(Roles = "Administrador")]
     public class ResponsibleController : Controller
     {
         public IConfiguration _Configuration { get; set; }
@@ -86,14 +86,45 @@ namespace bienesoft.Controllers
         }
 
 
-        [HttpPut("UpdateResponsible/{Id}")]
-        public IActionResult UpdateResponsible(int Id, [FromBody] UpdateResponsible update)
-        {
-            if (Id <= 0)
-            {
-                return BadRequest(new { message = "Id del responsable no es válido" });
-            }
+        //[HttpPut("UpdateResponsible/{Id}")]
+        //public IActionResult UpdateResponsible(int Id, [FromBody] UpdateResponsible update)
+        //{
+        //    if (Id <= 0)
+        //    {
+        //        return BadRequest(new { message = "Id del responsable no es válido" });
+        //    }
 
+        //    if (update == null)
+        //    {
+        //        return BadRequest(new { message = "El modelo de actualización es nulo" });
+        //    }
+
+        //    try
+        //    {
+        //        var existingResponsible = _ResponsibleServices.GetResponsibleById(Id);
+        //        if (existingResponsible == null)
+        //        {
+        //            return NotFound(new { message = "El responsable no existe" });
+        //        }
+
+        //        _ResponsibleServices.UpdateResponsible(Id, update); // sigue siendo async pero no se espera
+        //        return Ok(new { message = "Responsable actualizado" });
+        //    }
+        //    catch (KeyNotFoundException ex)
+        //    {
+        //        return NotFound(new { error = ex.Message });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        GeneralFunction.Addlog(ex.Message); // Aquí se asume que la clase es estática
+        //        return StatusCode(500, new { error = ex.Message });
+        //    }
+        //}
+
+        [Authorize(Roles = "Responsable")]
+        [HttpPut("UpdateResponsible")]
+        public IActionResult UpdateResponsible([FromBody] UpdateResponsible update)
+        {
             if (update == null)
             {
                 return BadRequest(new { message = "El modelo de actualización es nulo" });
@@ -101,13 +132,26 @@ namespace bienesoft.Controllers
 
             try
             {
-                var existingResponsible = _ResponsibleServices.GetResponsibleById(Id);
+                // Obtener Responsible_Id desde el JWT
+                var responsibleIdClaim = User.Claims.FirstOrDefault(c => c.Type == "Responsible_Id");
+                if (responsibleIdClaim == null)
+                {
+                    return Unauthorized(new { message = "No se encontró el ID del responsable en el token" });
+                }
+
+                // Convertir a int (si es numérico) o string según tu modelo
+                if (!int.TryParse(responsibleIdClaim.Value, out int responsibleId))
+                {
+                    return BadRequest(new { message = "El ID del responsable en el token no es válido" });
+                }
+
+                var existingResponsible = _ResponsibleServices.GetResponsibleById(responsibleId);
                 if (existingResponsible == null)
                 {
                     return NotFound(new { message = "El responsable no existe" });
                 }
 
-                _ResponsibleServices.UpdateResponsible(Id, update); // sigue siendo async pero no se espera
+                _ResponsibleServices.UpdateResponsible(responsibleId, update); // o await si es async
                 return Ok(new { message = "Responsable actualizado" });
             }
             catch (KeyNotFoundException ex)
@@ -116,12 +160,10 @@ namespace bienesoft.Controllers
             }
             catch (Exception ex)
             {
-                GeneralFunction.Addlog(ex.Message); // Aquí se asume que la clase es estática
+                GeneralFunction.Addlog(ex.Message);
                 return StatusCode(500, new { error = ex.Message });
             }
         }
-
-
 
     }
 }

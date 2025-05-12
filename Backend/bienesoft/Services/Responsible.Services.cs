@@ -157,44 +157,68 @@ namespace bienesoft.Services
 
         //    return existingResponsible;
         //}
-        public void UpdateResponsible(int id, UpdateResponsible updateResponsible)
+        //public void UpdateResponsible(int id, UpdateResponsible updateResponsible)
+        //{
+        //    var existingResponsible = _context.responsible.Find(id);
+        //    if (existingResponsible == null)
+        //    {
+        //        throw new KeyNotFoundException($"El responsable con el ID {id} no se encontró.");
+        //    }
+
+        //    if (!string.IsNullOrWhiteSpace(updateResponsible.Nom_Responsible))
+        //    {
+        //        existingResponsible.Nom_Responsible = updateResponsible.Nom_Responsible;
+        //    }
+
+        //    if (!string.IsNullOrWhiteSpace(updateResponsible.Ape_Responsible))
+        //    {
+        //        existingResponsible.Ape_Responsible = updateResponsible.Ape_Responsible;
+        //    }
+
+        //    if (updateResponsible.Tel_Responsible.HasValue)
+        //    {
+        //        existingResponsible.Tel_Responsible = updateResponsible.Tel_Responsible.Value;
+        //    }
+
+        //    if (updateResponsible.RoleId.HasValue && updateResponsible.RoleId.Value != 0)
+        //    {
+        //        existingResponsible.RoleId = updateResponsible.RoleId.Value;
+        //    }
+
+        //    if (!string.IsNullOrWhiteSpace(updateResponsible.State))
+        //    {
+        //        existingResponsible.State = updateResponsible.State;
+        //    }
+
+        //    _context.SaveChanges();
+        //}
+        public void UpdateResponsible(int id, UpdateResponsible update)
         {
-            var existingResponsible = _context.responsible.Find(id);
-            if (existingResponsible == null)
+            var responsible = _context.responsible.FirstOrDefault(r => r.Responsible_Id == id);
+
+            if (responsible == null)
             {
-                throw new KeyNotFoundException($"El responsable con el ID {id} no se encontró.");
+                throw new KeyNotFoundException("Responsable no encontrado.");
             }
 
-            if (!string.IsNullOrWhiteSpace(updateResponsible.Nom_Responsible))
-            {
-                existingResponsible.Nom_Responsible = updateResponsible.Nom_Responsible;
-            }
+            // Solo actualiza si el campo fue enviado (no nulo)
+            if (update.Nom_Responsible != null)
+                responsible.Nom_Responsible = update.Nom_Responsible;
 
-            if (!string.IsNullOrWhiteSpace(updateResponsible.Ape_Responsible))
-            {
-                existingResponsible.Ape_Responsible = updateResponsible.Ape_Responsible;
-            }
+            if (update.Ape_Responsible != null)
+                responsible.Ape_Responsible = update.Ape_Responsible;
 
-            if (updateResponsible.Tel_Responsible.HasValue)
-            {
-                existingResponsible.Tel_Responsible = updateResponsible.Tel_Responsible.Value;
-            }
+            if (update.Tel_Responsible != null)
+                responsible.Tel_Responsible = update.Tel_Responsible;
 
-            if (updateResponsible.RoleId.HasValue && updateResponsible.RoleId.Value != 0)
-            {
-                existingResponsible.RoleId = updateResponsible.RoleId.Value;
-            }
+            if (update.Email_Responsible != null)
+                responsible.Email_Responsible = update.Email_Responsible;
 
-            if (!string.IsNullOrWhiteSpace(updateResponsible.State))
-            {
-                existingResponsible.State = updateResponsible.State;
-            }
+            if (!string.IsNullOrEmpty(update.State))
+                responsible.State = update.State;
 
             _context.SaveChanges();
         }
-
-
-
 
     }
 }
