@@ -50,5 +50,4 @@ namespace bienesoft.Models
         public PermissionGN Permission { get; set; }
         public List<int> ResponsablesSeleccionados { get; set; }
     }
-
 }

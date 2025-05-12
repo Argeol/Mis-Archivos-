@@ -51,6 +51,11 @@ namespace bienesoft.Models
         public string Email_Responsible { get; set; } = string.Empty;
 
     }
+public class ResponsibleAssignment
+{
+    public int RoleId { get; set; }
+    public int ResponsibleId { get; set; }
+}
 
     
 }

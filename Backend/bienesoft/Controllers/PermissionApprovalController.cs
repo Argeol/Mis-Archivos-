@@ -27,8 +27,10 @@ namespace Bienesoft.Controllers
         }
 
         [HttpPost("rechazar")]
-        public async Task<IActionResult> RechazarPermiso([FromQuery] int idPermiso, [FromQuery] int idResponsable)
+        public async Task<IActionResult> RechazarPermiso([FromQuery] int idPermiso)
         {
+            var idResponsableClaim = User.Claims.FirstOrDefault(c => c.Type == "Responsible_Id")?.Value;
+            var idResponsable = Convert.ToInt32(idResponsableClaim);
             var result = await _approvalService.RechazarPermisoAsync(idPermiso, idResponsable);
             return Ok(new { message = result });
         }

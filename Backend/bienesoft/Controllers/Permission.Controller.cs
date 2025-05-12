@@ -34,16 +34,35 @@ namespace bienesoft.Controllers
         //         return BadRequest(new { Success = false, Message = ex.Message });
         //     }
         // }
+        // [Authorize(Roles = "Aprendiz")]
+        // [HttpPost("CrearPermiso")]
+        // public async Task<IActionResult> CreateApprentice(PermissionGN PermissionGN)
+        // {
+        //     var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
+        //     var Id = Convert.ToInt32(idApprenticeClaim); 
+        //     var Results = await _permissionService.CreatePermissionAsync(PermissionGN, Id);
+        //     return Ok(new { message = Results });
+        // }
         [Authorize(Roles = "Aprendiz")]
         [HttpPost("CrearPermiso")]
-        public async Task<IActionResult> CreateApprentice(PermissionGN PermissionGN)
+        public async Task<IActionResult> CreateApprentice([FromBody] CreatePermissionRequest request)
         {
-            var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
-            var Id = Convert.ToInt32(idApprenticeClaim); 
-            var Results = await _permissionService.CreatePermissionAsync(PermissionGN, Id);
-            return Ok(new { message = Results });
+            try
+            {
+                var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
+                var idApprentice = Convert.ToInt32(idApprenticeClaim);
+
+                var result = await _permissionService.CreatePermissionAsync(request.Permission, idApprentice, request.ResponsablesSeleccionados);
+
+                return Ok(new { success = true, message = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
         }
-        
+
+
         [HttpGet("GetPermiso")]
         public IActionResult GetActionResult()
         {

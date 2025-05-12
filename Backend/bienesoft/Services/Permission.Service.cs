@@ -15,19 +15,58 @@ namespace Bienesoft.Services
             _context = context;
             _apprenticeService = apprenticeService;
         }
-       
-        public async Task<PermissionGN> CreatePermissionAsync(PermissionGN permission, int Id)
+        public async Task<string> CreatePermissionAsync(PermissionGN permissionGN, int idApprentice, List<int> responsablesSeleccionados)
         {
-            var apprentice = await _context.apprentice.FindAsync(Id);
+            var apprentice = await _context.apprentice.FirstOrDefaultAsync(a => a.Id_Apprentice == idApprentice);
             if (apprentice == null)
-                throw new ArgumentException("El aprendiz no existe.");
-            permission.Id_Apprentice = Id; // 🔐 Importante: asignarlo tú
+                throw new Exception("Aprendiz no encontrado.");
 
-            _context.permissionGN.Add(permission);
+            var rolesEsperados = apprentice.Tip_Apprentice == "interno"
+                ? new List<int> { 1, 2, 3, 4 } // Instructor, Coordinador, Bienestar, Internado
+                : new List<int> { 1, 2, 3 };   // Instructor, Coordinador, Bienestar
+
+            if (responsablesSeleccionados.Count != rolesEsperados.Count)
+                throw new Exception("Cantidad de responsables no coincide con los roles requeridos.");
+
+            // Cargar responsables seleccionados con sus roles
+            var responsables = await _context.responsible
+                .Where(r => responsablesSeleccionados.Contains(r.Responsible_Id))
+                .Include(r => r.Role)
+                .ToListAsync();
+
+            // Validar que estén todos los roles esperados en orden
+            for (int i = 0; i < rolesEsperados.Count; i++)
+            {
+                var responsable = responsables.FirstOrDefault(r => r.Responsible_Id == responsablesSeleccionados[i]);
+                if (responsable == null)
+                    throw new Exception($"Responsable con ID {responsablesSeleccionados[i]} no encontrado.");
+
+                if (responsable.RoleId != rolesEsperados[i])
+                    throw new Exception($"El responsable con ID {responsable.Responsible_Id} no corresponde al rol esperado en la posición {i}.");
+            }
+
+            // Guardar el permiso
+            permissionGN.Id_Apprentice = idApprentice;
+            permissionGN.Status = Status.Pendiente;
+            _context.permissionGN.Add(permissionGN);
             await _context.SaveChangesAsync();
 
-            return permission;
+            // Crear aprobaciones
+            var aprobaciones = responsablesSeleccionados.Select(responsableId => new PermissionApproval
+            {
+                PermissionId = permissionGN.PermissionId,
+                ResponsibleId = responsableId,
+                ApprovalStatus = ApprovalStatus.Pendiente,
+                ApprovalDate = null
+            }).ToList();
+
+            _context.permissionApproval.AddRange(aprobaciones);
+            await _context.SaveChangesAsync();
+
+            return "Permiso creado con responsables asignados.";
         }
+
+
         // public async Task<object> CreatePermissionAsync(PermissionGN permission, List<int> responsablesSeleccionados)
         // {
         //     // Verificar si el aprendiz existe
