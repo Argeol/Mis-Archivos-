@@ -23,9 +23,9 @@ export default function RegisterPermissionFS() {
     fec_Diligenciado: "",
     fec_Salida: "",
     fec_Entrada: "",
-    dia_Salida: "Miercoles",
+    dia_Salida: "Miercoles, Domingo, Fin de Semana",
     alojamiento: "",
-    sen_Empresa: "Si",
+    sen_Empresa: "Si, No",
     direccion: "",
   });
 
@@ -90,18 +90,6 @@ export default function RegisterPermissionFS() {
 
   return (
     <form onSubmit={handleSubmit} className="w-full p-2 bg-white space-y-4">
-
-      {/* Fecha diligenciado */}
-      <div className="space-y-1 px-2">
-        <Label htmlFor="fec_Diligenciado">Fecha de diligenciamiento</Label>
-        <Input
-          id="fec_Diligenciado"
-          name="fec_Diligenciado"
-          type="date"
-          onChange={handleChange}
-          required
-        />
-      </div>
 
       {/* Fecha salida */}
       <div className="space-y-1 px-2">
@@ -170,6 +158,7 @@ export default function RegisterPermissionFS() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="Miercoles">Miércoles</SelectItem>
+            <SelectItem value="Domingo">Domingo</SelectItem>
             <SelectItem value="Fin de semana">Fin de semana</SelectItem>
           </SelectContent>
         </Select>
