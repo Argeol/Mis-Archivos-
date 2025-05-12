@@ -325,6 +325,25 @@ namespace Bienesoft.Services
 
 
         // }
+        public async Task<IEnumerable<object>> GetPermisosDeAprendizAsync(int apprenticeId)
+        {
+            var permisos = await _context.permissionGN
+                .Where(p => p.Id_Apprentice == apprenticeId)
+                .OrderByDescending(p => p.ApplicationDate)
+                .Select(p => new
+                {
+                    FechaPermiso = p.ApplicationDate.ToString("yyyy-MM-dd"),
+                    Estado = p.Status.ToString(),
+                    // Motivo = p.Motive // <- Descomenta esto si decides mostrarlo más adelante
+                })
+                .ToListAsync();
+
+            return permisos;
+        }
+
+
+
+
 
     }
 }

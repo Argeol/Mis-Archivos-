@@ -18,9 +18,9 @@ namespace Bienesoft.Models
         [StringLength(45)]
         public string Destino { get; set; }
 
-        public DateTime Fec_Salida { get; set; }
+        public DateTime? Fec_Salida { get; set; }
 
-        public DateTime Fec_Entrada { get; set; }
+        public DateTime? Fec_Entrada { get; set; }
 
         [Required]
         [StringLength(20)] // suficientemente largo para 'Fin de semana'
@@ -46,7 +46,7 @@ namespace Bienesoft.Models
         [NotMapped]
         public SenaEmpresaEnum SenaEmpresaEnum => Enum.Parse<SenaEmpresaEnum>(Sen_Empresa);
 
-        public DateTime Fec_Diligenciado { get; set; }
+        public DateTime? Fec_Diligenciado { get; set; }
     }
 
     // Enum para 'Dia_Salida'
