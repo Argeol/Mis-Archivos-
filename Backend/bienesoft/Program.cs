@@ -15,13 +15,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Configurar CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin",
-        builder => builder
-        .AllowAnyOrigin()
-        .AllowAnyMethod()
-        .AllowAnyHeader());
+    options.AddPolicy("AllowSpecificOrigin", builder =>
+     {
+         builder
+         .WithOrigins("http://localhost:3000") // Asegúrate de poner el origen correcto de tu frontend (puede ser otro puerto si es necesario)
+         .AllowAnyMethod()
+         .AllowAnyHeader()
+         .AllowCredentials(); // Permite el uso de credenciales como cookies
+     });
 });
-
 // Configurar controladores
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
@@ -108,6 +110,16 @@ builder.Services.AddAuthentication(options =>
     // Personalizar respuestas en errores de autenticación
     options.Events = new JwtBearerEvents
     {
+        OnMessageReceived = context =>
+        {
+            // Leer el token de las cookies
+            var token = context.Request.Cookies["token"];
+            if (!string.IsNullOrEmpty(token))
+            {
+                context.Token = token;
+            }
+            return Task.CompletedTask;
+        },
         OnChallenge = context =>
         {
             context.HandleResponse();

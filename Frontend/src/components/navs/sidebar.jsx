@@ -9,11 +9,7 @@ import { useIsMobile } from "./useIsMobile"
 const menuItems = [
   { href: "/dashboard/apprentice", icon: FaHouseUser, label: "Aprendiz" },
   { href: "/dashboard/file", icon: FaListAlt, label: "Ficha" },
-  {
-    href: "/dashboard/permissionGeneral",
-    icon: FaCheckCircle,
-    label: "Permisos",
-  },
+  { href: "/dashboard/permissionGeneral", icon: FaCheckCircle, label: "Permisos" },
   { href: "/dashboard/program", icon: FaUsersCog, label: "Programa" },
   { href: "/dashboard/responsible", icon: GroupIcon, label: "Responsables" },
 ]
@@ -32,14 +28,12 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Botón flotante solo en móvil cuando sidebar está cerrado */}
       {isMobile && !isOpen && (
         <button className="fixed top-4 left-4 z-50 bg-white shadow-md p-2 rounded-md" onClick={() => setIsOpen(true)}>
           <FaBars className="text-2xl text-gray-700" />
         </button>
       )}
 
-      {/* Sidebar: solo visible en desktop o en móvil si está abierto */}
       {(!isMobile || isOpen) && (
         <Card
           className={`fixed top-0 left-0 h-screen bg-slate-100 p-4 pt-6 z-40 transition-all duration-300 border-r border-gray-300 ${
@@ -48,14 +42,10 @@ export default function Sidebar() {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          {/* Logo - Ahora visible en todos los dispositivos */}
+          {/* Logo */}
           <div className="flex justify-center mb-4">
             {isOpen ? (
-              <img
-                src="/assets/img/logo.webp"
-                alt="Bienesoft Logo Grande"
-                className="w-40 h-auto animate-pulse mx-auto"
-              />
+              <img src="/assets/img/logo.webp" alt="Bienesoft Logo Grande" className="w-40 h-auto animate-pulse mx-auto" />
             ) : (
               <img src="/assets/img/bienesoft.webp" alt="Bienesoft Logo Pequeño" className="w-10 h-auto mx-auto" />
             )}
@@ -73,32 +63,33 @@ export default function Sidebar() {
           )}
 
           {/* Menú */}
-          <nav className={`mt-5 flex flex-col ${isOpen ? "gap-y-3 items-start" : "gap-y-6 items-center"}`}>
+          <nav className={`mt-2 flex flex-col ${isOpen ? "gap-y-3 items-start" : "gap-y-6 items-center"}`}>
             {menuItems.map(({ href, icon: Icon, label }) => (
               <a
                 key={href}
                 href={href}
-                className={`flex items-center p-2 rounded-md text-gray-500 hover:bg-[#218EED] hover:text-white transition-colors ${
-                  isOpen ? "space-x-3" : "flex-col"
+                className={`flex items-center p-2 rounded-md text-gray-500 hover:bg-[#218EED] hover:text-white transition-colors w-full ${
+                  isOpen ? "space-x-3 justify-start" : "flex-col justify-center"
                 }`}
               >
-                <Icon
-                  className={`text-gray-700 transition-all duration-200 ${isOpen ? "w-5 h-5" : "w-5 h-5 mx-auto"}`}
-                />
+                <Icon className={`text-gray-700 transition-all duration-200 ${isOpen ? "w-5 h-5" : "w-5 h-5 mx-auto"}`} />
                 {isOpen && <span>{label}</span>}
               </a>
             ))}
           </nav>
 
+          {/* Línea divisoria antes del inicio */}
+          <hr className="border-t border-gray-300 my-4 mx-2" />
+
           {/* Módulo para volver al dashboard */}
-          <div className="mt-auto pt-10">
+          <div className="mt-auto">
             <a
               href="/dashboard"
-              className={`flex items-center p-2 rounded-md text-gray-500 hover:bg-[#218EED] hover:text-white transition-colors ${
-                isOpen ? "space-x-3" : "flex-col"
+              className={`flex items-center p-2 rounded-md text-gray-500 hover:bg-[#218EED] hover:text-white transition-colors w-full ${
+                isOpen ? "space-x-3 justify-start" : "flex-col justify-center"
               }`}
             >
-              <FaHome className="text-gray-700 " />
+              <FaHome className="text-gray-700" />
               {isOpen && <span>Inicio</span>}
             </a>
           </div>

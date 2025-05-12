@@ -25,10 +25,9 @@ export default function RegisterPermission() {
     motive: "",
     observation: "",
     status: 0,
-    id_Apprentice: 0,
   });
 
-  // ✅ Obtener lista de aprendices
+  // ✅ Obtener lista de aprendices (si se necesita para alguna referencia, pero no se usará para el ID)
   const { data: apprentices = [] } = useQuery({
     queryKey: ["apprentices"],
     queryFn: async () => {
@@ -40,8 +39,8 @@ export default function RegisterPermission() {
   const mutation = useMutation({
     mutationFn: async () => {
       const res = await axiosInstance.post(
-        "/api/permission/CrearPermiso/",
-        formData
+        "/api/permission/CrearPermiso/", 
+        formData // Solo enviar los datos del permiso, sin `id_Apprentice`
       );
       return res.data;
     },
@@ -64,13 +63,6 @@ export default function RegisterPermission() {
     }));
   };
 
-  const handleSelectApprentice = (value) => {
-    setFormData((prev) => ({
-      ...prev,
-      id_Apprentice: parseInt(value),
-    }));
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     mutation.mutate();
@@ -78,6 +70,7 @@ export default function RegisterPermission() {
 
   return (
     <form onSubmit={handleSubmit} className="w-full p-2 bg-white space-y-4">
+      {/* Fecha de salida */}
       <div className="space-y-1 px-2">
         <Label htmlFor="departureDate" className="text-left">
           Fecha de salida
@@ -92,6 +85,7 @@ export default function RegisterPermission() {
         />
       </div>
 
+      {/* Fecha de entrada */}
       <div className="space-y-1 px-2">
         <Label htmlFor="entryDate" className="text-left">
           Fecha de entrada
@@ -106,6 +100,7 @@ export default function RegisterPermission() {
         />
       </div>
 
+      {/* Dirección */}
       <div className="space-y-1 px-2">
         <Label htmlFor="adress" className="text-left">
           Dirección
@@ -120,6 +115,7 @@ export default function RegisterPermission() {
         />
       </div>
 
+      {/* Destino */}
       <div className="space-y-1 px-2">
         <Label htmlFor="destination" className="text-left">
           Destino
@@ -134,6 +130,7 @@ export default function RegisterPermission() {
         />
       </div>
 
+      {/* Motivo */}
       <div className="space-y-1 px-2">
         <Label htmlFor="motive" className="text-left">
           Motivo
@@ -148,6 +145,7 @@ export default function RegisterPermission() {
         />
       </div>
 
+      {/* Observaciones */}
       <div className="space-y-1 px-2">
         <Label htmlFor="observation" className="text-left">
           Observaciones
@@ -159,26 +157,6 @@ export default function RegisterPermission() {
           onChange={handleChange}
           className="w-full text-sm md:text-base"
         />
-      </div>
-
-      <div className="space-y-1 px-2">
-        <Label className="text-left">Aprendiz</Label>
-        <Select onValueChange={handleSelectApprentice}>
-          <SelectTrigger className="w-full text-sm md:text-base">
-            <SelectValue placeholder="Seleccionar Aprendiz" />
-          </SelectTrigger>
-          <SelectContent>
-            {apprentices.map((a) => (
-              <SelectItem
-                key={a.id_Apprentice}
-                value={a.id_Apprentice.toString()}
-                className="text-sm"
-              >
-                {a.first_Name_Apprentice} {a.last_Name_Apprentice}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
 
       <div className="px-2">

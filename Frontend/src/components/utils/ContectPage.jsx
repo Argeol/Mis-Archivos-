@@ -3,8 +3,6 @@
 import DataTable from "./Datatable";
 import ModalDialog from "./ModalDialog";
 
-//
-
 function ContecPage({
   titlesPage,
   titlesData,
@@ -28,6 +26,7 @@ function ContecPage({
   updateEndpoint,
   queryKey,
   inf,
+  botonExtra, // Recibimos el botón aquí
 }) {
   return (
     <>
@@ -53,8 +52,10 @@ function ContecPage({
         updateEndpoint={updateEndpoint}
         queryKey={queryKey}
         inf={inf}
+        botonExtra={botonExtra} // Pasamos el botón a DataTable
       />
     </>
   );
 }
+
 export default ContecPage;

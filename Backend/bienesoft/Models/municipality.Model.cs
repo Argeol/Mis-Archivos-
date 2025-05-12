@@ -12,7 +12,7 @@ namespace bienesoft.Models
 
         [System.ComponentModel.DisplayName("Nombre del Municipio")]
         [Required(ErrorMessage = "El Campo {0} es requerido")]
-        [StringLength(50, ErrorMessage = "el campo {0} tiene un limite de caracter {1} ")]
+        [StringLength(255, ErrorMessage = "el campo {0} tiene un limite de caracter {1} ")]
         public string municipality { get; set; }
 
         [System.ComponentModel.DisplayName("Nombre del Municipio")]

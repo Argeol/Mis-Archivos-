@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Bienesoft.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bienesoft.Controllers
 {
@@ -15,9 +16,12 @@ namespace Bienesoft.Controllers
             _approvalService = approvalService;
         }
 
+        [Authorize(Roles = "Responsable")]
         [HttpPost("aprobar")]
-        public async Task<IActionResult> AprobarPermiso([FromQuery] int idPermiso, [FromQuery] int idResponsable)
+        public async Task<IActionResult> AprobarPermiso([FromQuery] int idPermiso)
         {
+            var idResponsableClaim = User.Claims.FirstOrDefault(c => c.Type == "Responsible_Id")?.Value;
+            var idResponsable = Convert.ToInt32(idResponsableClaim);
             var result = await _approvalService.AprobarPermisoAsync(idPermiso, idResponsable);
             return Ok(new { message = result });
         }

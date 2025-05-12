@@ -24,7 +24,8 @@ export default function UpdateResponsible({ id }) {
     tel_Responsible: "",
     roleId: 0,
     state: "",
-  });
+    Email_Responsible: "",
+    });
 
   // Obtener datos del responsable
   const { data, isLoading } = useQuery({

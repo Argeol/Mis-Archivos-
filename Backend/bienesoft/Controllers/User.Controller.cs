@@ -66,7 +66,6 @@ namespace bienesoft.Controllers
                             claimsList.Add(new Claim("FullName", $"{user.Apprentice.First_Name_Apprentice} {user.Apprentice.Last_Name_Apprentice}"));
                         }
                         break;
-
                     case "Responsable":
                         if (user.Responsible != null)
                         {
@@ -95,7 +94,16 @@ namespace bienesoft.Controllers
                 user.TokJwt = tokenString;
                 _UserServices.UpdateUserAsync(user).Wait();
 
-                return Ok(new { message = tokenString });
+                // return Ok(new { message = tokenString });
+                Response.Cookies.Append("token", tokenString, new CookieOptions
+                {
+                    HttpOnly = true,
+                    // Secure = true, // Solo si usas HTTPS
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(Convert.ToDouble(_jwtSettings.JWTExpireTime))
+                });
+
+                return Ok(new { message = "Login exitoso" });
             }
             catch (Exception ex)
             {
@@ -240,6 +248,7 @@ namespace bienesoft.Controllers
             }
         }
         [HttpPost("ResetPasswordConfirm")]
+
         public async Task<IActionResult> ResetPasswordConfirm([FromBody] ResetPasswordModel model)
         {
             try
@@ -274,6 +283,41 @@ namespace bienesoft.Controllers
                 return StatusCode(500, ex.ToString());
             }
         }
+
+        [Authorize]
+        [HttpGet("Me")]
+        public IActionResult GetUserDataFromToken()
+        {
+            try
+            {
+                var email = User.FindFirst(ClaimTypes.Email)?.Value;
+                var role = User.FindFirst(ClaimTypes.Role)?.Value;
+                var fullName = User.FindFirst("FullName")?.Value;
+                var idApprentice = User.FindFirst("Id_Apprentice")?.Value;
+                var responsibleId = User.FindFirst("Responsible_Id")?.Value;
+                if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(role))
+                {
+                    return Unauthorized(new { message = "Token inválido o incompleto." });
+                }
+
+
+                var result = new UserDataDto
+                {
+                    Email = email,
+                    Role = role,
+                    FullName = fullName ?? "No disponible",
+                    IdApprentice = idApprentice ?? "No disponible",
+                    ResponsibleId = responsibleId ?? "No disponible"
+                };
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al procesar el token", error = ex.Message });
+            }
+        }
+
+
 
         // Modelo para la solicitud
 
