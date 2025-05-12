@@ -6,7 +6,6 @@ import ContecPage from "@/components/utils/ContectPage";
 import axiosInstance from "@/lib/axiosInstance";
 import LoadingPage from "@/components/utils/LoadingPage";
 import RegisterPermissionFS from "./RegisterPermissionFS";
-import { FaFileExcel } from "react-icons/fa"; // Icono de Excel
 import ExportExcelButton from "./ButtonExelFS";
 
 export default function PermissionFSDashboard() {
@@ -75,7 +74,7 @@ export default function PermissionFSDashboard() {
         tableCell={tableCell}
         translations={translations}
         ignorar={["permissionFS_Id"]}
-        inf="apprentice.id_Apprentice"
+        inf="apprentice.Aprenttice_Id"
         botonExtra={<ExportExcelButton/>}
       />
     </PrivateNav>

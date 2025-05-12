@@ -42,7 +42,8 @@ export default function DashboardPage() {
 
   const [activeTab, setActiveTab] = useState("overview");
   const isMobile = useIsMobile();
-  const user = useAuthUser();
+  // const User = useAuthUser();
+  const { userData, loading: loadingUser, error } = useAuthUser(); // Obtén el usuario
 
   const stats = {
     totalApprentices: totalApprentices ?? 0,
@@ -93,6 +94,9 @@ export default function DashboardPage() {
   const formattedDate =
     currentDate.charAt(0).toUpperCase() + currentDate.slice(1);
 
+  if (loading) return <LoadingPage />;
+  if (error) return <div>Error: {error}</div>;
+  if (!userData) return <div>No se encontró información del usuario</div>;
   // if (isLoading) return <div>Cargando usuario...</div>;
   // if (error) return <div>Error: {error.message}</div>;
 
@@ -108,10 +112,11 @@ export default function DashboardPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800 drop-shadow-sm">
-                Bienvenido a BIENESOFT, {user.fullName} ({user.role})
+                Bienvenido a BIENESOFT,{userData.role !== "Administrador" && userData.fullName}
+                ({userData.role})
               </h1>
 
-              {user.role === "Aprendiz" && (
+              {userData.role === "Aprendiz" && (
                 <div className="mt-4">
                   {/* Aquí contenido exclusivo para Aprendices */}
                 </div>
