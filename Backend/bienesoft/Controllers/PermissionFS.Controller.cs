@@ -2,6 +2,8 @@
 ﻿using bienesoft.Models;
 using bienesoft.Services;
 using Bienesoft.Models;
+using Bienesoft.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bienesoft.Controllers
@@ -65,6 +67,18 @@ namespace bienesoft.Controllers
             return File(content,
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         "PermisosFS.xlsx");
+        }
+        [Authorize(Roles = "Aprendiz")]
+        [HttpGet("apprenticePermiId")]
+        public async Task<IActionResult> GetPermisosDeAprendiz()
+        {
+
+            // Sacamos el Id_Apprentice del token
+            var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
+            var Id = Convert.ToInt32(idApprenticeClaim);
+
+            var permisos = await _service.GetPermisosFSDeAprendizAsync(Id);
+            return Ok(permisos);
         }
     }
 }

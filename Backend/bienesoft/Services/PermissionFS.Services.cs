@@ -65,7 +65,7 @@ namespace bienesoft.Services
 
         public async Task<PermissionFS> CreateAsync(PermissionFS model)
         {
-            model.Fec_Diligenciado = DateTime.Now.Date; 
+            model.Fec_Diligenciado = DateTime.Now.Date;
             _context.permissionFS.Add(model);
             await _context.SaveChangesAsync();
             return model;
@@ -130,8 +130,8 @@ namespace bienesoft.Services
                 worksheet.Cell(row, 6).Value = apprentice?.Phone_Apprentice;
                 worksheet.Cell(row, 7).Value = apprentice?.nom_responsible;
                 worksheet.Cell(row, 8).Value = apprentice?.tel_responsible;
-                worksheet.Cell(row, 9).Value = p.Fec_Salida.ToString("yyyy-MM-dd");
-                worksheet.Cell(row, 10).Value = p.Fec_Entrada.ToString("yyyy-MM-dd");
+                worksheet.Cell(row, 9).Value = p.Fec_Salida?.ToString("yyyy-MM-dd") ?? "";
+                worksheet.Cell(row, 10).Value = p.Fec_Entrada?.ToString("yyyy-MM-dd") ?? "";
                 worksheet.Cell(row, 11).Value = p.Dia_Salida.ToString();
                 worksheet.Cell(row, 12).Value = p.Alojamiento;
                 worksheet.Cell(row, 13).Value = p.Sen_Empresa.ToString();
@@ -151,6 +151,21 @@ namespace bienesoft.Services
             using var stream = new MemoryStream();
             workbook.SaveAs(stream);
             return stream.ToArray();
+        }
+
+        public async Task<IEnumerable<object>> GetPermisosFSDeAprendizAsync(int apprenticeId)
+        {
+            var permisos = await _context.permissionFS
+                .Where(p => p.Apprentice_Id == apprenticeId)
+                .OrderByDescending(p => p.Fec_Salida)
+                .Select(p => new
+                {
+                    DiaSalida = p.Dia_Salida,
+                    FechaSalida = p.Fec_Salida != null ? p.Fec_Salida.Value.ToString("yyyy-MM-dd") : ""
+                })
+                .ToListAsync();
+
+            return permisos;
         }
     }
 }

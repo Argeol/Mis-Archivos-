@@ -86,5 +86,18 @@ namespace bienesoft.Controllers
             var result = await _permissionService.UpdatePermissionAsync(id, permiso);
             return Ok(result);
         }
+        [Authorize(Roles = "Aprendiz")]
+        [HttpGet("apprenticePermiId")]
+        public async Task<IActionResult> GetPermisosDeAprendiz()
+        {
+
+            // Sacamos el Id_Apprentice del token
+            var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
+            var Id = Convert.ToInt32(idApprenticeClaim);
+
+            var permisos = await _permissionService.GetPermisosDeAprendizAsync(Id);
+            return Ok(permisos);
+        }
+
     }
 }
