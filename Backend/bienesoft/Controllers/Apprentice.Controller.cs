@@ -78,7 +78,7 @@ namespace bienesoft.Controllers
                 return StatusCode(500, ex.ToString());            }
         }
 
-        [Authorize(Roles = "Administrador")]
+        //[Authorize(Roles = "Administrador")]
         [HttpGet("all")]
         public IActionResult GetApprentices()
         {

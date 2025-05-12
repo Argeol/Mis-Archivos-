@@ -122,12 +122,8 @@ namespace bienesoft.Controllers
         }
 
 
-
-
-
-
         // GET: api/Users
-        [Authorize(Roles = "Administrador")]
+        //[Authorize(Roles = "Administrador")]
         [HttpGet]
         public IActionResult GetUsers()
         {
@@ -187,7 +183,7 @@ namespace bienesoft.Controllers
             }
         }
 
-        [Authorize(Roles = "Administrador")]
+        //[Authorize(Roles = "Administrador")]
         [HttpGet("AllUsers")]
         //[Authorize]
         public async Task<ActionResult<IEnumerable<User>>> AllUsers()
@@ -215,7 +211,7 @@ namespace bienesoft.Controllers
             }
         }
 
-        [Authorize(Roles = "Administrador")]
+        //[Authorize(Roles = "Administrador")]
         [HttpGet("AllUsersInRange")]
         //[Authorize]
         public async Task<ActionResult<IEnumerable<User>>> GetAllInRange(int inicio, int fin)
@@ -255,11 +251,15 @@ namespace bienesoft.Controllers
                 {
                     return BadRequest(new { message = "Token inválido o expirado." });
                 }
+                // Generar nuevo salt
+                string newSalt = PasswordHasher.GenerateSalt();
 
-                // Hashear la nueva contraseña
-                string salt = BCrypt.Net.BCrypt.GenerateSalt();
-                user.HashedPassword = BCrypt.Net.BCrypt.HashPassword(model.NewPassword + salt);
-                user.Salt = salt;
+                // Hashear nueva contraseña con el salt
+                string newHashedPassword = PasswordHasher.HashPassword(model.NewPassword, newSalt);
+
+                // Asignar los valores al usuario
+                user.Salt = newSalt;
+                user.HashedPassword = newHashedPassword;
 
                 // Borrar el token usado
                 user.ResetToken = null;

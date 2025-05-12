@@ -156,5 +156,6 @@ app.UseAuthentication();            // Autenticación JWT
 app.UseAuthorization();             // Autorización de roles, políticas, etc.
 
 app.MapControllers();                // Mapear controladores
+app.UseStaticFiles();   //Activa la carpeta wwwrot como pùblica
 
 app.Run();
