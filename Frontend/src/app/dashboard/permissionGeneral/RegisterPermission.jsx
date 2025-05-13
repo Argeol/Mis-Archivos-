@@ -15,8 +15,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+const roles = [
+  { id: 1, label: "Instructor" },
+  { id: 2, label: "Coordinador" },
+  { id: 3, label: "Bienestar" },
+  { id: 4, label: "Internado" }, // Este solo si aplica
+];
+
 export default function RegisterPermission() {
   const queryClient = useQueryClient();
+
   const [formData, setFormData] = useState({
     departureDate: "",
     entryDate: "",
@@ -25,26 +33,37 @@ export default function RegisterPermission() {
     motive: "",
     observation: "",
     status: 0,
+    responsibleIds: {
+      instructorId: null,
+      coordinatorId: null,
+      bienestarId: null,
+      internadoId: null,
+    },
   });
 
-  // ✅ Obtener lista de aprendices (si se necesita para alguna referencia, pero no se usará para el ID)
-  const { data: apprentices = [] } = useQuery({
-    queryKey: ["apprentices"],
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const { data: responsables = [] } = useQuery({
+    queryKey: ["responsables", roles[currentStep]?.id],
     queryFn: async () => {
-      const res = await axiosInstance.get("/api/Apprentice/all");
+      const res = await axiosInstance.get(
+        `/api/Responsible/GetResponsiblesByRole/roleid=${roles[currentStep].id}`
+      );
       return res.data;
     },
+    enabled: currentStep < roles.length, // Solo cuando el paso es válido
   });
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const res = await axiosInstance.post(
-        "/api/permission/CrearPermiso/", 
-        formData // Solo enviar los datos del permiso, sin `id_Apprentice`
-      );
+      const payload = {
+        ...formData,
+        ...formData.responsibleIds,
+      };
+      const res = await axiosInstance.post("/api/permission/CrearPermiso/", payload);
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       alert("Permiso registrado exitosamente");
       queryClient.invalidateQueries(["permissions"]);
     },
@@ -63,6 +82,25 @@ export default function RegisterPermission() {
     }));
   };
 
+  const handleResponsibleSelect = (value) => {
+    const roleKey = [
+      "instructorId",
+      "coordinatorId",
+      "bienestarId",
+      "internadoId",
+    ][currentStep];
+
+    setFormData((prev) => ({
+      ...prev,
+      responsibleIds: {
+        ...prev.responsibleIds,
+        [roleKey]: parseInt(value),
+      },
+    }));
+
+    setCurrentStep((prev) => prev + 1);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     mutation.mutate();
@@ -70,104 +108,105 @@ export default function RegisterPermission() {
 
   return (
     <form onSubmit={handleSubmit} className="w-full p-2 bg-white space-y-4">
+      {/* Campos del permiso */}
       {/* Fecha de salida */}
       <div className="space-y-1 px-2">
-        <Label htmlFor="departureDate" className="text-left">
-          Fecha de salida
-        </Label>
+        <Label htmlFor="departureDate">Fecha de salida</Label>
         <Input
           id="departureDate"
           type="datetime-local"
           name="departureDate"
           onChange={handleChange}
           required
-          className="w-full text-sm md:text-base"
         />
       </div>
 
       {/* Fecha de entrada */}
       <div className="space-y-1 px-2">
-        <Label htmlFor="entryDate" className="text-left">
-          Fecha de entrada
-        </Label>
+        <Label htmlFor="entryDate">Fecha de entrada</Label>
         <Input
           id="entryDate"
           type="datetime-local"
           name="entryDate"
           onChange={handleChange}
           required
-          className="w-full text-sm md:text-base"
         />
       </div>
 
       {/* Dirección */}
       <div className="space-y-1 px-2">
-        <Label htmlFor="adress" className="text-left">
-          Dirección
-        </Label>
+        <Label htmlFor="adress">Dirección</Label>
         <Input
           id="adress"
           name="adress"
           placeholder="Dirección"
           onChange={handleChange}
           required
-          className="w-full text-sm md:text-base"
         />
       </div>
 
       {/* Destino */}
       <div className="space-y-1 px-2">
-        <Label htmlFor="destination" className="text-left">
-          Destino
-        </Label>
+        <Label htmlFor="destination">Destino</Label>
         <Input
           id="destination"
           name="destination"
           placeholder="Destino"
           onChange={handleChange}
           required
-          className="w-full text-sm md:text-base"
         />
       </div>
 
       {/* Motivo */}
       <div className="space-y-1 px-2">
-        <Label htmlFor="motive" className="text-left">
-          Motivo
-        </Label>
+        <Label htmlFor="motive">Motivo</Label>
         <Input
           id="motive"
           name="motive"
           placeholder="Motivo del permiso"
           onChange={handleChange}
           required
-          className="w-full text-sm md:text-base"
         />
       </div>
 
-      {/* Observaciones */}
+      {/* Observación */}
       <div className="space-y-1 px-2">
-        <Label htmlFor="observation" className="text-left">
-          Observaciones
-        </Label>
+        <Label htmlFor="observation">Observaciones</Label>
         <Textarea
           id="observation"
           name="observation"
           placeholder="Observaciones"
           onChange={handleChange}
-          className="w-full text-sm md:text-base"
         />
       </div>
 
-      <div className="px-2">
-        <Button
-          type="submit"
-          disabled={mutation.isLoading}
-          className="w-full py-2 mt-2"
-        >
-          {mutation.isLoading ? "Registrando..." : "Registrar Permiso"}
-        </Button>
-      </div>
+      {/* Flujo paso a paso para responsables */}
+      {currentStep < roles.length && (
+        <div className="space-y-2 px-2">
+          <Label>Seleccionar {roles[currentStep].label}</Label>
+          <Select onValueChange={handleResponsibleSelect}>
+            <SelectTrigger>
+              <SelectValue placeholder={`Seleccione un ${roles[currentStep].label}`} />
+            </SelectTrigger>
+            <SelectContent>
+              {responsables?.map((respo) => (
+                <SelectItem key={respo.id} value={respo.id.toString()}>
+                  {respo.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {/* Botón de enviar solo cuando ya se seleccionaron todos los responsables */}
+      {currentStep >= roles.length && (
+        <div className="px-2">
+          <Button type="submit" className="w-full py-2 mt-2" disabled={mutation.isLoading}>
+            {mutation.isLoading ? "Registrando..." : "Registrar Permiso"}
+          </Button>
+        </div>
+      )}
     </form>
   );
 }

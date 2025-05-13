@@ -46,12 +46,12 @@ namespace bienesoft.Models
             // {
             //     entity.SetTableName(entity.GetTableName().ToLower());
             // }
-            modelBuilder.Entity<Role>().HasData(
-                new Role { Id_role = 1, Name_role = "Instructor" },
-                new Role { Id_role = 2, Name_role = "Coordinator" },
-                new Role { Id_role = 3, Name_role = "WelfareLeader" },
-                new Role { Id_role = 4, Name_role = "AccommodationManager" }
-            );
+            // modelBuilder.Entity<Role>().HasData(
+            //     new Role { Id_role = 1, Name_role = "Instructor" },
+            //     new Role { Id_role = 2, Name_role = "Coordinator" },
+            //     new Role { Id_role = 3, Name_role = "WelfareLeader" },
+            //     new Role { Id_role = 4, Name_role = "AccommodationManager" }
+            // );
 
             // Relación Departamento -> Municipios (1 a muchos)
             modelBuilder.Entity<Department>()

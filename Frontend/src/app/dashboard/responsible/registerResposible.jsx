@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 
-const tips = ["Activo", "Inactivo"];
+// const tips = ["Activo", "Inactivo"];
 
 export default function RegisterResponsible() {
   const queryClient = useQueryClient();
@@ -24,7 +24,9 @@ export default function RegisterResponsible() {
     nom_Responsible: "",
     ape_Responsible: "",
     tel_Responsible: "",
+    email_Responsible: "",
     roleId: 0,
+    state: "Activo", 
   });
 
   // ✅ Mutación para Registrar Responsable
@@ -38,7 +40,7 @@ export default function RegisterResponsible() {
     },
     onSuccess: (data) => {
       alert(data.message);
-      queryClient.invalidateQueries(["responsables"]); // 🔄 Refrescar lista de responsables
+      queryClient.invalidateQueries(["responsables"]);
     },
     onError: (error) => {
       const errorMessage =
@@ -53,10 +55,9 @@ export default function RegisterResponsible() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Enviar Formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
-    mutation.mutate(); // Ejecutar la mutación
+    mutation.mutate();
   };
 
   const { data: roles = [] } = useQuery({
@@ -66,83 +67,102 @@ export default function RegisterResponsible() {
       return res.data;
     },
   });
-  console.log(roles)
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-8">
-    <div>
-      <Label htmlFor="nom_Responsible">Nombre del Responsable</Label>
-      <Input
-        name="nom_Responsible"
-        placeholder="Nombre del Responsable"
-        onChange={handleChange}
-        required
-      />
-    </div>
-  
-    <div>
-      <Label htmlFor="ape_Responsible">Apellido del Responsable</Label>
-      <Input
-        name="ape_Responsible"
-        placeholder="Apellido del Responsable"
-        onChange={handleChange}
-        required
-      />
-    </div>
-  
-    <div>
-      <Label htmlFor="tel_Responsible">Teléfono</Label>
-      <Input
-        name="tel_Responsible"
-        placeholder="Teléfono"
-        type="tel"
-        onChange={handleChange}
-        required
-      />
-    </div>
-  
-    <div>
-      <Label htmlFor="roleId">Rol</Label>
-      <Select
-        onValueChange={(value) =>
-          setFormData({ ...formData, roleId: parseInt(value) })
-        }
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Seleccionar rol" />
-        </SelectTrigger>
-        <SelectContent>
-          {roles.map((role) => (
-            <SelectItem key={role.id_role} value={role.id_role.toString()}>
-              {role.name_role}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  
-    {/* <div>
-      <Label htmlFor="state">Estado</Label>
-      <Select
-        onValueChange={(value) => setFormData({ ...formData, state: value })}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Estado" />
-        </SelectTrigger>
-        <SelectContent>
-          {tips.map((tip) => (
-            <SelectItem key={tip} value={tip}>
-              {tip}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div> */}
-  
-    <Button type="submit" disabled={mutation.isLoading}>
-      {mutation.isLoading ? "Registrando..." : "Registrar"}
-    </Button>
-  </form>
-  
+      <div>
+        <Label htmlFor="responsible_Id">Número de Documento</Label>
+        <Input
+          name="responsible_Id"
+          placeholder="Número de Documento"
+          type="number"
+          onChange={handleChange}
+          required/>
+      </div>
+      <div>
+
+        <Label htmlFor="nom_Responsible">Nombre del Responsable</Label>
+        <Input
+          name="nom_Responsible"
+          placeholder="Nombre del Responsable"
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="ape_Responsible">Apellido del Responsable</Label>
+        <Input
+          name="ape_Responsible"
+          placeholder="Apellido del Responsable"
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="tel_Responsible">Teléfono</Label>
+        <Input
+          name="tel_Responsible"
+          placeholder="Teléfono"
+          type="tel"
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="email_Responsible">Correo Electrónico</Label>
+        <Input
+          name="email_Responsible"
+          placeholder="Correo"
+          type="email"
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="roleId">Rol</Label>
+        <Select
+          onValueChange={(value) =>
+            setFormData({ ...formData, roleId: parseInt(value) })
+          }
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Seleccionar rol" />
+          </SelectTrigger>
+          <SelectContent>
+            {roles.map((role) => (
+              <SelectItem key={role.id_role} value={role.id_role.toString()}>
+                {role.name_role}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* <div>
+        <Label htmlFor="state">Estado</Label>
+        <Select
+          onValueChange={(value) => setFormData({ ...formData, state: value })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Estado" />
+          </SelectTrigger>
+          <SelectContent>
+            {tips.map((tip) => (
+              <SelectItem key={tip} value={tip}>
+                {tip}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div> */}
+
+      <Button type="submit" disabled={mutation.isLoading}>
+        {mutation.isLoading ? "Registrando..." : "Registrar"}
+      </Button>
+    </form>
   );
 }
