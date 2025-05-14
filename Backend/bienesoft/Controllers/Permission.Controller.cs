@@ -16,11 +16,16 @@ namespace bienesoft.Controllers
     public class permissionController : ControllerBase
     {
         private readonly PermissionService _permissionService;
+        private readonly PermissionApprovalService _permissionApproval;
 
-        public permissionController(PermissionService permissionService)
+        public permissionController(PermissionService permissionService, PermissionApprovalService permissionApproval)
         {
             _permissionService = permissionService;
+            _permissionApproval = permissionApproval;
         }
+        // {
+        //     _permissionService = permissionService;
+        // }
         // [HttpPost("create")]
         // public async Task<IActionResult> CreatePermission([FromBody] CreatePermissionRequest request)
         // {
@@ -105,17 +110,32 @@ namespace bienesoft.Controllers
             var result = await _permissionService.UpdatePermissionAsync(id, permiso);
             return Ok(result);
         }
-        [Authorize(Roles = "Aprendiz")]
-        [HttpGet("apprenticePermiId")]
+        [Authorize(Roles = "Aprendiz,Responsable")]
+        [HttpGet("ConsulPermiId")]
         public async Task<IActionResult> GetPermisosDeAprendiz()
         {
-
-            // Sacamos el Id_Apprentice del token
             var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
-            var Id = Convert.ToInt32(idApprenticeClaim);
+            var idresponsableClaim = User.Claims.FirstOrDefault(c => c.Type == "Responsible_Id")?.Value;
 
-            var permisos = await _permissionService.GetPermisosDeAprendizAsync(Id);
-            return Ok(permisos);
+            // Console.WriteLine($"Id_Apprentice: {idApprenticeClaim}");
+            // Console.WriteLine($"Responsible_Id: {idresponsableClaim}");
+
+            if (!string.IsNullOrEmpty(idApprenticeClaim))
+            {
+                var Id = Convert.ToInt32(idApprenticeClaim);
+                var permisos = await _permissionService.GetPermisosDeAprendizAsync(Id);
+                return Ok(permisos);
+            }
+            else if (!string.IsNullOrEmpty(idresponsableClaim))
+            {
+                var Id = Convert.ToInt32(idresponsableClaim);
+                var permisos = await _permissionApproval.ObtenerPermisosPendientesPorResponsableAsync(Id);
+                return Ok(permisos);
+            }
+            else
+            {
+                return BadRequest(new { message = "No se encontró el Id_Apprentice ni Responsible_Id en el token" });
+            }
         }
 
     }

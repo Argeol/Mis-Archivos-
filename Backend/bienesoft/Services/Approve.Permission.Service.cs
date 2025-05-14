@@ -118,10 +118,11 @@ public class PermissionApprovalService
         if (permiso == null)
             return "Permiso no encontrado.";
 
-        if(permiso.Status == Status.Rechazado){
+        if (permiso.Status == Status.Rechazado)
+        {
             return "El permiso ya fue rechazado por un responsable.";
-            }
-        
+        }
+
         var aprendiz = await _context.apprentice
             .FirstOrDefaultAsync(a => a.Id_Apprentice == permiso.Id_Apprentice);
 
@@ -366,6 +367,19 @@ public class PermissionApprovalService
             .ToList(); // <-- ahora retorna todos
 
         return pendientes;
+    }
+    public async Task<List<PermissionApproval>> ObtenerPermisosPendientesPorResponsableAsync(int idResponsable)
+    {
+        // Devuelve todos los registros de la tabla compuesta donde:
+        // - Ese responsable es el asignado
+        // - El estado está en Pendiente
+        var permisosPendientes = await _context.permissionApproval
+            .Include(pa => pa.Permission) // Incluye los datos del permiso
+                .ThenInclude(p => p.Apprentice) // si quieres también el aprendiz
+            .Where(pa => pa.ResponsibleId == idResponsable && pa.ApprovalStatus == ApprovalStatus.Pendiente)
+            .ToListAsync();
+
+        return permisosPendientes;
     }
 
 

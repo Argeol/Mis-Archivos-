@@ -28,7 +28,7 @@ namespace bienesoft.Services
                 throw new ArgumentException("El correo ya esta resgistrado.");
 
             //Comenzar una transaccion
-            using var transaction =await _context.Database.BeginTransactionAsync();
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 //Agregar responsables y guardar
@@ -68,7 +68,7 @@ namespace bienesoft.Services
                 {
                     await _GeneralFunction.SendWelcomeEmail(email, plainPassword);
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
                     mensajeCorreo = "No se pudo enviar el correo, revisa tu conexion a internet. Detalles:" + ex.Message;
                 }
@@ -87,7 +87,7 @@ namespace bienesoft.Services
             }
 
         }
-            
+
 
 
 
@@ -127,7 +127,7 @@ namespace bienesoft.Services
                     a.Email_Responsible,
                 })
                 .FirstOrDefault();
-            return responsible; 
+            return responsible;
         }
 
         //public async Task<ResponsibleModel> UpdateResponsibleAsync(int Id, UpdateResponsible updateResponsible)
