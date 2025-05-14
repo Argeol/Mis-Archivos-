@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { UserCircle, LogOut, Mail, Info } from "lucide-react";
 import {
   DropdownMenu,
@@ -13,12 +13,27 @@ import { Button } from "@/components/ui/button";
 import Sidebar from "./sidebar";
 import { useAuthUser } from "@/app/user/login/useCurrentUser";
 import { UserInfoModal } from "@/app/user/login/useUserInfo";
+import axiosInstance from "@/lib/axiosInstance";
 
 function PrivateNav({ children, titlespage }) {
   const pathname = usePathname();
   const { userData, loading, error } = useAuthUser(); // Obtiene la información del usuario
   const [theme, setTheme] = useState("light"); // Estado local para el tema
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await axiosInstance.post(
+        "/api/User/Logout",
+        {},
+        { withCredentials: true }
+      );
+      router.push("/user/login");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
 
   // Manejo de la carga y error antes de renderizar el componente
   if (loading) return <p>Cargando...</p>;
@@ -51,7 +66,6 @@ function PrivateNav({ children, titlespage }) {
             {pageTitle}
           </h1>
 
-     
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="rounded-full">
@@ -74,28 +88,27 @@ function PrivateNav({ children, titlespage }) {
                 </div>
               </DropdownMenuItem>
 
-              <DropdownMenuItem asChild>
-                <a href="/user/login" className="flex items-center">
+              <DropdownMenuItem onClick={handleLogout}>
+                <div className="flex items-center space-x-2">
                   <LogOut className="h-4 w-4 text-red-600" />
                   <span>Cerrar Sesión</span>
-                </a>
+                </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </nav>
-             {isModalOpen && (
-            <UserInfoModal
-              userData={userData}
-              open={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
-            />
-          )}
+        {isModalOpen && (
+          <UserInfoModal
+            userData={userData}
+            open={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+          />
+        )}
 
         {/* Contenido principal */}
         <div className="flex-1 overflow-y-auto">{children}</div>
       </div>
     </div>
-    
   );
 }
 

@@ -112,8 +112,7 @@ export default function DashboardPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800 drop-shadow-sm">
-                Bienvenido a BIENESOFT,{userData.role !== "Administrador" && userData.fullName}
-                ({userData.role})
+                Bienvenido a BIENESOFT, {userData.role !== "Administrador" && userData.fullName} ({userData.role})
               </h1>
 
               {userData.role === "Aprendiz" && (
@@ -126,7 +125,9 @@ export default function DashboardPage() {
                 {formattedDate} • Sistema de Gestión de Permisos
               </p>
             </div>
-            <div className="mt-4 md:mt-0 flex flex-wrap sm:flex-nowrap gap-2">
+
+            {userData?.role === "Administrador" || userData?.role === "Aprendiz" &&( 
+                <div className="mt-4 md:mt-0 flex flex-wrap sm:flex-nowrap gap-2">
               <Link href="/dashboard/permissionGeneral" passHref>
                 <Button
                   size="sm"
@@ -138,6 +139,18 @@ export default function DashboardPage() {
                 </Button>
               </Link>
             </div>
+            )}
+
+            {userData?.role === "Responsable" && (
+              <Button 
+              size="sm"
+              className="bg-[#218EED] hover:bg-[#1a70bd] flex items-center gap-2 text-xs sm:text-sm w-full sm:w-auto"
+              >
+                <p>Permisos Pendientes</p>
+              </Button>
+            )}
+
+
           </div>
 
           {/* Tarjetas de estadísticas */}
