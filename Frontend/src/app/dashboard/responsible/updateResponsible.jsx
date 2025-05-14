@@ -5,36 +5,25 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 
-const statusOptions = ["Activo", "Inactivo"];
-
-export default function UpdateResponsible({ id }) {
+export default function UpdateResponsible() {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     nom_Responsible: "",
     ape_Responsible: "",
     tel_Responsible: "",
-    roleId: 0,
     state: "",
     Email_Responsible: "",
-    });
+  });
 
-  // Obtener datos del responsable
+  // Obtener datos del responsable actual desde un endpoint tipo "Me"
   const { data, isLoading } = useQuery({
-    queryKey: ["responsible", id],
+    queryKey: ["responsible"],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/api/Responsible/${id}`);
+      const res = await axiosInstance.get("/api/Responsible/GetResponsibleID"); // <-- debes tener este endpoint
       return res.data || {};
     },
-    enabled: !!id,
   });
 
   useEffect(() => {
@@ -46,27 +35,13 @@ export default function UpdateResponsible({ id }) {
     }
   }, [data]);
 
-  // Obtener roles
-  const { data: roles = [] } = useQuery({
-    queryKey: ["roles"],
-    queryFn: async () => {
-      const res = await axiosInstance.get("/api/Role/GetRole");
-      return res.data;
-    },
-  });
-
-  // Mutación para actualizar responsable
   const mutation = useMutation({
     mutationFn: async () => {
-      console.log("Enviando datos:", formData);
-      await axiosInstance.put(
-        `/api/Responsible/UpdateResponsible/${id}`,
-        formData
-      );
+      await axiosInstance.put("/api/Responsible/UpdateResponsible", formData); // <-- sin ID en la URL
     },
     onSuccess: () => {
       alert("Responsable actualizado correctamente");
-      queryClient.invalidateQueries(["responsible", id]);
+      queryClient.invalidateQueries(["responsible"]);
     },
     onError: (error) => {
       alert(error.response?.data?.message || "Error al actualizar");
@@ -89,8 +64,9 @@ export default function UpdateResponsible({ id }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4">
-      <Label>Estado: {data.state}</Label>
-      <hr/>
+      <Label>Estado: {formData.state}</Label>
+      <hr />
+
       <Label>Nombre</Label>
       <Input
         name="nom_Responsible"
@@ -116,41 +92,14 @@ export default function UpdateResponsible({ id }) {
         required
       />
 
-      <Label>Rol</Label>
-      <Select
-        onValueChange={(value) =>
-          setFormData({ ...formData, roleId: parseInt(value) })
-        }
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Seleccionar Rol" />
-        </SelectTrigger>
-        <SelectContent>
-          {roles.map((role) => (
-            <SelectItem key={role.id_role} value={role.id_role.toString()}>
-              {role.name_role}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      {/* <Select
-        value={formData.state}
-        onValueChange={(value) =>
-          setFormData((prev) => ({ ...prev, state: value }))
-        }
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Seleccionar Estado" />
-        </SelectTrigger>
-        <SelectContent>
-          {statusOptions.map((status) => (
-            <SelectItem key={status} value={status}>
-              {status}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select> */}
+      <Label>Email</Label>
+      <Input
+        type="email"
+        name="Email_Responsible"
+        value={formData.Email_Responsible}
+        onChange={handleChange}
+        required
+      />
 
       <Button type="submit" disabled={mutation.isLoading}>
         {mutation.isLoading ? "Actualizando..." : "Actualizar"}

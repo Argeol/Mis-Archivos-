@@ -317,11 +317,12 @@ namespace bienesoft.Controllers
             }
         }
 
-
-
-        // Modelo para la solicitud
-
-
+        [HttpPost("Logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("token"); 
+            return Ok(new { message = "Sesión cerrada correctamente" });
+        }
     }
 }
 
