@@ -39,6 +39,7 @@ export default function DashboardPage() {
     usePermissionSummary();
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const user = (localStorage.getItem("user"));
 
   const [activeTab, setActiveTab] = useState("overview");
   const isMobile = useIsMobile();
@@ -99,7 +100,7 @@ export default function DashboardPage() {
   if (!userData) return <div>No se encontró información del usuario</div>;
   // if (isLoading) return <div>Cargando usuario...</div>;
   // if (error) return <div>Error: {error.message}</div>;
-
+  console.log("hola,",user)
   return (
     <PrivateNav titlespage="Contenido Principal">
       <div className="min-h-screen">
@@ -112,7 +113,7 @@ export default function DashboardPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800 drop-shadow-sm">
-                Bienvenido a BIENESOFT, {userData.role !== "Administrador" && userData.fullName} ({userData.role})
+                Bienvenido a BIENESOFT, (user.first_Name_Apprentice){user.fullName !== "Administrador" && userData.fullName} ({userData.role})
               </h1>
 
               {userData.role === "Aprendiz" && (

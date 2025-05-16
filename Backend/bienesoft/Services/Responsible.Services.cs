@@ -124,74 +124,11 @@ namespace bienesoft.Services
                     a.Tel_Responsible,
                     a.Role.Name_role,
                     a.State,
-                    a.Email_Responsible,
+                    a.Email_Responsible
                 })
                 .FirstOrDefault();
             return responsible;
         }
-
-        //public async Task<ResponsibleModel> UpdateResponsibleAsync(int Id, UpdateResponsible updateResponsible)
-        //{
-        //    var existingResponsible = await _context.responsible.FindAsync(Id);
-        //    if (existingResponsible == null)
-        //    {
-        //        return null;
-        //    }
-
-        //    if (updateResponsible.Nom_Responsible != "")
-        //        existingResponsible.Nom_Responsible = updateResponsible.Nom_Responsible;
-
-        //    if (updateResponsible.Ape_Responsible != "")
-        //        existingResponsible.Ape_Responsible = updateResponsible.Ape_Responsible;
-
-        //    if (updateResponsible.Tel_Responsible != 0)
-        //        existingResponsible.Tel_Responsible = updateResponsible.Tel_Responsible;
-
-        //    if (updateResponsible.RoleId != 0)
-        //        existingResponsible.RoleId = updateResponsible.RoleId.Value;
-
-        //    if (updateResponsible.State != "")
-        //        existingResponsible.State = updateResponsible.State;    
-
-        //    await _context.SaveChangesAsync();
-
-        //    return existingResponsible;
-        //}
-        //public void UpdateResponsible(int id, UpdateResponsible updateResponsible)
-        //{
-        //    var existingResponsible = _context.responsible.Find(id);
-        //    if (existingResponsible == null)
-        //    {
-        //        throw new KeyNotFoundException($"El responsable con el ID {id} no se encontró.");
-        //    }
-
-        //    if (!string.IsNullOrWhiteSpace(updateResponsible.Nom_Responsible))
-        //    {
-        //        existingResponsible.Nom_Responsible = updateResponsible.Nom_Responsible;
-        //    }
-
-        //    if (!string.IsNullOrWhiteSpace(updateResponsible.Ape_Responsible))
-        //    {
-        //        existingResponsible.Ape_Responsible = updateResponsible.Ape_Responsible;
-        //    }
-
-        //    if (updateResponsible.Tel_Responsible.HasValue)
-        //    {
-        //        existingResponsible.Tel_Responsible = updateResponsible.Tel_Responsible.Value;
-        //    }
-
-        //    if (updateResponsible.RoleId.HasValue && updateResponsible.RoleId.Value != 0)
-        //    {
-        //        existingResponsible.RoleId = updateResponsible.RoleId.Value;
-        //    }
-
-        //    if (!string.IsNullOrWhiteSpace(updateResponsible.State))
-        //    {
-        //        existingResponsible.State = updateResponsible.State;
-        //    }
-
-        //    _context.SaveChanges();
-        //}
         public void UpdateResponsible(int id, UpdateResponsible update)
         {
             var responsible = _context.responsible.FirstOrDefault(r => r.Responsible_Id == id);
