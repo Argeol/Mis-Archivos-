@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import UpdateResponsible from "@/app/dashboard/responsible/updateResponsible";
 
 export function UserInfoModal({ userData, open, onClose }) {
+  console.log(userData)
   const modalRef = useRef(null);
   const [data, setData] = useState(null);
   const [translations, setTranslations] = useState({});
@@ -30,7 +31,7 @@ export function UserInfoModal({ userData, open, onClose }) {
   useEffect(() => {
     if (!userData) return;
 
-    const role = userData.role;
+    const role = userData;
     let newUrl = "";
     let newTranslations = {};
     let ignoreFields = [];
@@ -177,7 +178,8 @@ export function UserInfoModal({ userData, open, onClose }) {
         </div>
       );
     }
-
+    // if (isloading) return <p>Cargando...</p>;
+    // if (error) return <p>Error: {error.message}</p>;
     return (
       <div className="space-y-6">
         <div className="flex items-center space-x-3">
@@ -187,8 +189,8 @@ export function UserInfoModal({ userData, open, onClose }) {
           <div>
             <h3 className="text-lg font-medium">Usuario</h3>
             <div className="flex items-center mt-0.5">
-              {getRoleIcon(userData?.role)}
-              <span className="text-sm text-slate-500">{userData?.role}</span>
+              {getRoleIcon(userData)}
+              <span className="text-sm text-slate-500">{userData}</span>
             </div>
           </div>
         </div>
@@ -238,7 +240,7 @@ export function UserInfoModal({ userData, open, onClose }) {
             className="text-xl font-semibold flex items-center gap-2"
           >
             <span className="bg-gradient-to-r from-slate-600 to-[#088EED] bg-clip-text text-transparent">
-              Información de {userData?.role || "Usuario"}
+              Información de {userData || "Usuario"}
             </span>
           </h2>
         </div>

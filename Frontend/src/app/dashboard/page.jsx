@@ -19,32 +19,41 @@ import { Progress } from "@/components/ui/progress";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTotalApprentices } from "@/app/dashboard/apprentice/totalApprentices";
 import { usePermissionSummary } from "@/app/dashboard/permissionGeneral/ResumenPermission";
-import {
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-  PieChart,
-  Pie,
-  Legend,
-} from "recharts";
 import { useAuthUser } from "../user/login/useCurrentUser";
 import LoadingPage from "@/components/utils/LoadingPage";
-
-// Datos de ejemplo para permisos recientes
 
 export default function DashboardPage() {
   const { data: totalApprentices, isLoading: loadingApprentices } =
     useTotalApprentices();
   const { data: permissionSummary, isLoading: loadingSummary } =
     usePermissionSummary();
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const user = (localStorage.getItem("user"));
 
+  const { user, tip, isLoading: loadingUser, error: errorUser } = useAuthUser();
+
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const isMobile = useIsMobile();
-  // const User = useAuthUser();
-  const { userData, loading: loadingUser, error } = useAuthUser(); // Obtén el usuario
+
+  useEffect(() => {
+    // Solo quitamos loading general si todos cargan
+    if (!loadingUser && !loadingApprentices && !loadingSummary) {
+      setLoading(false);
+    }
+  }, [loadingUser, loadingApprentices, loadingSummary]);
+
+  if (loading || loadingUser) return <LoadingPage />;
+
+  if (errorUser) return <div>Error al cargar usuario: {errorUser.message}</div>;
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-700">
+          No estás autenticado. Por favor inicia sesión.
+        </p>
+      </div>
+    );
+  }
 
   const stats = {
     totalApprentices: totalApprentices ?? 0,
@@ -70,20 +79,6 @@ export default function DashboardPage() {
     Math.round((stats.pendingApprovals / CAN_PENDIENTES) * 100),
     100
   );
-  const COLORS = ["#4ade80", "#60a5fa", "#facc15"];
-
-  const chartData = [
-    { name: "Hoy", value: stats.permissionsToday },
-    { name: "Semana", value: stats.permissionsThisWeek },
-    { name: "Mes", value: stats.permissionsThisMonth },
-  ];
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
 
   const currentDate = new Date().toLocaleDateString("es-ES", {
     weekday: "long",
@@ -95,12 +90,6 @@ export default function DashboardPage() {
   const formattedDate =
     currentDate.charAt(0).toUpperCase() + currentDate.slice(1);
 
-  if (loading) return <LoadingPage />;
-  if (error) return <div>Error: {error}</div>;
-  if (!userData) return <div>No se encontró información del usuario</div>;
-  // if (isLoading) return <div>Cargando usuario...</div>;
-  // if (error) return <div>Error: {error.message}</div>;
-  console.log("hola,",user)
   return (
     <PrivateNav titlespage="Contenido Principal">
       <div className="min-h-screen">
@@ -112,48 +101,42 @@ export default function DashboardPage() {
           {/* Encabezado del Dashboard */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800 drop-shadow-sm">
-                Bienvenido a BIENESOFT, (user.first_Name_Apprentice){user.fullName !== "Administrador" && userData.fullName} ({userData.role})
-              </h1>
-
-              {userData.role === "Aprendiz" && (
+            
                 <div className="mt-4">
-                  {/* Aquí contenido exclusivo para Aprendices */}
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800 drop-shadow-sm">
+                    Bienvenido a BIENESOFT, {user?.first_Name_Apprentice || user?.nom_Responsible}{" "}
+                    {user?.last_Name_Apprentice || user?.ape_Responsible} ({tip})
+                  </h1>
                 </div>
-              )}
 
               <p className="text-sm sm:text-base text-gray-600 mt-1">
                 {formattedDate} • Sistema de Gestión de Permisos
               </p>
             </div>
 
-            {userData?.role === "Administrador" || userData?.role === "Aprendiz" &&( 
-                <div className="mt-4 md:mt-0 flex flex-wrap sm:flex-nowrap gap-2">
-              <Link href="/dashboard/permissionGeneral" passHref>
-                <Button
-                  size="sm"
-                  className="bg-[#218EED] hover:bg-[#1a70bd] flex items-center gap-2 text-xs sm:text-sm w-full sm:w-auto"
-                >
-                  <Plus size={16} />
-                  <p>Nuevo Permiso </p>
-                  {/* if (isLoading) return <LoadingPage />; */}
-                </Button>
-              </Link>
-            </div>
+            {(tip === "Administrador" || tip === "Aprendiz") && (
+              <div className="mt-4 md:mt-0 flex flex-wrap sm:flex-nowrap gap-2">
+                <Link href="/dashboard/permissionGeneral" passHref>
+                  <Button
+                    size="sm"
+                    className="bg-[#218EED] hover:bg-[#1a70bd] flex items-center gap-2 text-xs sm:text-sm w-full sm:w-auto"
+                  >
+                    <Plus size={16} />
+                    <p>Nuevo Permiso</p>
+                  </Button>
+                </Link>
+              </div>
             )}
 
-            {userData?.role === "Responsable" && (
-              <Button 
-              size="sm"
-              className="bg-[#218EED] hover:bg-[#1a70bd] flex items-center gap-2 text-xs sm:text-sm w-full sm:w-auto"
+            {tip === "Responsable" && (
+              <Button
+                size="sm"
+                className="bg-[#218EED] hover:bg-[#1a70bd] flex items-center gap-2 text-xs sm:text-sm w-full sm:w-auto"
               >
                 <p>Permisos Pendientes</p>
               </Button>
             )}
-
-
           </div>
-
           {/* Tarjetas de estadísticas */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-6">
             <Card className="overflow-hidden">
@@ -275,7 +258,7 @@ export default function DashboardPage() {
                         fill="#8884d8"
                         dataKey="value"
                         nameKey="name"
-                        label={({  percent }) => ` ${(percent * 100).toFixed(0)}%`}
+                        label={({  percent }) =>  ${(percent * 100).toFixed(0)}%}
                       >
                         {chartData.map((entry, index) => (
                           <Cell key={cell-${index}} fill={COLORS[index % COLORS.length]}/>
@@ -323,6 +306,8 @@ export default function DashboardPage() {
               </div>
             </TabsContent>
           </Tabs>
+          {/* Tarjetas de estadísticas */}
+          {/* ... (el resto del código sigue igual) */}
         </main>
       </div>
     </PrivateNav>

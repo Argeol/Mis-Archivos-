@@ -12,7 +12,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-
+import { useAuthUser } from "@/app/user/login/useCurrentUser";
 
 async function Login(credentials) {
   const response = await axiosInstance.post("/api/User/Login", credentials, {
@@ -27,16 +27,18 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false); // Estado para la visibilidad de la contraseña
-
+  const { login } = useAuthUser();
   const loginMutation = useMutation({
     mutationFn: Login,
     onMutate: () => setLoading(true),
     onSuccess: (response) => {
       if (response.status === 200) {
-        alert("¡Inicio de sesión exitoso!");
-        router.push("/dashboard"); // Ya no necesitas guardar el token
-        localStorage.setItem("user", JSON.stringify(data.user));
-        localStorage.setItem("user", JSON.stringify(safeUser));
+        const { tip, user } = response.data;
+
+        login({ user, tip }); // Guardar el usuario y rol en el contexto
+
+        // Redirige después
+        router.push("/dashboard");
       }
     },
     onError: (err) => {
@@ -51,7 +53,6 @@ function LoginPage() {
     const credentials = { email, hashedPassword: password };
     loginMutation.mutate(credentials);
   };
-  
 
   return (
     <main className="flex items-center justify-center min-h-screen px-4 bg-gradient-to-r from-white to-white">
@@ -64,11 +65,7 @@ function LoginPage() {
             animate={{ y: [0, -5, 0], opacity: [1, 0.7, 1] }}
             transition={{ repeat: Infinity, duration: 1 }}
           >
-            <img
-              className="w-24"
-              alt="logo"
-              src="/assets/img/bienesoft.webp"
-            />
+            <img className="w-24" alt="logo" src="/assets/img/bienesoft.webp" />
           </motion.div>
         </div>
 
@@ -118,7 +115,9 @@ function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)} // Cambiar el estado de visibilidad
-                    aria-label={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
+                    aria-label={
+                      showPassword ? "Ocultar contraseña" : "Ver contraseña"
+                    }
                   >
                     {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                   </button>
