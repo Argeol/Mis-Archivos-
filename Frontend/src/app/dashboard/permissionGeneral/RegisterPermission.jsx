@@ -1,28 +1,17 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+"use client";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import axiosInstance from "@/lib/axiosInstance";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
-// Roles definidos
-const roles = [
-  { id: 1, label: "Instructor" },
-  { id: 2, label: "Coordinador" },
-  { id: 3, label: "Bienestar" },
-  { id: 4, label: "Internado" },
-];
-
-export default function RegisterPermission() {
+export default function RegisterPermission({ onSuccess }) {
   const queryClient = useQueryClient();
+
   const [formData, setFormData] = useState({
     departureDate: "",
     entryDate: "",
@@ -30,132 +19,202 @@ export default function RegisterPermission() {
     destination: "",
     motive: "",
     observation: "",
-    status: 0,
-    responsibleIds: {
-      instructorId: null,
-      coordinatorId: null,
-      bienestarId: null,
-      internadoId: null,
-    },
+    responsablesSeleccionados: [],
   });
-  const [currentStep, setCurrentStep] = useState(0); // Paso actual
 
-  // Query para obtener los responsables según el rol
-  const { data: responsables = [] } = useQuery({
-    queryKey: ["responsables", roles[currentStep]?.id],
-    queryFn: async () => {
-      const res = await axiosInstance.get(
-        `/api/Responsible/GetResponsiblesByRole/roleid=${roles[currentStep].id}`
-      );
-      console.log("Responsables:", res.data); // Depuración de la respuesta de la API
-      return res.data;
-    },
-    enabled: currentStep < roles.length, // Solo cuando el paso es válido
+  const [responsables, setResponsables] = useState({
+    instructor: [],
+    cordinador: [],
+    liderBienestar: [],
+    internado: [],
   });
+
+  const getConsult = {
+    instructor: "/api/Responsible/GetResponsiblesByRole/roleid=1",
+    cordinador: "/api/Responsible/GetResponsiblesByRole/roleid=2",
+    liderBienestar: "/api/Responsible/GetResponsiblesByRole/roleid=3",
+    internado: "/api/Responsible/GetResponsiblesByRole/roleid=4",
+  };
+
+  const ordenRoles = ["instructor", "cordinador", "liderBienestar", "internado"];
+
+  const fetchResponsables = async () => {
+    const roles = Object.keys(getConsult);
+    for (const rol of roles) {
+      const res = await axiosInstance.get(getConsult[rol]);
+      setResponsables((prev) => ({ ...prev, [rol]: res.data }));
+    }
+  };
+
+  useEffect(() => {
+    fetchResponsables();
+  }, []);
 
   const mutation = useMutation({
     mutationFn: async () => {
       const payload = {
-        ...formData,
-        ...formData.responsibleIds,
+        permission: {
+          departureDate: formData.departureDate,
+          entryDate: formData.entryDate,
+          adress: formData.adress,
+          destination: formData.destination,
+          motive: formData.motive,
+          observation: formData.observation,
+          status: 0,
+        },
+        responsablesSeleccionados: formData.responsablesSeleccionados,
       };
-      const res = await axiosInstance.post("/api/permission/CrearPermiso/", payload);
+
+      const res = await axiosInstance.post(
+        "/api/permission/CrearPermiso",
+        payload
+      );
+
       return res.data;
     },
-    onSuccess: () => {
-      alert("Permiso registrado exitosamente");
+    onSuccess: (data) => {
+      toast.success(`${data.message}`);
+      setFormData({
+        departureDate: "",
+        entryDate: "",
+        adress: "",
+        destination: "",
+        motive: "",
+        observation: "",
+        responsablesSeleccionados: [],
+      });
+
+      if (onSuccess) onSuccess();
       queryClient.invalidateQueries(["permissions"]);
     },
     onError: (error) => {
-      const errorMessage =
-        error.response?.data?.message || "Error al registrar el permiso.";
-      alert(errorMessage);
+      const msg =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message;
+      toast.error(msg);
     },
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleResponsibleSelect = (value) => {
-    const roleKey = [
-      "instructorId",
-      "coordinatorId",
-      "bienestarId",
-      "internadoId",
-    ][currentStep];
-
-    setFormData((prev) => ({
-      ...prev,
-      responsibleIds: {
-        ...prev.responsibleIds,
-        [roleKey]: parseInt(value),
-      },
-    }));
-
-    // Avanza al siguiente paso solo si el usuario selecciona un responsable
-    setCurrentStep((prev) => prev + 1);
+  const handleResponsableSelect = (value) => {
+    const parsed = parseInt(value);
+    if (!formData.responsablesSeleccionados.includes(parsed)) {
+      setFormData((prev) => ({
+        ...prev,
+        responsablesSeleccionados: [...prev.responsablesSeleccionados, parsed],
+      }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    mutation.mutate(); // Llama a la mutación para registrar el permiso
+    mutation.mutate();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full p-2 bg-white space-y-4">
-      {/* Campos del permiso */}
-      <div className="space-y-1 px-2">
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-xl p-6 mx-auto bg-white shadow ">
+      <h2 className="text-2xl font-semibold mb-4">Registrar Permiso</h2>
+
+      <div className="space-y-2">
         <Label htmlFor="departureDate">Fecha de salida</Label>
         <Input
-          id="departureDate"
           type="datetime-local"
           name="departureDate"
+          value={formData.departureDate}
           onChange={handleChange}
           required
         />
       </div>
 
-      {/* Otros campos como entrada, dirección, etc. */}
-      {/* ... */}
+      <div className="space-y-2">
+        <Label htmlFor="entryDate">Fecha de entrada</Label>
+        <Input
+          type="datetime-local"
+          name="entryDate"
+          value={formData.entryDate}
+          onChange={handleChange}
+          required
+        />
+      </div>
 
-      {/* Selección de responsables según el rol actual */}
-      {currentStep < roles.length && (
-        <div className="space-y-2 px-2">
-          <Label>Seleccionar {roles[currentStep].label}</Label>
-          <Select onValueChange={handleResponsibleSelect}>
-            <SelectTrigger>
-              <SelectValue
-                placeholder={`Seleccione un ${roles[currentStep].label}`}
-              />
-            </SelectTrigger>
-            <SelectContent>
-              {responsables?.map((respo) => (
-                <SelectItem key={respo.responsible_Id} value={respo.responsible_Id.toString()}>
-                  {respo.nom_Responsible} {respo.ape_Responsible}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
+      <div className="space-y-2">
+        <Label htmlFor="adress">Dirección</Label>
+        <Input
+          type="text"
+          name="adress"
+          value={formData.adress}
+          onChange={handleChange}
+          required
+        />
+      </div>
 
-      {/* Botón de enviar solo cuando se hayan seleccionado todos los responsables */}
-      {currentStep >= roles.length && (
-        <div className="px-2">
-          <Button
-            type="submit"
-            className="w-full py-2 mt-2"
-            disabled={mutation.isLoading}
-          >
-            {mutation.isLoading ? "Registrando..." : "Registrar Permiso"}
-          </Button>
-        </div>
-      )}
+      <div className="space-y-2">
+        <Label htmlFor="destination">Destino</Label>
+        <Input
+          type="text"
+          name="destination"
+          value={formData.destination}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="motive">Motivo</Label>
+        <Input
+          type="text"
+          name="motive"
+          value={formData.motive}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="observation">Observación</Label>
+        <Input
+          type="text"
+          name="observation"
+          value={formData.observation}
+          onChange={handleChange}
+        />
+      </div>
+
+      {ordenRoles.map((rol, index) => {
+        const lista = responsables[rol];
+        const isEnabled =
+          index === 0 || formData.responsablesSeleccionados.length >= index;
+
+        return (
+          <div key={rol} className="space-y-2">
+            <Label className="capitalize">{rol}</Label>
+            <Select
+              onValueChange={handleResponsableSelect}
+              disabled={!isEnabled}
+            >
+              <SelectTrigger className={isEnabled ? "" : "opacity-50 cursor-not-allowed"}>
+                <SelectValue placeholder="Seleccionar" />
+              </SelectTrigger>
+              <SelectContent>
+                {lista.map((r) => (
+                  <SelectItem key={r.responsible_Id} value={r.responsible_Id.toString()}>
+                    {r.nom_Responsible} {r.ape_Responsible}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        );
+      })}
+
+      <Button type="submit" className="w-full">
+        Registrar Permiso
+      </Button>
     </form>
   );
 }

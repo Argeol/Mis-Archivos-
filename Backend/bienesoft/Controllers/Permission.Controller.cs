@@ -50,14 +50,14 @@ namespace bienesoft.Controllers
         // }
         [Authorize(Roles = "Aprendiz")]
         [HttpPost("CrearPermiso")]
-        public async Task<IActionResult> CreateApprentice([FromBody] CreatePermissionRequest request)
+        public async Task<IActionResult> CreateApprentice(CreatePermissionRequest Request)
         {
             try
             {
                 var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
                 var idApprentice = Convert.ToInt32(idApprenticeClaim);
 
-                var result = await _permissionService.CreatePermissionAsync(request.Permission, idApprentice, request.ResponsablesSeleccionados);
+                var result = await _permissionService.CreatePermissionAsync(Request.Permission, idApprentice, Request.ResponsablesSeleccionados);
 
                 return Ok(new { success = true, message = result });
             }
