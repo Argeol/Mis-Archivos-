@@ -20,7 +20,6 @@ async function Login(credentials) {
   });
   return response;
 }
-
 function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -36,6 +35,8 @@ function LoginPage() {
       if (response.status === 200) {
         alert("¡Inicio de sesión exitoso!");
         router.push("/dashboard"); // Ya no necesitas guardar el token
+        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("user", JSON.stringify(safeUser));
       }
     },
     onError: (err) => {
