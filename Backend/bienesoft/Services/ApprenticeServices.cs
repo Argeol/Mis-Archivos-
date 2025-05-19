@@ -112,6 +112,7 @@ namespace Bienesoft.Services
                     a.Email_Apprentice,
                     Birth_Date_Apprentice_Formatted = a.birth_date_apprentice.ToString("yyyy-MM-dd"),
                     a.Phone_Apprentice,
+                    a.Stratum_Apprentice,
                     a.Gender_Apprentice,
                     a.Tip_Apprentice,
                     a.nom_responsible,
@@ -149,6 +150,7 @@ namespace Bienesoft.Services
                     a.Email_Apprentice,
                     Birth_Date_Apprentice_Formatted = a.birth_date_apprentice.ToString("yyyy-MM-dd"),
                     a.Phone_Apprentice,
+                    a.Stratum_Apprentice,
                     a.Gender_Apprentice,
                     a.Tip_Apprentice,
                     a.nom_responsible,
@@ -197,6 +199,9 @@ namespace Bienesoft.Services
 
             if (!string.IsNullOrWhiteSpace(update.phone_Apprentice))
                 exiteapprentice.Phone_Apprentice = update.phone_Apprentice;
+
+            if (update.Stratum_apprentice.HasValue)
+                exiteapprentice.Stratum_Apprentice = update.Stratum_apprentice.Value;
 
             if (!string.IsNullOrWhiteSpace(update.status_Apprentice))
                 exiteapprentice.Status_Apprentice = update.status_Apprentice;
