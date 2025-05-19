@@ -38,6 +38,7 @@ export default function UpdateApprentice({ id }) {
     email_responsible: "",
     id_municipality: 0,
     file_Id: 0,
+    stratum_Apprentice: 0,
   });
 
   const { data, isLoading } = useQuery({
@@ -70,6 +71,7 @@ export default function UpdateApprentice({ id }) {
         email_responsible: data.email_responsible || "",
         id_municipality: data.Id_municipality || 0, // Ajusta según el ID real
         file_Id: data.file_Id || 0,
+        stratum_Apprentice: data.stratum_apprentice || 0,
       }));
     }
   }, [data]);
@@ -216,6 +218,14 @@ export default function UpdateApprentice({ id }) {
         onChange={handleChange}
       />
 
+      <Label>Estrato</Label>
+      <Input
+        name="stratum_apprentice"
+        value={formData.status_Apprentice}
+        onChange={handleChange}
+      />
+      
+
       <Label>Tipo de Aprendiz</Label>
       <Select
         value={formData.tip_Apprentice}
@@ -317,7 +327,7 @@ export default function UpdateApprentice({ id }) {
         value={formData.file_Id}
         onChange={handleChange}
       />
-      
+
       <Button type="submit" disabled={mutation.isLoading}>
         {mutation.isLoading ? "Actualizando..." : "Actualizar"}
       </Button>

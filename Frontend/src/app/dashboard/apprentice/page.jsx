@@ -57,6 +57,7 @@ export default function ApprenticeDashboard() {
     file_Id: "ID de Ficha",
     programName: "Programa",
     areaName: "Área",
+    stratum_Apprentice: "Estrato",
   };
   
   const fieldLabels = ["Documento","Nombre", "Apellido", "Teléfono", "Ficha"];
