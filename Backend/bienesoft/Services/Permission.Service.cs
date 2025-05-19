@@ -344,24 +344,42 @@ namespace Bienesoft.Services
 
 
         // }
-        public async Task<IEnumerable<object>> GetPermisosDeAprendizAsync(int apprenticeId)
+        // public async Task<IEnumerable<object>> GetPermisosDeAprendizAsync(int apprenticeId)
+        // {
+        //     var permisos = await _context.permissionGN
+        //         .Where(p => p.Id_Apprentice == apprenticeId)
+        //         .OrderByDescending(p => p.ApplicationDate)
+        //         .Select(p => new
+        //         {
+        //             FechaPermiso = p.ApplicationDate.ToString("yyyy-MM-dd"),
+        //             Estado = p.Status.ToString(),
+        //             // Motivo = p.Motive // <- Descomenta esto si decides mostrarlo más adelante
+        //         })
+        //         .ToListAsync();
+
+        //     return permisos;
+        // }
+        public async Task<IEnumerable<object>> GetPermissionsByApprenticeId(int apprenticeId)
         {
             var permisos = await _context.permissionGN
+                .Include(p => p.Approvals)
                 .Where(p => p.Id_Apprentice == apprenticeId)
-                .OrderByDescending(p => p.ApplicationDate)
-                .Select(p => new
+                .Select(permiso => new
                 {
-                    FechaPermiso = p.ApplicationDate.ToString("yyyy-MM-dd"),
-                    Estado = p.Status.ToString(),
-                    // Motivo = p.Motive // <- Descomenta esto si decides mostrarlo más adelante
+                    permiso.PermissionId,
+                    permiso.DepartureDate, // Fecha de salida   
+                    permiso.EntryDate, // Fecha de entrada
+                    permiso.ApplicationDate, // Fecha de solicitud
+                    permiso.Adress, // Dirección
+                    permiso.Motive, // Motivo
+                    permiso.Observation, // Observación 
+                    Status = permiso.Status.ToString(), // Estado
+                    Porcentaje = CalcularPorcentajeAprobacion(permiso) // Porcentaje de aprobación)
                 })
                 .ToListAsync();
 
             return permisos;
         }
-
-
-
 
 
 

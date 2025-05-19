@@ -137,11 +137,11 @@ namespace bienesoft.Controllers
                 //}
 
                 //return Ok();
-                object userDto = null;
+                object UserObject = null;
 
                 if (user.UserType == "Responsable" && user.Responsible != null)
                 {
-                    userDto = new UserLoginResponseDTO
+                    UserObject = new UserLoginResponseDTO
                     {
 
                         Responsible_Id = user.Responsible.Responsible_Id,
@@ -154,7 +154,18 @@ namespace bienesoft.Controllers
                 }
                 else if (user.UserType == "Aprendiz" && user.Apprentice != null)
                 {
-                    userDto = user.Apprentice; // Aquí puedes mapear a un DTO si lo prefieres
+                    UserObject = user.Apprentice; // Aquí puedes mapear a un DTO si lo prefieres
+                }
+                else if (user.UserType == "Administrador")
+                {
+                    UserObject = new 
+                    {
+                        user.Email,
+                    };
+                }
+                else
+                {
+                    return BadRequest(new { message = "Tipo de usuario no reconocido." });
                 }
 
                 // Al final, se hace un solo return:
@@ -162,7 +173,7 @@ namespace bienesoft.Controllers
                 {
                     message = "Login Exitoso",
                     tip = user.UserType,
-                    user = userDto
+                    user = UserObject
                 });
             }
             catch (Exception ex)

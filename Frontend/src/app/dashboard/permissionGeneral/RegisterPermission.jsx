@@ -7,10 +7,20 @@ import axiosInstance from "@/lib/axiosInstance";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { useAuthUser } from "@/app/user/login/useCurrentUser";
 
 export default function RegisterPermission({ onSuccess }) {
+  const { user, isLoading, error } = useAuthUser();
+  
   const queryClient = useQueryClient();
+  // const { user, isLoading, error } = useAuthUser();
 
   const [formData, setFormData] = useState({
     departureDate: "",
@@ -36,8 +46,11 @@ export default function RegisterPermission({ onSuccess }) {
     internado: "/api/Responsible/GetResponsiblesByRole/roleid=4",
   };
 
-  const ordenRoles = ["instructor", "cordinador", "liderBienestar", "internado"];
+ const ordenRoles = ["instructor", "cordinador", "liderBienestar"];
 
+if (user?.tip_Apprentice === "interno") {
+  ordenRoles.push("internado");
+}
   const fetchResponsables = async () => {
     const roles = Object.keys(getConsult);
     for (const rol of roles) {
@@ -115,10 +128,17 @@ export default function RegisterPermission({ onSuccess }) {
     e.preventDefault();
     mutation.mutate();
   };
+    if (isLoading) return <div>Cargando usuario...</div>;
+    if (error) return <div>Error al cargar usuario: {error.message}</div>;
+    if (!user) return <div>No se encontró información del usuario</div>;
+    console.log(user);
+    console.log("Tipo de aprendiz:", user?.tip_Apprentice);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-xl p-6 mx-auto bg-white shadow ">
-      <h2 className="text-2xl font-semibold mb-4">Registrar Permiso</h2>
+    <form
+      onSubmit={handleSubmit}
+      className="p-6 "
+    >
 
       <div className="space-y-2">
         <Label htmlFor="departureDate">Fecha de salida</Label>
@@ -197,12 +217,17 @@ export default function RegisterPermission({ onSuccess }) {
               onValueChange={handleResponsableSelect}
               disabled={!isEnabled}
             >
-              <SelectTrigger className={isEnabled ? "" : "opacity-50 cursor-not-allowed"}>
+              <SelectTrigger
+                className={isEnabled ? "" : "opacity-50 cursor-not-allowed"}
+              >
                 <SelectValue placeholder="Seleccionar" />
               </SelectTrigger>
               <SelectContent>
                 {lista.map((r) => (
-                  <SelectItem key={r.responsible_Id} value={r.responsible_Id.toString()}>
+                  <SelectItem
+                    key={r.responsible_Id}
+                    value={r.responsible_Id.toString()}
+                  >
                     {r.nom_Responsible} {r.ape_Responsible}
                   </SelectItem>
                 ))}

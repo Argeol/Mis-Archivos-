@@ -17,20 +17,30 @@ namespace Bienesoft.Controllers
         }
 
         [Authorize(Roles = "Responsable")]
-        [HttpPost("aprobar")]
+        [HttpPut("aprobar")]
         public async Task<IActionResult> AprobarPermiso([FromQuery] int idPermiso)
         {
             var idResponsableClaim = User.Claims.FirstOrDefault(c => c.Type == "Responsible_Id")?.Value;
-            var idResponsable = Convert.ToInt32(idResponsableClaim);
+
+            if (string.IsNullOrEmpty(idResponsableClaim))
+                return Unauthorized(new { message = "ID de responsable no encontrado en el token." });
+
+            if (!int.TryParse(idResponsableClaim, out int idResponsable))
+                return BadRequest(new { message = "ID de responsable inválido." });
+
             var result = await _approvalService.AprobarPermisoAsync(idPermiso, idResponsable);
+
             return Ok(new { message = result });
         }
-
-        [HttpPost("rechazar")]
+        
+        [Authorize(Roles = "Responsable")]
+        [HttpPut("rechazar")]
         public async Task<IActionResult> RechazarPermiso([FromQuery] int idPermiso)
         {
-            var idResponsableClaim = User.Claims.FirstOrDefault(c => c.Type == "Responsible_Id")?.Value;
-            var idResponsable = Convert.ToInt32(idResponsableClaim);
+            var claimValue = User.Claims.FirstOrDefault(c => c.Type == "Responsible_Id")?.Value;
+            if (!int.TryParse(claimValue, out int idResponsable))
+                return Unauthorized(new { message = "ID de responsable inválido o no presente en el token." });
+
             var result = await _approvalService.RechazarPermisoAsync(idPermiso, idResponsable);
             return Ok(new { message = result });
         }
@@ -49,7 +59,7 @@ namespace Bienesoft.Controllers
             return Ok(result);
         }
         [HttpGet("pendientes-aprobar")]
-        public IActionResult GetPendingApprovals([FromQuery]int permissionId)
+        public IActionResult GetPendingApprovals([FromQuery] int permissionId)
         {
             var data = _approvalService.GetPendingApprovalsBy(permissionId);
             return Ok(data);

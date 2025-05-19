@@ -24,20 +24,17 @@ function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false); // Estado para la visibilidad de la contraseña
   const { login } = useAuthUser();
   const loginMutation = useMutation({
     mutationFn: Login,
-    onMutate: () => setLoading(true),
+    // onMutate: () => setLoading(true),
     onSuccess: (response) => {
       if (response.status === 200) {
         const { tip, user } = response.data;
-
         login({ user, tip }); // Guardar el usuario y rol en el contexto
-
-        // Redirige después
         router.push("/dashboard");
       }
     },
@@ -45,7 +42,7 @@ function LoginPage() {
       console.error(err);
       setError(err.response ? err.response.data.message : "Error desconocido");
     },
-    onSettled: () => setLoading(false),
+    // onSettled: () => setLoading(false),
   });
 
   const handleSubmit = (e) => {
@@ -130,9 +127,9 @@ function LoginPage() {
         <Button
           type="submit"
           className="mt-4 bg-blue-500 text-white hover:bg-gray-400 transition-colors duration-200 rounded-md mx-auto block"
-          disabled={loading}
+          disabled={loginMutation.isLoading}
         >
-          {loading ? "Iniciando..." : "Ingresar"}
+          {loginMutation.isLoading ? "Iniciando..." : "Ingresar"}
         </Button>
         <div className="flex flex-col items-center mt-5 text-sm space-y-2">
           <a href="/user/reset" className="text-blue-600 hover:underline">

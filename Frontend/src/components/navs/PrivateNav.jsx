@@ -76,7 +76,7 @@ function PrivateNav({ children, titlespage }) {
               <DropdownMenuItem disabled>
                 <div className="flex items-center space-x-2">
                   <Mail className="h-4 w-4 text-[#218EED]" />
-                  <span className="truncate">{user?.email_Apprentice || user?.email_Responsible}</span>
+                  <span className="truncate">{user?.email_Apprentice || user?.email_Responsible || user?.email}</span>
                 </div>
               </DropdownMenuItem>
 

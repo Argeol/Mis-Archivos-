@@ -283,7 +283,7 @@ export default function DataTable({
           apprenticeId={selectedApprenticeId}
         />
       )}
-
+      
       {translations && selectedRowInfo && (
         <RowInfoModal
           isOpen={isOpenInfoModal}

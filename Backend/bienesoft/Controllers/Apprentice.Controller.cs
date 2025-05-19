@@ -54,7 +54,7 @@ namespace bienesoft.Controllers
                 return StatusCode(500, new { error = "Ocurrió un error inesperado.", detalle = ex.Message });
             }
         }
-        [Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador,Responsable")]
         [HttpGet("GetApprenticeByIdAdmi/{id}")]
         public IActionResult GetApprenticeById(int id)
         {
@@ -81,9 +81,8 @@ namespace bienesoft.Controllers
             {
                 // Sacamos el Id_Apprentice del token
                 var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
-            
-                var idApprentice = int.Parse(idApprenticeClaim);    
-            
+                if(!int.TryParse(idApprenticeClaim, out int idApprentice))
+                    return Unauthorized(new { message = "No se encontró el Id_Apprentice en el token." });
                 var apprentice = _apprenticeService.GetApprenticeById(idApprentice);
                 if (apprentice == null)
                     return NotFound(new { message = "Aprendiz no encontrado" });
@@ -96,7 +95,7 @@ namespace bienesoft.Controllers
                 return StatusCode(500, ex.ToString());            }
         }
 
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         [HttpGet("all")]
         public IActionResult GetApprentices()
         {

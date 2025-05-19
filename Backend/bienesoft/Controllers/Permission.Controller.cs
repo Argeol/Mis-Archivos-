@@ -110,33 +110,30 @@ namespace bienesoft.Controllers
             var result = await _permissionService.UpdatePermissionAsync(id, permiso);
             return Ok(result);
         }
-        [Authorize(Roles = "Aprendiz,Responsable")]
-        [HttpGet("ConsulPermiId")]
-        public async Task<IActionResult> GetPermisosDeAprendiz()
+      
+        [Authorize(Roles = "Aprendiz")]
+        [HttpGet("GetPermissionsByApprentice")]
+        public async Task<IActionResult> GetPermissionsByApprentice()
         {
             var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
-            var idresponsableClaim = User.Claims.FirstOrDefault(c => c.Type == "Responsible_Id")?.Value;
+            if (string.IsNullOrEmpty(idApprenticeClaim) || !int.TryParse(idApprenticeClaim, out int id))
+                return Unauthorized(new { message = "ID de aprendiz inválido." });
 
-            // Console.WriteLine($"Id_Apprentice: {idApprenticeClaim}");
-            // Console.WriteLine($"Responsible_Id: {idresponsableClaim}");
-
-            if (!string.IsNullOrEmpty(idApprenticeClaim))
-            {
-                var Id = Convert.ToInt32(idApprenticeClaim);
-                var permisos = await _permissionService.GetPermisosDeAprendizAsync(Id);
-                return Ok(permisos);
-            }
-            else if (!string.IsNullOrEmpty(idresponsableClaim))
-            {
-                var Id = Convert.ToInt32(idresponsableClaim);
-                var permisos = await _permissionApproval.ObtenerPermisosPendientesPorResponsableAsync(Id);
-                return Ok(permisos);
-            }
-            else
-            {
-                return BadRequest(new { message = "No se encontró el Id_Apprentice ni Responsible_Id en el token" });
-            }
+            var permisos = await _permissionService.GetPermissionsByApprenticeId(id);
+            return Ok(permisos);
         }
+        [Authorize(Roles = "Responsable")]
+        [HttpGet("GetPendingPermissionsForResponsible")]
+        public async Task<IActionResult> GetPendingPermissionsForResponsible()
+        {
+            var idresponsableClaim = User.Claims.FirstOrDefault(c => c.Type == "Responsible_Id")?.Value;
+            if (string.IsNullOrEmpty(idresponsableClaim) || !int.TryParse(idresponsableClaim, out int id))
+                return Unauthorized(new { message = "ID de responsable inválido." });
+
+            var permisos = await _permissionApproval.ObtenerPermisosPendientesPorResponsableAsync(id);
+            return Ok(permisos);
+        }
+
 
     }
 }
