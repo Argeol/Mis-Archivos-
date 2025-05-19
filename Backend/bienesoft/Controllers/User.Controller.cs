@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization; // Añadir esto
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -101,9 +102,79 @@ namespace bienesoft.Controllers
                     // Secure = true, // Solo si usas HTTPS
                     SameSite = SameSiteMode.Strict,
                     Expires = DateTimeOffset.UtcNow.AddMinutes(Convert.ToDouble(_jwtSettings.JWTExpireTime))
+
                 });
 
-                return Ok(new { message = "Login exitoso" });
+                //object userDto = null;
+
+                //if (user.UserType == "Responsable" && user.Responsible != null)
+                //{
+                //    userDto= new UserLoginResponseDTO
+                //    {
+                //        Responsible_Id = user.Responsible.Responsible_Id,
+                //        Nom_Responsible = user.Responsible.Nom_Responsible,
+                //        Ape_Responsible = user.Responsible.Ape_Responsible,
+                //        Tel_Responsible = user.Responsible.Tel_Responsible,
+                //        Email_Responsible = user.Responsible.Email_Responsible,
+                //        State = user.Responsible.State
+                //    };
+
+                //    return Ok(new
+                //    {
+                //        message = "Login Exitoso",
+                //        tip = user.UserType,
+                //        user = userDto
+                //    });
+                //}
+                //else if (user.UserType == "Aprendiz " && user.Apprentice != null)
+                //{
+                //    return Ok(new
+                //    {
+                //        message = "Login Exitoso",
+                //        tip = user.UserType,
+                //        user = user.Apprentice
+                //    });
+                //}
+
+                //return Ok();
+                object UserObject = null;
+
+                if (user.UserType == "Responsable" && user.Responsible != null)
+                {
+                    UserObject = new UserLoginResponseDTO
+                    {
+
+                        Responsible_Id = user.Responsible.Responsible_Id,
+                        Nom_Responsible = user.Responsible.Nom_Responsible,
+                        Ape_Responsible = user.Responsible.Ape_Responsible,
+                        Tel_Responsible = user.Responsible.Tel_Responsible,
+                        Email_Responsible = user.Responsible.Email_Responsible,
+                        State = user.Responsible.State
+                    };
+                }
+                else if (user.UserType == "Aprendiz" && user.Apprentice != null)
+                {
+                    UserObject = user.Apprentice; // Aquí puedes mapear a un DTO si lo prefieres
+                }
+                else if (user.UserType == "Administrador")
+                {
+                    UserObject = new 
+                    {
+                        user.Email,
+                    };
+                }
+                else
+                {
+                    return BadRequest(new { message = "Tipo de usuario no reconocido." });
+                }
+
+                // Al final, se hace un solo return:
+                return Ok(new
+                {
+                    message = "Login Exitoso",
+                    tip = user.UserType,
+                    user = UserObject
+                });
             }
             catch (Exception ex)
             {
@@ -284,46 +355,16 @@ namespace bienesoft.Controllers
             }
         }
 
-        [Authorize]
-        [HttpGet("Me")]
-        public IActionResult GetUserDataFromToken()
-        {
-            try
-            {
-                var email = User.FindFirst(ClaimTypes.Email)?.Value;
-                var role = User.FindFirst(ClaimTypes.Role)?.Value;
-                var fullName = User.FindFirst("FullName")?.Value;
-                var idApprentice = User.FindFirst("Id_Apprentice")?.Value;
-                var responsibleId = User.FindFirst("Responsible_Id")?.Value;
-                if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(role))
-                {
-                    return Unauthorized(new { message = "Token inválido o incompleto." });
-                }
-
-
-                var result = new UserDataDto
-                {
-                    Email = email,
-                    Role = role,
-                    FullName = fullName ?? "No disponible",
-                    IdApprentice = idApprentice ?? "No disponible",
-                    ResponsibleId = responsibleId ?? "No disponible"
-                };
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error al procesar el token", error = ex.Message });
-            }
-        }
+        
 
         [HttpPost("Logout")]
         public IActionResult Logout()
         {
-            Response.Cookies.Delete("token"); 
+            Response.Cookies.Delete("token");
             return Ok(new { message = "Sesión cerrada correctamente" });
         }
     }
+    
 }
 
 

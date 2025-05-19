@@ -20,7 +20,7 @@ namespace bienesoft.Controllers
             _roleServices = roleServices;
         }
 
-        [Authorize(Roles = "Administrador,Aprenidz,Responsable")]
+        [Authorize(Roles = "Administrador,Aprendiz,Responsable")]
         [HttpGet("GetRole")]
 
         public async Task<IActionResult> GetRole()

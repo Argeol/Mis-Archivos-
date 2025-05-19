@@ -16,11 +16,16 @@ namespace bienesoft.Controllers
     public class permissionController : ControllerBase
     {
         private readonly PermissionService _permissionService;
+        private readonly PermissionApprovalService _permissionApproval;
 
-        public permissionController(PermissionService permissionService)
+        public permissionController(PermissionService permissionService, PermissionApprovalService permissionApproval)
         {
             _permissionService = permissionService;
+            _permissionApproval = permissionApproval;
         }
+        // {
+        //     _permissionService = permissionService;
+        // }
         // [HttpPost("create")]
         // public async Task<IActionResult> CreatePermission([FromBody] CreatePermissionRequest request)
         // {
@@ -45,14 +50,14 @@ namespace bienesoft.Controllers
         // }
         [Authorize(Roles = "Aprendiz")]
         [HttpPost("CrearPermiso")]
-        public async Task<IActionResult> CreateApprentice([FromBody] CreatePermissionRequest request)
+        public async Task<IActionResult> CreateApprentice(CreatePermissionRequest Request)
         {
             try
             {
                 var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
                 var idApprentice = Convert.ToInt32(idApprenticeClaim);
 
-                var result = await _permissionService.CreatePermissionAsync(request.Permission, idApprentice, request.ResponsablesSeleccionados);
+                var result = await _permissionService.CreatePermissionAsync(Request.Permission, idApprentice, Request.ResponsablesSeleccionados);
 
                 return Ok(new { success = true, message = result });
             }
@@ -105,18 +110,30 @@ namespace bienesoft.Controllers
             var result = await _permissionService.UpdatePermissionAsync(id, permiso);
             return Ok(result);
         }
+      
         [Authorize(Roles = "Aprendiz")]
-        [HttpGet("apprenticePermiId")]
-        public async Task<IActionResult> GetPermisosDeAprendiz()
+        [HttpGet("GetPermissionsByApprentice")]
+        public async Task<IActionResult> GetPermissionsByApprentice()
         {
-
-            // Sacamos el Id_Apprentice del token
             var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
-            var Id = Convert.ToInt32(idApprenticeClaim);
+            if (string.IsNullOrEmpty(idApprenticeClaim) || !int.TryParse(idApprenticeClaim, out int id))
+                return Unauthorized(new { message = "ID de aprendiz inválido." });
 
-            var permisos = await _permissionService.GetPermisosDeAprendizAsync(Id);
+            var permisos = await _permissionService.GetPermissionsByApprenticeId(id);
             return Ok(permisos);
         }
+        [Authorize(Roles = "Responsable")]
+        [HttpGet("GetPendingPermissionsForResponsible")]
+        public async Task<IActionResult> GetPendingPermissionsForResponsible()
+        {
+            var idresponsableClaim = User.Claims.FirstOrDefault(c => c.Type == "Responsible_Id")?.Value;
+            if (string.IsNullOrEmpty(idresponsableClaim) || !int.TryParse(idresponsableClaim, out int id))
+                return Unauthorized(new { message = "ID de responsable inválido." });
+
+            var permisos = await _permissionApproval.ObtenerPermisosPendientesPorResponsableAsync(id);
+            return Ok(permisos);
+        }
+
 
     }
 }

@@ -12,7 +12,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-
+import { useAuthUser } from "@/app/user/login/useCurrentUser";
 
 async function Login(credentials) {
   const response = await axiosInstance.post("/api/User/Login", credentials, {
@@ -20,29 +20,29 @@ async function Login(credentials) {
   });
   return response;
 }
-
 function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false); // Estado para la visibilidad de la contraseña
-
+  const { login } = useAuthUser();
   const loginMutation = useMutation({
     mutationFn: Login,
-    onMutate: () => setLoading(true),
+    // onMutate: () => setLoading(true),
     onSuccess: (response) => {
       if (response.status === 200) {
-        alert("¡Inicio de sesión exitoso!");
-        router.push("/dashboard"); // Ya no necesitas guardar el token
+        const { tip, user } = response.data;
+        login({ user, tip }); // Guardar el usuario y rol en el contexto
+        router.push("/dashboard");
       }
     },
     onError: (err) => {
       console.error(err);
       setError(err.response ? err.response.data.message : "Error desconocido");
     },
-    onSettled: () => setLoading(false),
+    // onSettled: () => setLoading(false),
   });
 
   const handleSubmit = (e) => {
@@ -50,7 +50,6 @@ function LoginPage() {
     const credentials = { email, hashedPassword: password };
     loginMutation.mutate(credentials);
   };
-  
 
   return (
     <main className="flex items-center justify-center min-h-screen px-4 bg-gradient-to-r from-white to-white">
@@ -63,11 +62,7 @@ function LoginPage() {
             animate={{ y: [0, -5, 0], opacity: [1, 0.7, 1] }}
             transition={{ repeat: Infinity, duration: 1 }}
           >
-            <img
-              className="w-24"
-              alt="logo"
-              src="/assets/img/bienesoft.webp"
-            />
+            <img className="w-24" alt="logo" src="/assets/img/bienesoft.webp" />
           </motion.div>
         </div>
 
@@ -117,7 +112,9 @@ function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)} // Cambiar el estado de visibilidad
-                    aria-label={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
+                    aria-label={
+                      showPassword ? "Ocultar contraseña" : "Ver contraseña"
+                    }
                   >
                     {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                   </button>
@@ -130,9 +127,9 @@ function LoginPage() {
         <Button
           type="submit"
           className="mt-4 bg-blue-500 text-white hover:bg-gray-400 transition-colors duration-200 rounded-md mx-auto block"
-          disabled={loading}
+          disabled={loginMutation.isLoading}
         >
-          {loading ? "Iniciando..." : "Ingresar"}
+          {loginMutation.isLoading ? "Iniciando..." : "Ingresar"}
         </Button>
         <div className="flex flex-col items-center mt-5 text-sm space-y-2">
           <a href="/user/reset" className="text-blue-600 hover:underline">

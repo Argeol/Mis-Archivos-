@@ -89,4 +89,16 @@ namespace bienesoft.models
         public string IdApprentice { get; set; }
         public string ResponsibleId { get; set; }
     }
+    public class UserLoginResponseDTO
+    {
+        public int Responsible_Id { get; set; }
+        public string Nom_Responsible { get; set; }
+        public string Ape_Responsible { get; set; }
+        public long? Tel_Responsible { get; set; }
+        public string Email_Responsible { get; set; } = string.Empty;
+        public int RoleId { get; set; }
+        [ForeignKey("RoleId")]
+        public Role? Role { get; set; }
+        public string? State { get; set; }
+    }
 }

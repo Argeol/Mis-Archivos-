@@ -13,8 +13,9 @@ export default function UpdateResponsible() {
     nom_Responsible: "",
     ape_Responsible: "",
     tel_Responsible: "",
+    name_role: "",
     state: "",
-    Email_Responsible: "",
+    email_Responsible: "",
   });
 
   // Obtener datos del responsable actual desde un endpoint tipo "Me"
@@ -27,7 +28,7 @@ export default function UpdateResponsible() {
   });
 
   useEffect(() => {
-    if (data) {
+    if (useState) {
       setFormData((prev) => ({
         ...prev,
         ...data,
@@ -96,7 +97,7 @@ export default function UpdateResponsible() {
       <Input
         type="email"
         name="Email_Responsible"
-        value={formData.Email_Responsible}
+        value={formData.email_Responsible}
         onChange={handleChange}
         required
       />

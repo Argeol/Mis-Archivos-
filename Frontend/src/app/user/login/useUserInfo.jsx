@@ -1,31 +1,43 @@
-"use client"
+"use client";
 
-import { Mail, Calendar, ChevronRight, GraduationCap, ShieldCheck, UserCheck, UserIcon, X } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
-import axiosInstance from "@/lib/axiosInstance"
-import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Button } from "@/components/ui/button"
+import {
+  Mail,
+  Calendar,
+  ChevronRight,
+  GraduationCap,
+  ShieldCheck,
+  UserCheck,
+  UserIcon,
+  X,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import axiosInstance from "@/lib/axiosInstance";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import UpdateResponsible from "@/app/dashboard/responsible/updateResponsible";
 
 export function UserInfoModal({ userData, open, onClose }) {
-  const modalRef = useRef(null)
-  const [data, setData] = useState(null)
-  const [translations, setTranslations] = useState({})
-  const [ignorar, setIgnorar] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [url, setUrl] = useState("")
+  console.log(userData)
+  const modalRef = useRef(null);
+  const [data, setData] = useState(null);
+  const [translations, setTranslations] = useState({});
+  const [ignorar, setIgnorar] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [url, setUrl] = useState("");
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
 
   useEffect(() => {
-    if (!userData) return
+    if (!userData) return;
 
-    const role = userData.role
-    let newUrl = ""
-    let newTranslations = {}
-    let ignoreFields = []
+    const role = userData;
+    let newUrl = "";
+    let newTranslations = {};
+    let ignoreFields = [];
 
     if (role === "Aprendiz") {
-      newUrl = "/api/Apprentice/GetApprenticeById"
+      newUrl = "/api/Apprentice/GetApprenticeById";
       newTranslations = {
         id_Apprentice: "Numero de Documento",
         first_Name_Apprentice: "Nombres",
@@ -45,10 +57,14 @@ export function UserInfoModal({ userData, open, onClose }) {
         file_Id: "Codigo de Ficha",
         programName: "Programa de Formacion",
         areaName: "Area",
-      }
-      ignoreFields = ["id_municipality", "status_Apprentice", "email_Apprentice"]
+      };
+      ignoreFields = [
+        "id_municipality",
+        "status_Apprentice",
+        "email_Apprentice",
+      ];
     } else if (role === "Responsable") {
-      newUrl = "/api/Responsible/GetResponsibleID"
+      newUrl = "/api/Responsible/GetResponsibleID";
       newTranslations = {
         responsible_Id: "Numero de Documento",
         nom_Responsible: "Nombres",
@@ -56,74 +72,79 @@ export function UserInfoModal({ userData, open, onClose }) {
         tel_Responsible: "Numero Telefonico",
         name_role: "Rol",
         state: "Estado",
-      }
-      ignoreFields = ["email_Responsible"]
+      };
+      ignoreFields = ["email_Responsible"];
     } else {
-      return
+      return;
     }
 
-    setUrl(newUrl)
-    setTranslations(newTranslations)
-    setIgnorar(ignoreFields)
-  }, [userData])
+    setUrl(newUrl);
+    setTranslations(newTranslations);
+    setIgnorar(ignoreFields);
+  }, [userData]);
 
   useEffect(() => {
     if (open && url) {
-      fetchData()
+      fetchData();
     }
-  }, [open, url])
+  }, [open, url]);
 
   // Manejar tecla Escape para cerrar el modal
   useEffect(() => {
     const handleEscapeKey = (e) => {
       if (e.key === "Escape" && typeof onClose === "function") {
-        onClose()
+        onClose();
       }
-    }
+    };
 
-    document.addEventListener("keydown", handleEscapeKey)
-    return () => document.removeEventListener("keydown", handleEscapeKey)
-  }, [onClose])
+    document.addEventListener("keydown", handleEscapeKey);
+    return () => document.removeEventListener("keydown", handleEscapeKey);
+  }, [onClose]);
 
   const fetchData = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await axiosInstance.get(url)
-      setData(response.data)
+      const response = await axiosInstance.get(url);
+      setData(response.data);
     } catch (err) {
-      console.error("Error al obtener los datos:", err)
+      console.error("Error al obtener los datos:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget && onClose) {
-      onClose()
+      onClose();
     }
-  }
+  };
 
   const getIconForKey = (key) => {
-    const keyLower = key.toLowerCase()
+    const keyLower = key.toLowerCase();
     // if (keyLower.includes("name") || keyLower.includes("nombre")) return <UserIcon className="h-5 w-5 text-rose-500" />
-    if (keyLower.includes("correo") || keyLower.includes("email")) return <Mail className="h-5 w-5 text-amber-500" />
-    if (keyLower.includes("fecha") || keyLower.includes("birth") || keyLower.includes("date"))
-      return <Calendar className="h-5 w-5 text-emerald-500" />
-    return <ChevronRight className="h-5 w-5 text-slate-400" />
-  }
+    if (keyLower.includes("correo") || keyLower.includes("email"))
+      return <Mail className="h-5 w-5 text-amber-500" />;
+    if (
+      keyLower.includes("fecha") ||
+      keyLower.includes("birth") ||
+      keyLower.includes("date")
+    )
+      return <Calendar className="h-5 w-5 text-emerald-500" />;
+    return <ChevronRight className="h-5 w-5 text-slate-400" />;
+  };
 
   const getRoleIcon = (role) => {
     switch (role) {
       case "Aprendiz":
-        return <GraduationCap className="h-4.3 w-4.3 text-blue-500 mr-1" />
+        return <GraduationCap className="h-4.3 w-4.3 text-blue-500 mr-1" />;
       case "Responsable":
-        return <UserCheck className="h-4.5 w-4.5 text-green-500 mr-1" />
+        return <UserCheck className="h-4.5 w-4.5 text-green-500 mr-1" />;
       case "Administrador":
-        return <ShieldCheck className="h-3.5 w-3.5 text-red-500 mr-1" />
+        return <ShieldCheck className="h-3.5 w-3.5 text-red-500 mr-1" />;
       default:
-        return <ShieldCheck className="h-3.5 w-3.5 text-slate-400 mr-1" />
+        return <ShieldCheck className="h-3.5 w-3.5 text-slate-400 mr-1" />;
     }
-  }
+  };
 
   const renderContent = () => {
     if (loading) {
@@ -144,18 +165,21 @@ export function UserInfoModal({ userData, open, onClose }) {
             </div>
           ))}
         </div>
-      )
+      );
     }
 
     if (!data || Object.keys(data).length === 0) {
       return (
         <div className="p-6 rounded-xl bg-slate-50 border-l-4 border-slate-300 my-4">
           <h3 className="text-slate-700 font-semibold">Sin datos</h3>
-          <p className="text-slate-600 mt-1">No hay información disponible para mostrar.</p>
+          <p className="text-slate-600 mt-1">
+            No hay información disponible para mostrar.
+          </p>
         </div>
-      )
+      );
     }
-
+    // if (isloading) return <p>Cargando...</p>;
+    // if (error) return <p>Error: {error.message}</p>;
     return (
       <div className="space-y-6">
         <div className="flex items-center space-x-3">
@@ -165,8 +189,8 @@ export function UserInfoModal({ userData, open, onClose }) {
           <div>
             <h3 className="text-lg font-medium">Usuario</h3>
             <div className="flex items-center mt-0.5">
-              {getRoleIcon(userData?.role)}
-              <span className="text-sm text-slate-500">{userData?.role}</span>
+              {getRoleIcon(userData)}
+              <span className="text-sm text-slate-500">{userData}</span>
             </div>
           </div>
         </div>
@@ -175,23 +199,27 @@ export function UserInfoModal({ userData, open, onClose }) {
 
         <div className="space-y-5 max-h-[calc(90vh-250px)] overflow-y-auto pr-2">
           {Object.entries(data).map(([key, value]) => {
-            if (ignorar.includes(key) || !translations[key]) return null
+            if (ignorar.includes(key) || !translations[key]) return null;
             return (
               <div key={key} className="group">
                 <div className="flex items-center gap-2 mb-1">
                   {getIconForKey(key)}
-                  <span className="text-sm font-medium text-slate-500">{translations[key]}</span>
+                  <span className="text-sm font-medium text-slate-500">
+                    {translations[key]}
+                  </span>
                 </div>
-                <p className="pl-7 text-slate-800 font-medium break-words">{String(value) || "-"}</p>
+                <p className="pl-7 text-slate-800 font-medium break-words">
+                  {String(value) || "-"}
+                </p>
               </div>
-            )
+            );
           })}
         </div>
       </div>
-    )
-  }
+    );
+  };
 
-  if (!open) return null
+  if (!open) return null;
 
   return (
     <div
@@ -207,24 +235,45 @@ export function UserInfoModal({ userData, open, onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-white border-b">
-          <h2 id="modal-title" className="text-xl font-semibold flex items-center gap-2">
+          <h2
+            id="modal-title"
+            className="text-xl font-semibold flex items-center gap-2"
+          >
             <span className="bg-gradient-to-r from-slate-600 to-[#088EED] bg-clip-text text-transparent">
-              Información de {userData?.role || "Usuario"}
+              Información de {userData || "Usuario"}
             </span>
           </h2>
         </div>
+        <CardContent className="p-5 overflow-y-auto">
+          {showUpdateForm ? <UpdateResponsible /> : renderContent()}
+        </CardContent>
 
-        <CardContent className="p-5 overflow-y-auto ">{renderContent()}</CardContent>
+        <div className="p-4 border-t bg-slate-50">
+          <div className="flex flex-col-reverse md:flex-row md:justify-end md:items-center gap-3 md:gap-4 w-full">
+            <Button
+              onClick={onClose}
+              className="w-full md:w-auto bg-gradient-to-r from-slate-600 to-blue-600 hover:from-slate-700 hover:to-blue-700 text-white px-6 py-2 shadow-md hover:shadow-lg transition-all"
+            >
+              Cerrar
+            </Button>
 
-        <div className="p-4 border-t bg-slate-50 flex justify-end ">
-          <Button
-            onClick={onClose}
-            className="bg-gradient-to-r from-slate-600 to-blue-600 hover:from-slate-700 hover:to-blue-700 text-white px-7 shadow-md hover:shadow-lg transition-all "
-          >
-            Cerrar
-          </Button>
+            {userData?.role === "Responsable" && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (showUpdateForm) {
+                    fetchData();
+                  }
+                  setShowUpdateForm(!showUpdateForm);
+                }}
+                className="w-full md:w-auto bg-gradient-to-r from-slate-600 to-blue-600 hover:from-slate-700 hover:to-blue-700 text-white px-6 py-2 shadow-md hover:shadow-lg transition-all"
+              >
+                {showUpdateForm ? "Volver" : "Actualizar Información"}
+              </Button>
+            )}
+          </div>
         </div>
       </Card>
     </div>
-  )
+  );
 }

@@ -17,7 +17,7 @@ import axiosInstance from "@/lib/axiosInstance";
 
 function PrivateNav({ children, titlespage }) {
   const pathname = usePathname();
-  const { userData, loading, error } = useAuthUser(); // Obtiene la información del usuario
+  const { user, tip, isLoading: loadingUser, error: errorUser } = useAuthUser();
   const [theme, setTheme] = useState("light"); // Estado local para el tema
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
@@ -36,9 +36,9 @@ function PrivateNav({ children, titlespage }) {
   };
 
   // Manejo de la carga y error antes de renderizar el componente
-  if (loading) return <p>Cargando...</p>;
-  if (error) return <p>Error: {error.message}</p>;
 
+  if (loadingUser) return <p>Cargando...</p>;
+  if (errorUser) return <p>Error: {errorUser.message}</p>;
   // Título dinámico para la página
   const pageTitle =
     titlespage === "Contenido Principal"
@@ -52,7 +52,7 @@ function PrivateNav({ children, titlespage }) {
       }`}
     >
       {/* Sidebar solo visible para administradores */}
-      {userData?.role === "Administrador" && (
+      {tip === "Administrador" && (
         <div className="mt-4">
           <Sidebar className="h-full shadow-md bg-white/80 backdrop-blur-md" />
         </div>
@@ -76,7 +76,7 @@ function PrivateNav({ children, titlespage }) {
               <DropdownMenuItem disabled>
                 <div className="flex items-center space-x-2">
                   <Mail className="h-4 w-4 text-[#218EED]" />
-                  <span className="truncate">{userData?.email}</span>
+                  <span className="truncate">{user?.email_Apprentice || user?.email_Responsible || user?.email}</span>
                 </div>
               </DropdownMenuItem>
 
@@ -99,7 +99,7 @@ function PrivateNav({ children, titlespage }) {
         </nav>
         {isModalOpen && (
           <UserInfoModal
-            userData={userData}
+            userData={tip}
             open={isModalOpen}
             onClose={() => setIsModalOpen(false)}
           />

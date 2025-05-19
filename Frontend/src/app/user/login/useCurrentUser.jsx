@@ -1,27 +1,33 @@
-import axiosInstance from "@/lib/axiosInstance";
-import { useQuery } from "@tanstack/react-query";
+"use client";
 
-const fetchUserData = async () => {
-  const response = await axiosInstance.get("/api/User/Me", {
-    withCredentials: true,
-  });
-  if (response.status === 200) {
-    return response.data;
-  } else {
-    throw new Error("No se pudo obtener los datos del usuario.");
-  }
-};
+import { useState, useEffect } from "react";
 
-export const useAuthUser = () => {
-  const { data, error, isLoading } = useQuery({
-    queryKey: ["userData"], // ahora se usa así
-    queryFn: fetchUserData,
-    retry: false, // opcional: no reintenta si falla
-  });
+export function useAuthUser() {
+  const [user, setUser] = useState(null);
+  const [tip, setTip] = useState(null);
 
-  return {
-    userData: data,
-    loading: isLoading,
-    error: error ? error.message : null,
+  // Cargar info al montar
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const storedTip = localStorage.getItem("tip");
+
+    if (storedUser) setUser(JSON.parse(storedUser));
+    if (storedTip) setTip(storedTip);
+  }, []);
+
+  const login = ({ user, tip }) => {
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("tip", tip);
+    setUser(user);
+    setTip(tip);
   };
-};
+
+  const logout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("tip");
+    setUser(null);
+    setTip(null);
+  };
+
+  return { user, tip, login, logout };
+}

@@ -15,44 +15,23 @@ namespace Bienesoft.Services
             _context = context;
             _apprenticeService = apprenticeService;
         }
-        public async Task<string> CreatePermissionAsync(PermissionGN permissionGN, int idApprentice, List<int> responsablesSeleccionados)
+        public async Task<string> CreatePermissionAsync(PermissionGN permissionGN, int idApprentice, List<int> responsablesOrdenados)
         {
+            // Validar que el aprendiz exista
             var apprentice = await _context.apprentice.FirstOrDefaultAsync(a => a.Id_Apprentice == idApprentice);
             if (apprentice == null)
                 throw new Exception("Aprendiz no encontrado.");
 
-            var rolesEsperados = apprentice.Tip_Apprentice == "interno"
-                ? new List<int> { 1, 2, 3, 4 } // Instructor, Coordinador, Bienestar, Internado
-                : new List<int> { 1, 2, 3 };   // Instructor, Coordinador, Bienestar
-
-            if (responsablesSeleccionados.Count != rolesEsperados.Count)
-                throw new Exception("Cantidad de responsables no coincide con los roles requeridos.");
-
-            // Cargar responsables seleccionados con sus roles
-            var responsables = await _context.responsible
-                .Where(r => responsablesSeleccionados.Contains(r.Responsible_Id))
-                .Include(r => r.Role)
-                .ToListAsync();
-
-            // Validar que estén todos los roles esperados en orden
-            for (int i = 0; i < rolesEsperados.Count; i++)
-            {
-                var responsable = responsables.FirstOrDefault(r => r.Responsible_Id == responsablesSeleccionados[i]);
-                if (responsable == null)
-                    throw new Exception($"Responsable con ID {responsablesSeleccionados[i]} no encontrado.");
-
-                if (responsable.RoleId != rolesEsperados[i])
-                    throw new Exception($"El responsable con ID {responsable.Responsible_Id} no corresponde al rol esperado en la posición {i}.");
-            }
-
-            // Guardar el permiso
+            // Asignar aprendiz al permiso
             permissionGN.Id_Apprentice = idApprentice;
             permissionGN.Status = Status.Pendiente;
+
+            // Guardar el permiso
             _context.permissionGN.Add(permissionGN);
             await _context.SaveChangesAsync();
 
-            // Crear aprobaciones
-            var aprobaciones = responsablesSeleccionados.Select(responsableId => new PermissionApproval
+            // Crear las aprobaciones en el orden dado
+            var aprobaciones = responsablesOrdenados.Select(responsableId => new PermissionApproval
             {
                 PermissionId = permissionGN.PermissionId,
                 ResponsibleId = responsableId,
@@ -65,6 +44,7 @@ namespace Bienesoft.Services
 
             return "Permiso creado con responsables asignados.";
         }
+
 
 
         // public async Task<object> CreatePermissionAsync(PermissionGN permission, List<int> responsablesSeleccionados)
@@ -364,23 +344,42 @@ namespace Bienesoft.Services
 
 
         // }
-        public async Task<IEnumerable<object>> GetPermisosDeAprendizAsync(int apprenticeId)
+        // public async Task<IEnumerable<object>> GetPermisosDeAprendizAsync(int apprenticeId)
+        // {
+        //     var permisos = await _context.permissionGN
+        //         .Where(p => p.Id_Apprentice == apprenticeId)
+        //         .OrderByDescending(p => p.ApplicationDate)
+        //         .Select(p => new
+        //         {
+        //             FechaPermiso = p.ApplicationDate.ToString("yyyy-MM-dd"),
+        //             Estado = p.Status.ToString(),
+        //             // Motivo = p.Motive // <- Descomenta esto si decides mostrarlo más adelante
+        //         })
+        //         .ToListAsync();
+
+        //     return permisos;
+        // }
+        public async Task<IEnumerable<object>> GetPermissionsByApprenticeId(int apprenticeId)
         {
             var permisos = await _context.permissionGN
+                .Include(p => p.Approvals)
                 .Where(p => p.Id_Apprentice == apprenticeId)
-                .OrderByDescending(p => p.ApplicationDate)
-                .Select(p => new
+                .Select(permiso => new
                 {
-                    FechaPermiso = p.ApplicationDate.ToString("yyyy-MM-dd"),
-                    Estado = p.Status.ToString(),
-                    // Motivo = p.Motive // <- Descomenta esto si decides mostrarlo más adelante
+                    permiso.PermissionId,
+                    permiso.DepartureDate, // Fecha de salida   
+                    permiso.EntryDate, // Fecha de entrada
+                    permiso.ApplicationDate, // Fecha de solicitud
+                    permiso.Adress, // Dirección
+                    permiso.Motive, // Motivo
+                    permiso.Observation, // Observación 
+                    Status = permiso.Status.ToString(), // Estado
+                    Porcentaje = CalcularPorcentajeAprobacion(permiso) // Porcentaje de aprobación)
                 })
                 .ToListAsync();
 
             return permisos;
         }
-
-
 
 
 

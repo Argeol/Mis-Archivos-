@@ -104,12 +104,12 @@ public class PermissionApprovalService
 
     public async Task<string> AprobarPermisoAsync(int idPermiso, int idResponsable)
     {
-        var responsable = await _context.responsible
-            .Include(r => r.Role)
-            .FirstOrDefaultAsync(r => r.Responsible_Id == idResponsable);
+        // var responsable = await _context.responsible
+        //     .Include(r => r.Role)
+        //     .FirstOrDefaultAsync(r => r.Responsible_Id == idResponsable);
 
-        if (responsable == null)
-            return "Responsable no encontrado.";
+        // if (responsable == null)
+        //     return "Responsable no encontrado.";
 
         var permiso = await _context.permissionGN
             .Include(p => p.Approvals)
@@ -118,40 +118,43 @@ public class PermissionApprovalService
         if (permiso == null)
             return "Permiso no encontrado.";
 
-        if(permiso.Status == Status.Rechazado){
+        if (permiso.Status == Status.Rechazado)
+        {
             return "El permiso ya fue rechazado por un responsable.";
-            }
-        
+        }
+
         var aprendiz = await _context.apprentice
             .FirstOrDefaultAsync(a => a.Id_Apprentice == permiso.Id_Apprentice);
 
         if (aprendiz == null)
             return "Aprendiz no encontrado.";
 
-        // Validar si ya aprobó ese rol
-        var yaAprobo = await _context.permissionApproval
-            .Include(pa => pa.Responsible)
+        // // Validar si ya aprobó ese rol
+        // var yaAprobo = await _context.permissionApproval
+        //     .Include(pa => pa.Responsible)
 
-            .AnyAsync(pa =>
-                pa.PermissionId == idPermiso &&
-                pa.Responsible.RoleId == responsable.RoleId
-            );
+        //     .AnyAsync(pa =>
+        //         pa.PermissionId == idPermiso &&
+        //         pa.Responsible.RoleId == responsable.RoleId
+        //     );
 
-        if (yaAprobo)
-            return "Ya hay un responsable de este rol que aprobó este permiso.";
+        // if (yaAprobo)
+        //     return "Ya hay un responsable de este rol que aprobó este permiso.";
 
-        // Crear nueva aprobación
-        var nuevaAprobacion = new PermissionApproval
-        {
-            PermissionId = idPermiso,
-            ResponsibleId = idResponsable,
-            ApprovalDate = DateTime.Now,
-            ApprovalStatus = ApprovalStatus.Aprobado
-        };
+        // Buscar la aprobación correspondiente ya creada
+        var aprobacionExistente = await _context.permissionApproval
+            .FirstOrDefaultAsync(pa => pa.PermissionId == idPermiso && pa.ResponsibleId == idResponsable);
 
-        _context.permissionApproval.Add(nuevaAprobacion);
+        if (aprobacionExistente == null)
+            return "No se encontró la aprobación correspondiente para este responsable.";
+
+        if (aprobacionExistente.ApprovalStatus != ApprovalStatus.Pendiente)
+            return "Usted ya ha aprobado o rechazado el permiso.";
+
+        aprobacionExistente.ApprovalStatus = ApprovalStatus.Aprobado;
+        aprobacionExistente.ApprovalDate = DateTime.Now;
+
         await _context.SaveChangesAsync();
-
         // Definir roles necesarios según tipo de aprendiz
         List<int> rolesRequeridos = aprendiz.Tip_Apprentice == "interno"
             ? new List<int> { 1, 2, 3, 4 } // Interno: Instructor, Coordinador, Bienestar, Internado
@@ -178,7 +181,7 @@ public class PermissionApprovalService
     }
     public async Task<string> RechazarPermisoAsync(int idPermiso, int idResponsable)
     {
-        // 1. Verifica que el responsable existe
+        // 1. Verifica que el responsable exista
         var responsable = await _context.responsible
             .Include(r => r.Role)
             .FirstOrDefaultAsync(r => r.Responsible_Id == idResponsable);
@@ -186,7 +189,7 @@ public class PermissionApprovalService
         if (responsable == null)
             return "Responsable no encontrado.";
 
-        // 2. Verifica que el permiso existe
+        // 2. Verifica que el permiso exista
         var permiso = await _context.permissionGN
             .Include(p => p.Approvals)
             .FirstOrDefaultAsync(p => p.PermissionId == idPermiso);
@@ -194,35 +197,31 @@ public class PermissionApprovalService
         if (permiso == null)
             return "Permiso no encontrado.";
 
-        // 3. Valida si ya ese rol ha respondido (aprobado o rechazado)
-        var yaRespondio = await _context.permissionApproval
-            .Include(pa => pa.Responsible)
-            .AnyAsync(pa =>
+        // 3. Busca la aprobación ya creada para este responsable
+        var aprobacion = await _context.permissionApproval
+            .FirstOrDefaultAsync(pa =>
                 pa.PermissionId == idPermiso &&
-                pa.Responsible.RoleId == responsable.RoleId
-            );
+                pa.ResponsibleId == idResponsable);
 
-        if (yaRespondio)
-            return "Ya hay un responsable de este rol que respondió este permiso.";
+        if (aprobacion == null)
+            return "No existe aprobación previa para este responsable.";
 
-        // 4. Crea la aprobación con estado Rechazado
-        var nuevoRechazo = new PermissionApproval
-        {
-            PermissionId = idPermiso,
-            ResponsibleId = idResponsable,
-            ApprovalDate = DateTime.Now,
-            ApprovalStatus = ApprovalStatus.Rechazado
-        };
+        // 4. Verifica que esté pendiente
+        if (aprobacion.ApprovalStatus != ApprovalStatus.Pendiente)
+            return "Este responsable ya respondió este permiso.";
 
-        _context.permissionApproval.Add(nuevoRechazo);
+        // 5. Actualiza la aprobación a Rechazado
+        aprobacion.ApprovalStatus = ApprovalStatus.Rechazado;
+        aprobacion.ApprovalDate = DateTime.Now;
 
-        // 5. Cambia el estado del permiso a "Rejected" inmediatamente
+        // 6. Cambia el estado global del permiso a "Rechazado"
         permiso.Status = Status.Rechazado;
 
         await _context.SaveChangesAsync();
 
         return "Permiso rechazado exitosamente.";
     }
+
     // public async Task<string> MarcarPendienteAsync(int idPermiso, int idResponsable)
     // {
     //     var responsable = await _context.responsible
@@ -323,12 +322,12 @@ public class PermissionApprovalService
             estadoPermiso = estado,
             aprendiz = new
             {
-                permiso.Apprentice.First_Name_Apprentice,
+                aprendiz = permiso.Apprentice.First_Name_Apprentice + " " + permiso.Apprentice.Last_Name_Apprentice,
                 permiso.Apprentice.Tip_Apprentice
             },
             aprobaciones = permiso.Approvals.Select(pa => new
             {
-                pa.Responsible.Nom_Responsible,
+                Nombre = pa.Responsible.Nom_Responsible + " " + pa.Responsible.Ape_Responsible,
                 pa.Responsible.Role.Name_role,
                 pa.ApprovalStatus,
                 pa.ApprovalDate
@@ -366,6 +365,19 @@ public class PermissionApprovalService
             .ToList(); // <-- ahora retorna todos
 
         return pendientes;
+    }
+    public async Task<List<PermissionApproval>> ObtenerPermisosPendientesPorResponsableAsync(int idResponsable)
+    {
+        // Devuelve todos los registros de la tabla compuesta donde:
+        // - Ese responsable es el asignado
+        // - El estado está en Pendiente
+        var permisosPendientes = await _context.permissionApproval
+            .Include(pa => pa.Permission) // Incluye los datos del permiso
+                .ThenInclude(p => p.Apprentice) // si quieres también el aprendiz
+            .Where(pa => pa.ResponsibleId == idResponsable && pa.ApprovalStatus == ApprovalStatus.Pendiente)
+            .ToListAsync();
+
+        return permisosPendientes;
     }
 
 
