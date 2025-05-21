@@ -40,7 +40,7 @@ namespace bienesoft.Models
         public string Phone_Apprentice { get; set; } = string.Empty;
 
         [Required]
-        public int Stratum_Apprentice { get; set; }
+        public string Stratum_Apprentice { get; set; } = string.Empty;
 
         [Required, StringLength(20)]
         public string Status_Apprentice { get; set; } = "Activo";
@@ -85,7 +85,7 @@ namespace bienesoft.Models
         public string? address_apprentice { get; set; }
         public string? 	address_type_apprentice { get; set; }
         public string? phone_Apprentice { get; set; }
-        public int? Stratum_apprentice { get; set; }
+        public string? Stratum_apprentice { get; set; }
         public string? status_Apprentice { get; set; } = "Activo";
         public string? Tip_Apprentice {get; set;}
         public string? nom_responsible { get; set; }
