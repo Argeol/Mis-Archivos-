@@ -18,8 +18,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import UpdateResponsible from "@/app/dashboard/responsible/updateResponsible";
 
-export function UserInfoModal({ userData, open, onClose }) {
-  console.log(userData)
+export function UserInfoModal({ Tip, open, onClose, Data}) {
+  console.log(Data.nom_Responsible)
   const modalRef = useRef(null);
   const [data, setData] = useState(null);
   const [translations, setTranslations] = useState({});
@@ -29,9 +29,9 @@ export function UserInfoModal({ userData, open, onClose }) {
   const [showUpdateForm, setShowUpdateForm] = useState(false);
 
   useEffect(() => {
-    if (!userData) return;
+    if (!Tip) return;
 
-    const role = userData;
+    const role = Tip;
     let newUrl = "";
     let newTranslations = {};
     let ignoreFields = [];
@@ -81,7 +81,7 @@ export function UserInfoModal({ userData, open, onClose }) {
     setUrl(newUrl);
     setTranslations(newTranslations);
     setIgnorar(ignoreFields);
-  }, [userData]);
+  }, [Tip]);
 
   useEffect(() => {
     if (open && url) {
@@ -184,13 +184,13 @@ export function UserInfoModal({ userData, open, onClose }) {
       <div className="space-y-6">
         <div className="flex items-center space-x-3">
           <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-200 to-[#068EED] flex items-center justify-center text-white font-serif text-xl shadow-sm">
-            {(userData?.fullName?.[0] || "U").toUpperCase()}
+            {(Data.nom_Responsible?.[0] || "U").toUpperCase()}
           </div>
           <div>
             <h3 className="text-lg font-medium">Usuario</h3>
             <div className="flex items-center mt-0.5">
-              {getRoleIcon(userData)}
-              <span className="text-sm text-slate-500">{userData}</span>
+              {getRoleIcon(Tip)}
+              <span className="text-sm text-slate-500">{Tip}</span>
             </div>
           </div>
         </div>
@@ -240,7 +240,7 @@ export function UserInfoModal({ userData, open, onClose }) {
             className="text-xl font-semibold flex items-center gap-2"
           >
             <span className="bg-gradient-to-r from-slate-600 to-[#088EED] bg-clip-text text-transparent">
-              Información de {userData || "Usuario"}
+              Información de {Data.nom_Responsible} {Data.ape_Responsible}
             </span>
           </h2>
         </div>
@@ -257,7 +257,7 @@ export function UserInfoModal({ userData, open, onClose }) {
               Cerrar
             </Button>
 
-            {userData?.role === "Responsable" && (
+            {Tip === "Responsable" && (
               <Button
                 variant="outline"
                 onClick={() => {
