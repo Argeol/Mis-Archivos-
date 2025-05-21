@@ -99,7 +99,8 @@ function PrivateNav({ children, titlespage }) {
         </nav>
         {isModalOpen && (
           <UserInfoModal
-            userData={tip}
+            Tip={tip}
+            Data={user}
             open={isModalOpen}
             onClose={() => setIsModalOpen(false)}
           />
