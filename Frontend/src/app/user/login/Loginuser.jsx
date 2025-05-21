@@ -15,26 +15,33 @@ import { useMutation } from "@tanstack/react-query";
 import { useAuthUser } from "@/app/user/login/useCurrentUser";
 
 async function Login(credentials) {
+  // Delay artificial de 2 segundos para ver el estado loading
+  await new Promise((r) => setTimeout(r, 2000));
   const response = await axiosInstance.post("/api/User/Login", credentials, {
-    withCredentials: true, // 👈 Asegúrate de incluir esto por si acaso
+    withCredentials: true,
   });
   return response;
 }
+
 function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // Estado para la visibilidad de la contraseña
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuthUser();
+
+  // Estado local para loading para probar y comparar
+  const [localLoading, setLocalLoading] = useState(false);
+
   const loginMutation = useMutation({
     mutationFn: Login,
-    // onMutate: () => setLoading(true),
+    onMutate: () => setLocalLoading(true), // activar loading local
+    onSettled: () => setLocalLoading(false), // desactivar loading local
     onSuccess: (response) => {
       if (response.status === 200) {
         const { tip, user } = response.data;
-        login({ user, tip }); // Guardar el usuario y rol en el contexto
+        login({ user, tip });
         router.push("/dashboard");
       }
     },
@@ -42,7 +49,6 @@ function LoginPage() {
       console.error(err);
       setError(err.response ? err.response.data.message : "Error desconocido");
     },
-    // onSettled: () => setLoading(false),
   });
 
   const handleSubmit = (e) => {
@@ -97,7 +103,7 @@ function LoginPage() {
           <TextField
             label="Contraseña"
             placeholder="Contraseña"
-            type={showPassword ? "text" : "password"} // Cambiar entre texto y password
+            type={showPassword ? "text" : "password"}
             onChange={(e) => setPassword(e.target.value)}
             required
             fullWidth
@@ -111,7 +117,7 @@ function LoginPage() {
                 <InputAdornment position="end">
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)} // Cambiar el estado de visibilidad
+                    onClick={() => setShowPassword(!showPassword)}
                     aria-label={
                       showPassword ? "Ocultar contraseña" : "Ver contraseña"
                     }
@@ -124,13 +130,43 @@ function LoginPage() {
             variant="outlined"
           />
         </div>
+
         <Button
           type="submit"
-          className="mt-4 bg-blue-500 text-white hover:bg-gray-400 transition-colors duration-200 rounded-md mx-auto block"
-          disabled={loginMutation.isLoading}
+          disabled={localLoading}
+          className="mt-4 bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200 rounded-md mx-auto block w-full flex items-center justify-center gap-2"
         >
-          {loginMutation.isLoading ? "Iniciando..." : "Ingresar"}
+          {localLoading ? (
+            <>
+              <svg
+                className="animate-spin h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                ></path>
+              </svg>
+              Ingresando...
+            </>
+          ) : (
+            <>
+              Ingresar
+            </>
+          )}
         </Button>
+
         <div className="flex flex-col items-center mt-5 text-sm space-y-2">
           <a href="/user/reset" className="text-blue-600 hover:underline">
             ¿Olvidaste tu contraseña?
