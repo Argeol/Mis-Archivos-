@@ -200,8 +200,8 @@ namespace Bienesoft.Services
             if (!string.IsNullOrWhiteSpace(update.phone_Apprentice))
                 exiteapprentice.Phone_Apprentice = update.phone_Apprentice;
 
-            if (update.Stratum_apprentice.HasValue)
-                exiteapprentice.Stratum_Apprentice = update.Stratum_apprentice.Value;
+            if (!string.IsNullOrWhiteSpace(update.Stratum_apprentice))
+                exiteapprentice.Stratum_Apprentice = update.Stratum_apprentice;
 
             if (!string.IsNullOrWhiteSpace(update.status_Apprentice))
                 exiteapprentice.Status_Apprentice = update.status_Apprentice;
