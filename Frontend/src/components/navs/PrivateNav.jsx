@@ -47,9 +47,8 @@ function PrivateNav({ children, titlespage }) {
 
   return (
     <div
-      className={`flex h-screen ${
-        theme === "dark" ? "bg-gray-900" : "bg-white"
-      }`}
+      className={`flex h-screen ${theme === "dark" ? "bg-gray-900" : "bg-white"
+        }`}
     >
       {/* Sidebar solo visible para administradores */}
       {tip === "Administrador" && (
@@ -80,13 +79,15 @@ function PrivateNav({ children, titlespage }) {
                 </div>
               </DropdownMenuItem>
 
+              {(tip === "Aprendiz" || tip === "Responsable") && (
+                <DropdownMenuItem onClick={() => setIsModalOpen(true)}>
+                  <div className="flex items-center space-x-2">
+                    <Info className="h-4 w-4 text-blue-500" />
+                    <span>Más Información</span>
+                  </div>
+                </DropdownMenuItem>
+              )}
               {/* Opción para abrir el modal con más información */}
-              <DropdownMenuItem onClick={() => setIsModalOpen(true)}>
-                <div className="flex items-center space-x-2">
-                  <Info className="h-4 w-4 text-blue-500" />
-                  <span>Más Información</span>
-                </div>
-              </DropdownMenuItem>
 
               <DropdownMenuItem onClick={handleLogout}>
                 <div className="flex items-center space-x-2">
