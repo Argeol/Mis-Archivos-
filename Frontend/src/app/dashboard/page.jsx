@@ -23,6 +23,8 @@ import { useAuthUser } from "../user/login/useCurrentUser";
 import LoadingPage from "@/components/utils/LoadingPage";
 import { PendingPermissionsList } from "./permissionGeneral/PendingPermissionsList";
 import ApprenticePermissionList from "./permissionGeneral/ApprenticePermissionList";
+import RegisterPermission from "./permissionGeneral/RegisterPermission";
+import RegisterPermissionFS from "./permissionFS/RegisterPermissionFS";
 
 export default function DashboardPage() {
   const { data: totalApprentices, isLoading: loadingApprentices } =
@@ -35,6 +37,21 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const isMobile = useIsMobile();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalopen, setIsModalOpne] = useState(false);
+
+  // const handleLogout = async () => {
+  //   try {
+  //     return (
+  //       <ContactPage
+  //         registerComponets={RegisterPermission}
+  //       />
+  //     );
+  //   } catch (error) {
+  //     console.error("Error al cerrar sesión:", error);
+  //   }
+  // };
 
   useEffect(() => {
     // Solo quitamos loading general si todos cargan
@@ -118,38 +135,62 @@ export default function DashboardPage() {
 
             {(tip === "Administrador" || tip === "Aprendiz") && (
               <div className="mt-4 md:mt-0 flex flex-wrap sm:flex-nowrap gap-2">
-                <Link href="/dashboard/permissionGeneral/" passHref>
-                  <Button
-                    size="sm"
-                    className="bg-[#218EED] hover:bg-[#1a70bd] flex items-center gap-2 text-xs sm:text-sm w-full sm:w-auto"
-                  >
-                    <Plus size={16} />
-                    <p>Nuevo Permiso</p>
-                  </Button>
-                </Link>
+                
+                <Button
+                  size="sm"
+                  className="bg-[#218EED] hover:bg-[#1a70bd] flex items-center gap-2 text-xs sm:text-sm w-full sm:w-auto"
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  <Plus size={16} />
+                  <p>Permiso General</p>
+                </Button>
+
+                {isModalOpen && (
+                  <RegisterPermission
+                    userData={tip}
+                    open={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                  />
+                )}
+                
+                <Button
+                  size="sm"
+                  className="bg-[#218EED] hover::bg-[#1a70bd] flex items-center gap-2 text-xs sm:text-sm w-full sm:w-auto"
+                  onClick={() => setIsModalOpen(true)}  
+                >
+                <Plus size={16} />
+                <p>Permiso Internos</p>
+                </Button>
+                {isModalopen && (
+                  <RegisterPermissionFS
+                    userData={tip}
+                    open={isModalopen}
+                    onClose={() => setIsModalOpen(false)}
+                  />
+                )}
               </div>
             )}
           </div>
-            <div className="p-6">
-              {tip === "Responsable" && (
-                <>
-                  <h2 className="text-lg font-semibold mb-4">
-                    Permisos Pendientes
-                  </h2>
-                  <PendingPermissionsList />
-                </>
-              )}
-            </div>
-              <div className="p-6">
-              {tip === "Aprendiz" && (
-                <>
-                  <h2 className="text-lg font-semibold mb-4">
-                    Permisos Pendientes
-                  </h2>
-                  <ApprenticePermissionList/>
-                </>
-              )}
-            </div>
+          <div className="p-6">
+            {tip === "Responsable" && (
+              <>
+                <h2 className="text-lg font-semibold mb-4">
+                  Permisos Pendientes
+                </h2>
+                <PendingPermissionsList />
+              </>
+            )}
+          </div>
+          <div className="p-6">
+            {tip === "Aprendiz" && (
+              <>
+                <h2 className="text-lg font-semibold mb-4">
+                  Permisos Pendientes
+                </h2>
+                <ApprenticePermissionList />
+              </>
+            )}
+          </div>
           {tip === "Administrador" && (
             <>
               {/* Tarjetas de estadísticas */}

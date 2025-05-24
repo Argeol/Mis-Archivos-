@@ -54,7 +54,7 @@ export default function DataTable({
   updateEndpoint,
   queryKey,
   inf,
-  botonExtra
+  botonExtra,
 }) {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -95,13 +95,9 @@ export default function DataTable({
             className="sm:max-w-xs"
           />
         </div>
-        {botonExtra &&(
-        <div className="mb-4 flex justify-end">
-          {botonExtra}
-        </div>
-        )
-      }
-
+        {botonExtra && (
+          <div className="mb-4 flex justify-end">{botonExtra}</div>
+        )}
 
         {RegisterComponets && (
           <ModalDialog
@@ -136,9 +132,10 @@ export default function DataTable({
                   >
                     {tableCell.map((cell, index) => (
                       <TableCell key={index}>
-                        {cell === "porcentaje" ? (
+                        {typeof cell === "function" ? (
+                          cell(row) // Ejecutar la función pasando el 'row' como argumento
+                        ) : cell === "porcentaje" ? (
                           <div className="flex flex-col items-center">
-                            {/* Barra de porcentaje */}
                             <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
                               <div
                                 className={`h-full rounded-full ${
@@ -151,13 +148,12 @@ export default function DataTable({
                                 style={{ width: `${row[cell]}%` }}
                               />
                             </div>
-                            {/* Número debajo de la barra */}
                             <span className="text-sm font-semibold">
                               {Math.round(row[cell])}%
                             </span>
                           </div>
                         ) : (
-                          row[cell] // Renderizar los demás valores normalmente
+                          row[cell] // Renderizar valores normales si no es función ni porcentaje
                         )}
                       </TableCell>
                     ))}
@@ -283,7 +279,7 @@ export default function DataTable({
           apprenticeId={selectedApprenticeId}
         />
       )}
-      
+
       {translations && selectedRowInfo && (
         <RowInfoModal
           isOpen={isOpenInfoModal}

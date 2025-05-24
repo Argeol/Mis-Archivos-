@@ -21,25 +21,38 @@ export default function PermissionFSDashboard() {
   if (isLoading) return <LoadingPage />;
 
   const fieldLabels = [
-    "Destino", "Fecha Diligenciado", "Fecha Salida", "Fecha Entrada", 
-    "Día Salida", "Alojamiento", "SENA/Empresa", "Dirección", "Aprendiz"
+    "Aprendiz",
+    "Destino", 
+    "Día Salida", 
+    // "Alojamiento",
+    "SENA/Empresa", 
+    "Dirección",
   ];
 
+  // const fullName =(row)=>row.apprenticeInfo? `${row.apprenticeInfo.first_Name_Apprentice} ${row.apprenticeInfo.last_Name_Apprentice}`.trim()
+  //   : "Sin nombre";
+
   const tableCell = [
-    "destino", "fec_Diligenciado", "fec_Salida", "fec_Entrada", 
-    "dia_Salida", "alojamiento", "sen_Empresa", "direccion", "apprentice.nombre"
+    (row) => `${row.apprenticeInfo.first_Name_Apprentice}`,
+    // fullName,
+    "destino", 
+    "dia_Salida", 
+    // "alojamiento", 
+    "sen_Empresa", 
+    "direccion",
   ];
 
   const translations = {
+    apprentice_Id: "Numero Documento",
     destino: "Destino",
     fec_Diligenciado: "Fecha Diligenciado",
     fec_Salida: "Fecha Salida",
     fec_Entrada: "Fecha Entrada",
     dia_Salida: "Día de salida",
     alojamiento: "Alojamiento",
-    sen_Empresa: "¿SENA o empresa?",
+    sen_Empresa: "Sena Empresa",
     direccion: "Dirección",
-    "apprentice.nombre": "Nombre del aprendiz"
+    fullName :"Nombre",
   };
 
   const handleExport = async () => {
@@ -73,7 +86,7 @@ export default function PermissionFSDashboard() {
         idKey="permissionFS_Id"
         tableCell={tableCell}
         translations={translations}
-        ignorar={["permissionFS_Id"]}
+        ignorar={["permissionFS_Id","apprenticeInfo"]}
         inf="apprentice.Aprenttice_Id"
         botonExtra={<ExportExcelButton/>}
       />
