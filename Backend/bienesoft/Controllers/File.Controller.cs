@@ -1,4 +1,5 @@
-﻿using bienesoft.Funcions;
+﻿using System.Runtime.CompilerServices;
+using bienesoft.Funcions;
 using bienesoft.Models;
 using bienesoft.ProductionDTOs;
 using bienesoft.Services;
@@ -28,14 +29,17 @@ namespace bienesoft.Controllers
 
 
         [HttpPost("CreateFile")]
-        public IActionResult AddFile(FileModel file)
+        public async Task<IActionResult> AddFile(FileModel file)
         {
             try
             {
-                _FileServices.AddFile(file);
+                await _FileServices.AddFileAsync(file);
+                // Desactiva aprendices de fichas vencidas
+                int desactivados = await _FileServices.DesactivarAprendicesPorFichasFinalizadasAsync();
+
                 return Ok(new
                 {
-                    message = "Ficha registrada con exito"
+                    message = $"Ficha registrada con éxito. {desactivados} aprendices fueron desactivados por fichas finalizadas."
                 });
             }
             catch (Exception ex)
@@ -118,7 +122,7 @@ namespace bienesoft.Controllers
             var files = await _FileServices.GetFilesAsync();
             return Ok(files);
         }
-      
+
         [HttpPut("UpdateFile/{Id}")]
         public async Task<IActionResult> UpdateFile(int Id, [FromBody] FileModel updatedFile)
         {

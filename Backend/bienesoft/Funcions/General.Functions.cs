@@ -361,6 +361,92 @@ namespace bienesoft.Funcions
 </html>
 ";
         }
+        public async Task<ResponseSend> NotifyResponsibleAsync(string emailDestino, string nombreRol, string nombreAprendiz)
+        {
+            ResponseSend response = new ResponseSend();
+            try
+            {
+                using (SmtpClient smtpClient = new SmtpClient(configServer.HostName, configServer.PortHost))
+                {
+                    smtpClient.Credentials = new NetworkCredential(configServer.Email, configServer.Password);
+                    smtpClient.EnableSsl = true;
+
+                    MailAddress remitente = new MailAddress(configServer.Email, "Bienesoft", Encoding.UTF8);
+                    MailAddress destinatario = new MailAddress(emailDestino);
+
+                    using (MailMessage message = new MailMessage(remitente, destinatario))
+                    {
+                        message.IsBodyHtml = true;
+                        message.Subject = $"Permiso pendiente por revisar - Rol: {nombreRol}";
+                        message.Body = GenerateApprovalBody(nombreRol, nombreAprendiz);
+                        message.BodyEncoding = Encoding.UTF8;
+
+                        await smtpClient.SendMailAsync(message);
+                    }
+                }
+
+                response.Message = "Correo enviado exitosamente al responsable";
+                response.Status = true;
+            }
+            catch (Exception ex)
+            {
+                Addlog($"Error al notificar al responsable: {ex}");
+                response.Message = ex.Message;
+                response.Status = false;
+            }
+
+            return response;
+        }
+        private string GenerateApprovalBody(string nombreRol, string nombreAprendiz)
+        {
+            return $@"
+        <h2>Notificación de Permiso Pendiente</h2>
+        <p>Estimado/a {nombreRol},</p>
+        <p>El aprendiz <strong>{nombreAprendiz}</strong> ha solicitado un permiso que requiere su aprobación.</p>
+        <p>Por favor, ingrese al sistema para autorizar o rechazar la solicitud.</p>
+        <br/>
+        <p><em>Este es un mensaje automático del sistema Bienesoft.</em></p>
+    ";
+        }
+
+        public async Task<ResponseSend> NotifyAprendizAsync(string emailDestino, string nombreAprendiz)
+        {
+            ResponseSend response = new ResponseSend();
+            try
+            {
+                using (SmtpClient smtpClient = new SmtpClient(configServer.HostName, configServer.PortHost))
+                {
+                    smtpClient.Credentials = new NetworkCredential(configServer.Email, configServer.Password);
+                    smtpClient.EnableSsl = true;
+
+                    MailAddress remitente = new MailAddress(configServer.Email, "Bienesoft", Encoding.UTF8);
+                    MailAddress destinatario = new MailAddress(emailDestino);
+
+                    using (MailMessage message = new MailMessage(remitente, destinatario))
+                    {
+                        message.IsBodyHtml = true;
+                        message.Subject = $"Tu permiso ha sido aprobado";
+                        message.Body = $"<p>Hola {nombreAprendiz},</p><p>Tu permiso ha sido aprobado por todos los responsables.</p>";
+                        message.BodyEncoding = Encoding.UTF8;
+
+                        await smtpClient.SendMailAsync(message);
+                    }
+                }
+
+                // response.Message = "Correo enviado exitosamente al aprendiz";
+                response.Status = true;
+            }
+            catch (Exception ex)
+            {
+                Addlog($"Error al notificar al aprendiz: {ex}");
+                response.Message = ex.Message;
+                response.Status = false;
+            }
+
+            return response;
+        }
+
+
 
 
     }

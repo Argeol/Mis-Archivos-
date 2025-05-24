@@ -39,6 +39,10 @@ namespace bienesoft.Controllers
             try
             {
                 var user = _UserServices.GetByEmailAsync(login.Email).Result;
+                if (user == null || (user.Apprentice != null && user.Apprentice.Status_Apprentice == "Inactivo"))
+                {
+                    return Unauthorized(new { message = "Acceso denegado. Tu estado es inactivo." });
+                }
                 var hashedInput = PasswordHasher.HashPassword(login.HashedPassword, user.Salt);
                 if (hashedInput != user.HashedPassword)
                 {
@@ -158,7 +162,7 @@ namespace bienesoft.Controllers
                 }
                 else if (user.UserType == "Administrador")
                 {
-                    UserObject = new 
+                    UserObject = new
                     {
                         user.Email,
                     };
@@ -355,7 +359,7 @@ namespace bienesoft.Controllers
             }
         }
 
-        
+
 
         [HttpPost("Logout")]
         public IActionResult Logout()
@@ -364,7 +368,7 @@ namespace bienesoft.Controllers
             return Ok(new { message = "Sesión cerrada correctamente" });
         }
     }
-    
+
 }
 
 
