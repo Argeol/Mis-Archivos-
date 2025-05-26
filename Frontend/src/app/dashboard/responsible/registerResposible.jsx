@@ -14,8 +14,6 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 
-// const tips = ["Activo", "Inactivo"];
-
 export default function RegisterResponsible() {
   const queryClient = useQueryClient();
 
@@ -28,6 +26,8 @@ export default function RegisterResponsible() {
     roleId: 0,
     state: "Activo", 
   });
+
+  const [localLoading, setLocalLoading] = useState(false); // ✅ Declarado correctamente
 
   // ✅ Mutación para Registrar Responsable
   const mutation = useMutation({
@@ -55,9 +55,15 @@ export default function RegisterResponsible() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // ✅ Manejo del submit con localLoading
   const handleSubmit = async (e) => {
     e.preventDefault();
-    mutation.mutate();
+    setLocalLoading(true);
+    mutation.mutate(undefined, {
+      onSettled: () => {
+        setLocalLoading(false);
+      },
+    });
   };
 
   const { data: roles = [] } = useQuery({
@@ -77,10 +83,11 @@ export default function RegisterResponsible() {
           placeholder="Número de Documento"
           type="number"
           onChange={handleChange}
-          required/>
+          required
+        />
       </div>
-      <div>
 
+      <div>
         <Label htmlFor="nom_Responsible">Nombre del Responsable</Label>
         <Input
           name="nom_Responsible"
@@ -142,26 +149,38 @@ export default function RegisterResponsible() {
         </Select>
       </div>
 
-      {/* <div>
-        <Label htmlFor="state">Estado</Label>
-        <Select
-          onValueChange={(value) => setFormData({ ...formData, state: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Estado" />
-          </SelectTrigger>
-          <SelectContent>
-            {tips.map((tip) => (
-              <SelectItem key={tip} value={tip}>
-                {tip}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div> */}
-
-      <Button type="submit" disabled={mutation.isLoading}>
-        {mutation.isLoading ? "Registrando..." : "Registrar"}
+      <Button
+        type="submit"
+        disabled={localLoading}
+        className="mt-4 bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200 rounded-md mx-auto block w-full flex items-center justify-center gap-2"
+      >
+        {localLoading ? (
+          <>
+            <svg
+              className="animate-spin h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              ></path>
+            </svg>
+            Registrando...
+          </>
+        ) : (
+          <>Registrar</>
+        )}
       </Button>
     </form>
   );

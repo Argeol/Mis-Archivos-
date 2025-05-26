@@ -18,7 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import UpdateResponsible from "@/app/dashboard/responsible/updateResponsible";
 
-export function UserInfoModal({ Tip, open, onClose, Data}) {
+export function UserInfoModal({ Tip, open, onClose, Data }) {
   console.log(Data.nom_Responsible)
   const modalRef = useRef(null);
   const [data, setData] = useState(null);
@@ -248,7 +248,7 @@ export function UserInfoModal({ Tip, open, onClose, Data}) {
           {showUpdateForm ? <UpdateResponsible /> : renderContent()}
         </CardContent>
 
-        <div className="p-4 border-t bg-slate-50">
+        <div className="p-4 border-t bg-slate-50 mt-[-20px]">
           <div className="flex flex-col-reverse md:flex-row md:justify-end md:items-center gap-3 md:gap-4 w-full">
             <Button
               onClick={onClose}
@@ -273,6 +273,7 @@ export function UserInfoModal({ Tip, open, onClose, Data}) {
             )}
           </div>
         </div>
+
       </Card>
     </div>
   );
