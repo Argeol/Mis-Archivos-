@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 export default function RegisterResponsible() {
   const queryClient = useQueryClient();
@@ -39,13 +40,13 @@ export default function RegisterResponsible() {
       return res.data;
     },
     onSuccess: (data) => {
-      alert(data.message);
+      toast(data.message);
       queryClient.invalidateQueries(["responsables"]);
     },
     onError: (error) => {
       const errorMessage =
         error.response?.data?.message || "Error desconocido.";
-      alert(errorMessage);
+      toast(errorMessage);
     },
   });
 

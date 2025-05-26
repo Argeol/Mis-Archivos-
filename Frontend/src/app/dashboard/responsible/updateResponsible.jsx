@@ -6,6 +6,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 export default function UpdateResponsible() {
   const queryClient = useQueryClient();
@@ -41,11 +42,11 @@ export default function UpdateResponsible() {
       await axiosInstance.put("/api/Responsible/UpdateResponsible", formData); // <-- sin ID en la URL
     },
     onSuccess: () => {
-      alert("Responsable actualizado correctamente");
+      toast("Responsable actualizado correctamente");
       queryClient.invalidateQueries(["responsible"]);
     },
     onError: (error) => {
-      alert(error.response?.data?.message || "Error al actualizar");
+      toast(error.response?.data?.message || "Error al actualizar");
     },
   });
 
