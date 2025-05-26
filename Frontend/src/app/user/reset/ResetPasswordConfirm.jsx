@@ -1,3 +1,5 @@
+"use client";
+
 import { useLocation } from "react-router-dom"; // Usamos useLocation para leer parámetros de la URL
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";

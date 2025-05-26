@@ -65,11 +65,30 @@ namespace bienesoft.Services
 
         public async Task<PermissionFS> CreateAsync(PermissionFS model)
         {
-            model.Fec_Diligenciado = DateTime.Now.Date;
-            _context.permissionFS.Add(model);
+            model.Fec_Diligenciado = DateTime.Today;
+            await _context.permissionFS.AddAsync(model);
             await _context.SaveChangesAsync();
             return model;
         }
+
+        // ✔ Versión que usa el Id_Apprentice desde el controlador
+        public async Task<PermissionFS> CreateAsync(PermissionFS model, int idApprentice)
+        {
+            // Asignar el aprendiz al modelo antes de guardarlo
+            model.Apprentice_Id = idApprentice;
+            model.Fec_Diligenciado = DateTime.Today;    
+
+            await _context.permissionFS.AddAsync(model);
+            await _context.SaveChangesAsync();
+
+            // Si tienes que procesar responsablesSeleccionados, lo haces aquí
+            // Por ahora se deja como pendiente si no hay tabla intermedia
+
+            return model;
+        }
+
+
+
 
         public async Task<PermissionFS> UpdateAsync(int id, PermissionFS model)
         {

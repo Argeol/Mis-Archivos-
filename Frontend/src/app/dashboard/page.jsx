@@ -23,8 +23,10 @@ import { useAuthUser } from "../user/login/useCurrentUser";
 import LoadingPage from "@/components/utils/LoadingPage";
 import { PendingPermissionsList } from "./permissionGeneral/PendingPermissionsList";
 import ApprenticePermissionList from "./permissionGeneral/ApprenticePermissionList";
+
 import ModalDialog from "@/components/utils/ModalDialog";
 import RegisterPermission from "./permissionGeneral/RegisterPermission";
+
 
 export default function DashboardPage() {
   const { data: totalApprentices, isLoading: loadingApprentices } =
@@ -37,6 +39,21 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const isMobile = useIsMobile();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalopen, setIsModalOpne] = useState(false);
+
+  // const handleLogout = async () => {
+  //   try {
+  //     return (
+  //       <ContactPage
+  //         registerComponets={RegisterPermission}
+  //       />
+  //     );
+  //   } catch (error) {
+  //     console.error("Error al cerrar sesión:", error);
+  //   }
+  // };
 
   useEffect(() => {
     // Solo quitamos loading general si todos cargan

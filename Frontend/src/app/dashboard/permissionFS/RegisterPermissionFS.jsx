@@ -18,28 +18,28 @@ import {
 export default function RegisterPermissionFS() {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
-    apprentice_Id: 0,
     destino: "",
-    fec_Diligenciado: "",
     fec_Salida: "",
     fec_Entrada: "",
-    dia_Salida: "Miercoles, Domingo, Fin de Semana",
+    dia_Salida: "",
     alojamiento: "",
     sen_Empresa: "Si, No",
     direccion: "",
   });
 
-  const { data: apprentices = [] } = useQuery({
-    queryKey: ["apprentices"],
-    queryFn: async () => {
-      const res = await axiosInstance.get("/api/Apprentice/all");
-      return res.data;
-    },
-  });
+  // const { data: apprentices = [] } = useQuery({
+  //   queryKey: ["apprentices"],
+  //   queryFn: async () => {
+  //     const res = await axiosInstance.get("/api/Apprentice/all");
+  //     return res.data;
+  //   },
+  // });
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const res = await axiosInstance.post("/api/PermissionFS", formData);
+      const res = await axiosInstance.post("/api/PermissionFS/Create", {
+        permission: formData, // 👈 importante
+      });
       return res.data;
     },
     onSuccess: () => {
@@ -82,7 +82,6 @@ export default function RegisterPermissionFS() {
     }));
   };
 
-
   const handleSubmit = (e) => {
     e.preventDefault();
     mutation.mutate();
@@ -90,7 +89,6 @@ export default function RegisterPermissionFS() {
 
   return (
     <form onSubmit={handleSubmit} className="w-full p-2 bg-white space-y-4">
-
       {/* Fecha salida */}
       <div className="space-y-1 px-2">
         <Label htmlFor="fec_Salida">Fecha de salida</Label>
@@ -152,7 +150,10 @@ export default function RegisterPermissionFS() {
       {/* Día de salida */}
       <div className="space-y-1 px-2">
         <Label>Día de salida</Label>
-        <Select onValueChange={handleSelectDiaSalida} defaultValue="Miercoles">
+        <Select
+          onValueChange={handleSelectDiaSalida}
+          defaultValue="Seleccione dia"
+        >
           <SelectTrigger>
             <SelectValue placeholder="Seleccionar día" />
           </SelectTrigger>
@@ -179,7 +180,7 @@ export default function RegisterPermissionFS() {
       </div>
 
       {/* Aprendiz */}
-      <div className="space-y-1 px-2">
+      {/* <div className="space-y-1 px-2">
         <Label>Aprendiz</Label>
         <Select onValueChange={handleSelectApprentice}>
           <SelectTrigger>
@@ -196,7 +197,7 @@ export default function RegisterPermissionFS() {
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </div> */}
 
       <div className="px-2">
         <Button type="submit" disabled={mutation.isLoading} className="w-full">

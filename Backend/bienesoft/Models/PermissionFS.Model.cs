@@ -54,7 +54,7 @@ namespace Bienesoft.Models
     {
         Miercoles = 1,
         Domingo = 2,
-        FinDeSemana = 3
+        Findesemana= 3
     }
 
     // Enum para 'Sen_Empresa'
@@ -62,5 +62,10 @@ namespace Bienesoft.Models
     {
         Si = 1,
         No = 2
+    }
+
+    public class CreatePermissionFS
+    {
+        public PermissionFS Permission { get; set; }
     }
 }
