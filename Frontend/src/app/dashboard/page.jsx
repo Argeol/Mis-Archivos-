@@ -24,6 +24,10 @@ import LoadingPage from "@/components/utils/LoadingPage";
 import { PendingPermissionsList } from "./permissionGeneral/PendingPermissionsList";
 import ApprenticePermissionList from "./permissionGeneral/ApprenticePermissionList";
 
+import ModalDialog from "@/components/utils/ModalDialog";
+import RegisterPermission from "./permissionGeneral/RegisterPermission";
+
+
 export default function DashboardPage() {
   const { data: totalApprentices, isLoading: loadingApprentices } =
     useTotalApprentices();
@@ -35,6 +39,21 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const isMobile = useIsMobile();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalopen, setIsModalOpne] = useState(false);
+
+  // const handleLogout = async () => {
+  //   try {
+  //     return (
+  //       <ContactPage
+  //         registerComponets={RegisterPermission}
+  //       />
+  //     );
+  //   } catch (error) {
+  //     console.error("Error al cerrar sesión:", error);
+  //   }
+  // };
 
   useEffect(() => {
     // Solo quitamos loading general si todos cargan
@@ -96,9 +115,8 @@ export default function DashboardPage() {
     <PrivateNav titlespage="Contenido Principal">
       <div className="min-h-screen">
         <main
-          className={`flex-1 overflow-y-auto p-4 sm:p-6 bg-white/80 backdrop-blur-md rounded-t-2xl shadow-inner ${
-            isMobile ? "mx-auto" : "ml-[60px]"
-          }`}
+          className={`flex-1 overflow-y-auto p-4 sm:p-6 bg-white/80 backdrop-blur-md rounded-t-2xl shadow-inner ${isMobile ? "mx-auto" : "ml-[60px]"
+            }`}
         >
           {/* Encabezado del Dashboard */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
@@ -117,39 +135,33 @@ export default function DashboardPage() {
             </div>
 
             {(tip === "Administrador" || tip === "Aprendiz") && (
-              <div className="mt-4 md:mt-0 flex flex-wrap sm:flex-nowrap gap-2">
-                <Link href="/dashboard/permissionGeneral/" passHref>
-                  <Button
-                    size="sm"
-                    className="bg-[#218EED] hover:bg-[#1a70bd] flex items-center gap-2 text-xs sm:text-sm w-full sm:w-auto"
-                  >
-                    <Plus size={16} />
-                    <p>Nuevo Permiso</p>
-                  </Button>
-                </Link>
-              </div>
+              <ModalDialog
+                TitlePage="Permiso"
+                RegisterComponets={RegisterPermission}
+              />
+            )}
+
+          </div>
+          <div className="p-6">
+            {tip === "Responsable" && (
+              <>
+                <h2 className="text-lg font-semibold mb-4">
+                  Permisos Pendientes
+                </h2>
+                <PendingPermissionsList />
+              </>
             )}
           </div>
-            <div className="p-6">
-              {tip === "Responsable" && (
-                <>
-                  <h2 className="text-lg font-semibold mb-4">
-                    Permisos Pendientes
-                  </h2>
-                  <PendingPermissionsList />
-                </>
-              )}
-            </div>
-              <div className="p-6">
-              {tip === "Aprendiz" && (
-                <>
-                  <h2 className="text-lg font-semibold mb-4">
-                    Permisos Pendientes
-                  </h2>
-                  <ApprenticePermissionList/>
-                </>
-              )}
-            </div>
+          <div className="p-6">
+            {tip === "Aprendiz" && (
+              <>
+                <h2 className="text-lg font-semibold mb-4">
+                  Permisos Pendientes
+                </h2>
+                <ApprenticePermissionList />
+              </>
+            )}
+          </div>
           {tip === "Administrador" && (
             <>
               {/* Tarjetas de estadísticas */}

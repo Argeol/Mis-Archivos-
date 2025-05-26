@@ -19,6 +19,35 @@ namespace bienesoft.Controllers
             _service = service;
         }
 
+        [Authorize(Roles = "Aprendiz")]
+        [HttpPost("Create")]
+        public async Task<IActionResult> Create([FromBody] CreatePermissionFS model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                // Obtener el ID del aprendiz desde el token
+                var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
+                if (string.IsNullOrEmpty(idApprenticeClaim))
+                    return Unauthorized(new { success = false, message = "No se pudo obtener el aprendiz desde el token." });
+
+                var idApprentice = Convert.ToInt32(idApprenticeClaim);
+
+                //// Asignar el aprendiz al modelo antes de guardarlo
+                //model.Id_Apprentice = idApprentice;
+
+                var result = await _service.CreateAsync(model.Permission, idApprentice);
+
+                return CreatedAtAction(nameof(GetById), new { id = result.PermissionFS_Id }, result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -36,15 +65,8 @@ namespace bienesoft.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] PermissionFS model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
-            var result = await _service.CreateAsync(model);
-            return CreatedAtAction(nameof(GetById), new { id = result.PermissionFS_Id }, result);
-        }
+
 
         // Aquí se cambia de PATCH a PUT
         [HttpPut("{id}")]

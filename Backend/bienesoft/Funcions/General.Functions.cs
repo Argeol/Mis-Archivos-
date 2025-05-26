@@ -112,7 +112,7 @@ namespace bienesoft.Funcions
                             <table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" style=""margin: 0 auto;"">
                                 <tr>
                                     <td style=""border-radius: 50px; background: linear-gradient(to right, #4a6cf7, #6a11cb); box-shadow: 0 5px 15px rgba(106, 17, 203, 0.3);"">
-                                        <a href=""{resetLink}"" target=""_blank"" style=""display: inline-block; padding: 15px 35px; color: #ffffff; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 50px;"">Restablecer Contraseña</a>
+                                        <a href=""{resetLink}"" target=""_blank"" style=""display: inline-block; padding: 15px 35px; color: #ffffff; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 50px;""> Restablecer Contraseña</a>
                                     </td>
                                 </tr>
                             </table>
@@ -151,7 +151,6 @@ namespace bienesoft.Funcions
                             <p style=""color: #5d6778; font-size: 15px; line-height: 1.6; margin: 0 0 15px;"">
                                 Si tienes alguna pregunta o necesitas asistencia, no dudes en contactarnos.
                             </p>
-                            <a href=""mailto:bienesoft5@gmail.com"" style=""color: #4a6cf7; text-decoration: none; font-weight: 600;"">soporte@bienesoft.com</a>
                         </td>
                     </tr>
                 </table>
@@ -165,6 +164,7 @@ namespace bienesoft.Funcions
                 <p style=""color: rgba(255, 255, 255, 0.8); font-size: 13px; margin: 0;"">
                     Espinal - Tolima
                 </p>
+                <p style=""font - size:12px; color:#999;"">Este mensaje fue enviado automáticamente por Bienesoft. Si recibiste este correo por error, ignóralo.</p>
             </td>
         </tr>
     </table>
@@ -321,7 +321,7 @@ namespace bienesoft.Funcions
                         <td style=""padding: 0 40px 40px;"">
                             <div style=""background-color: #fff8f0; border-left: 4px solid #ff9800; padding: 15px; border-radius: 4px;"">
                                 <p style=""color: #e67e22; font-size: 14px; line-height: 1.6; margin: 0;"">
-                                    <strong>Consejo de seguridad:</strong> Nunca compartas tu contraseña con nadie. Nuestro equipo nunca te pedirá tu contraseña por correo electrónico o teléfono.
+                                    <strong>Consejo de seguridad:</strong> Protege tu cuenta manteniendo tu contraseña solo para ti. Nuestro equipo no solicitará tu contraseña bajo ninguna circunstancia.
                                 </p>
                             </div>
                         </td>
@@ -354,13 +354,102 @@ namespace bienesoft.Funcions
                 <p style=""color: rgba(255, 255, 255, 0.8); font-size: 13px; margin: 0;"">
                     Espinal - Tolima
                 </p>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>
+                <p style=""font - size:12px; color:#999;"">Este mensaje fue enviado automáticamente por Bienesoft. Si recibiste este correo por error, ignóralo.
+                </p>
+            </ td >
+        </ tr >
+    </ table >
+</ body >
+</ html >
+
 ";
         }
+        public async Task<ResponseSend> NotifyResponsibleAsync(string emailDestino, string nombreRol, string nombreAprendiz)
+        {
+            ResponseSend response = new ResponseSend();
+            try
+            {
+                using (SmtpClient smtpClient = new SmtpClient(configServer.HostName, configServer.PortHost))
+                {
+                    smtpClient.Credentials = new NetworkCredential(configServer.Email, configServer.Password);
+                    smtpClient.EnableSsl = true;
+
+                    MailAddress remitente = new MailAddress(configServer.Email, "Bienesoft", Encoding.UTF8);
+                    MailAddress destinatario = new MailAddress(emailDestino);
+
+                    using (MailMessage message = new MailMessage(remitente, destinatario))
+                    {
+                        message.IsBodyHtml = true;
+                        message.Subject = $"Permiso pendiente por revisar - Rol: {nombreRol}";
+                        message.Body = GenerateApprovalBody(nombreRol, nombreAprendiz);
+                        message.BodyEncoding = Encoding.UTF8;
+
+                        await smtpClient.SendMailAsync(message);
+                    }
+                }
+
+                response.Message = "Correo enviado exitosamente al responsable";
+                response.Status = true;
+            }
+            catch (Exception ex)
+            {
+                Addlog($"Error al notificar al responsable: {ex}");
+                response.Message = ex.Message;
+                response.Status = false;
+            }
+
+            return response;
+        }
+        private string GenerateApprovalBody(string nombreRol, string nombreAprendiz)
+        {
+            return $@"
+        <h2>Notificación de Permiso Pendiente</h2>
+        <p>Estimado/a {nombreRol},</p>
+        <p>El aprendiz <strong>{nombreAprendiz}</strong> ha solicitado un permiso que requiere su aprobación.</p>
+        <p>Por favor, ingrese al sistema para autorizar o rechazar la solicitud.</p>
+        <br/>
+        <p><em>Este es un mensaje automático del sistema Bienesoft.</em></p>
+    ";
+        }
+
+        public async Task<ResponseSend> NotifyAprendizAsync(string emailDestino, string nombreAprendiz)
+        {
+            ResponseSend response = new ResponseSend();
+            try
+            {
+                using (SmtpClient smtpClient = new SmtpClient(configServer.HostName, configServer.PortHost))
+                {
+                    smtpClient.Credentials = new NetworkCredential(configServer.Email, configServer.Password);
+                    smtpClient.EnableSsl = true;
+
+                    MailAddress remitente = new MailAddress(configServer.Email, "Bienesoft", Encoding.UTF8);
+                    MailAddress destinatario = new MailAddress(emailDestino);
+
+                    using (MailMessage message = new MailMessage(remitente, destinatario))
+                    {
+                        message.IsBodyHtml = true;
+                        message.Subject = $"Tu permiso ha sido aprobado";
+                        message.Body = $"<p>Hola {nombreAprendiz},</p><p>Tu permiso ha sido aprobado por todos los responsables.</p>";
+                        message.BodyEncoding = Encoding.UTF8;
+
+                        await smtpClient.SendMailAsync(message);
+                    }
+                }
+
+                // response.Message = "Correo enviado exitosamente al aprendiz";
+                response.Status = true;
+            }
+            catch (Exception ex)
+            {
+                Addlog($"Error al notificar al aprendiz: {ex}");
+                response.Message = ex.Message;
+                response.Status = false;
+            }
+
+            return response;
+        }
+
+
 
 
     }

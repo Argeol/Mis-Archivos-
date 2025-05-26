@@ -17,9 +17,7 @@ import { useAuthUser } from "@/app/user/login/useCurrentUser";
 async function Login(credentials) {
   // Delay artificial de 2 segundos para ver el estado loading
   await new Promise((r) => setTimeout(r, 2000));
-  const response = await axiosInstance.post("/api/User/Login", credentials, {
-    withCredentials: true,
-  });
+  const response = await axiosInstance.post("/api/User/Login", credentials);
   return response;
 }
 
@@ -168,7 +166,7 @@ function LoginPage() {
         </Button>
 
         <div className="flex flex-col items-center mt-5 text-sm space-y-2">
-          <a href="/user/reset" className="text-blue-600 hover:underline">
+          <a href="/user/reset-password/reset" className="text-blue-600 hover:underline">
             ¿Olvidaste tu contraseña?
           </a>
         </div>

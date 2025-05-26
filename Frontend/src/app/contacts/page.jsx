@@ -2,16 +2,12 @@
 
 import Footer from "@/components/navs/Footer";
 import PublicNav from "@/components/navs/PublicNav";
-import ContactPage from "@/components/navs/contact"; // Asegúrate de importar el componente ContactPage correctamente
+import ContactPage from "@/app/contacts/contact"; // Asegúrate de importar el componente ContactPage correctamente
 
 export default function Contact() {
   return (
     <>
       <PublicNav />
-      <br>
-      </br>
-      <br>
-      </br>
       <ContactPage /> {/* Aquí renderizamos el componente ContactPage */}
       <Footer/>
     </>
