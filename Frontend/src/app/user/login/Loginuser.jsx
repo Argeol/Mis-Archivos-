@@ -166,7 +166,7 @@ function LoginPage() {
         </Button>
 
         <div className="flex flex-col items-center mt-5 text-sm space-y-2">
-          <a href="/user/reset" className="text-blue-600 hover:underline">
+          <a href="/user/reset-password/reset" className="text-blue-600 hover:underline">
             ¿Olvidaste tu contraseña?
           </a>
         </div>
