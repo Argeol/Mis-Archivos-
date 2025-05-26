@@ -93,7 +93,7 @@ export default function ApprenticeDashboard() {
           ignorar={["status_Apprentice"]}
           //update del estado  -->
           currentStatus={"status_Apprentice"}
-          updateEndpoint="/api/Apprentice"
+          updateEndpoint="/api/Apprentice/UpdateApprentice"
           queryKey="aprendices"
         />
       </PrivateNav>
