@@ -29,6 +29,7 @@ const fieldTranslations = {
   programName: "Programa",
   areaName: "Área",
   status_Apprentice: "Estado",
+  stratum_Apprentice: "Estrato",
 };
 
 export default function ModalInfoApprentice({ isOpen, onClose, apprenticeId }) {

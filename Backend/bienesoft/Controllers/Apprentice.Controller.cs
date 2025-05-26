@@ -103,26 +103,14 @@ namespace bienesoft.Controllers
             return Ok(list);
         }
 
-        [Authorize(Roles = "Aprendiz,Administrador")]  
-        [HttpPut("update-profile")] // Opcional: cambia el endpoint si quieres
-        public IActionResult UpdateApprentice([FromBody] UpdateApprentice model)
+        [Authorize(Roles = "Aprendiz,Administrador")]
+        [HttpPut("UpdateApprentice/{id}")]
+        public IActionResult UpdateApprentice(int id, [FromBody] UpdateApprentice updateApprentice)
         {
             try
             {
-                // Sacamos el Id_Apprentice del token
-                var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
-
-                if (string.IsNullOrEmpty(idApprenticeClaim))
-                {
-                    return Unauthorized(new { message = "No se encontró el Id_Apprentice en el token." });
-                }
-                //se trasforma el idApprenticeClaim a numero entero
-                int id = int.Parse(idApprenticeClaim);
-
-                // Ahora sí, actualizas
-                _apprenticeService.UpdateApprentice(id, model);
-
-                return Ok(new { message = "Aprendiz actualizado exitosamente" });
+                _apprenticeService.UpdateApprentice(id, updateApprentice);
+                return NoContent(); // 204 - Actualización exitosa sin contenido
             }
             catch (KeyNotFoundException ex)
             {
@@ -130,7 +118,7 @@ namespace bienesoft.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return StatusCode(500, new { message = "Ocurrió un error al actualizar el aprendiz.", error = ex.Message });
             }
         }
 

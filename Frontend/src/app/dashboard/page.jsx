@@ -23,8 +23,10 @@ import { useAuthUser } from "../user/login/useCurrentUser";
 import LoadingPage from "@/components/utils/LoadingPage";
 import { PendingPermissionsList } from "./permissionGeneral/PendingPermissionsList";
 import ApprenticePermissionList from "./permissionGeneral/ApprenticePermissionList";
+
+import ModalDialog from "@/components/utils/ModalDialog";
 import RegisterPermission from "./permissionGeneral/RegisterPermission";
-import RegisterPermissionFS from "./permissionFS/RegisterPermissionFS";
+
 
 export default function DashboardPage() {
   const { data: totalApprentices, isLoading: loadingApprentices } =
@@ -113,9 +115,8 @@ export default function DashboardPage() {
     <PrivateNav titlespage="Contenido Principal">
       <div className="min-h-screen">
         <main
-          className={`flex-1 overflow-y-auto p-4 sm:p-6 bg-white/80 backdrop-blur-md rounded-t-2xl shadow-inner ${
-            isMobile ? "mx-auto" : "ml-[60px]"
-          }`}
+          className={`flex-1 overflow-y-auto p-4 sm:p-6 bg-white/80 backdrop-blur-md rounded-t-2xl shadow-inner ${isMobile ? "mx-auto" : "ml-[60px]"
+            }`}
         >
           {/* Encabezado del Dashboard */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
@@ -134,42 +135,12 @@ export default function DashboardPage() {
             </div>
 
             {(tip === "Administrador" || tip === "Aprendiz") && (
-              <div className="mt-4 md:mt-0 flex flex-wrap sm:flex-nowrap gap-2">
-                
-                <Button
-                  size="sm"
-                  className="bg-[#218EED] hover:bg-[#1a70bd] flex items-center gap-2 text-xs sm:text-sm w-full sm:w-auto"
-                  onClick={() => setIsModalOpen(true)}
-                >
-                  <Plus size={16} />
-                  <p>Permiso General</p>
-                </Button>
-
-                {isModalOpen && (
-                  <RegisterPermission
-                    userData={tip}
-                    open={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                  />
-                )}
-                
-                <Button
-                  size="sm"
-                  className="bg-[#218EED] hover::bg-[#1a70bd] flex items-center gap-2 text-xs sm:text-sm w-full sm:w-auto"
-                  onClick={() => setIsModalOpen(true)}  
-                >
-                <Plus size={16} />
-                <p>Permiso Internos</p>
-                </Button>
-                {isModalopen && (
-                  <RegisterPermissionFS
-                    userData={tip}
-                    open={isModalopen}
-                    onClose={() => setIsModalOpen(false)}
-                  />
-                )}
-              </div>
+              <ModalDialog
+                TitlePage="Permiso"
+                RegisterComponets={RegisterPermission}
+              />
             )}
+
           </div>
           <div className="p-6">
             {tip === "Responsable" && (

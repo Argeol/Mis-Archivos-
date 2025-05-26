@@ -13,10 +13,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Value } from "@radix-ui/react-select";
+import { Files } from "lucide-react";
 
-const genders = ["masculino", "femenino", "otro"];
+const genders = ["Masculino", "Femenino", "Otro"];
 const addressTypes = ["Barrio", "Vereda", "Corregimiento", "Comuna"];
-const apprenticeTypes = ["interno", "externo"];
+const apprenticeTypes = ["Interno", "Externo"];
 const statusOptions = ["Active", "Inactive"];
 
 export default function UpdateApprentice({ id }) {
@@ -37,13 +39,13 @@ export default function UpdateApprentice({ id }) {
     tel_responsible: "",
     email_responsible: "",
     id_municipality: 0,
-    file_Id: 0,
+    stratum_Apprentice: "",
   });
 
   const { data, isLoading } = useQuery({
     queryKey: ["apprentice", id],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/api/Apprentice/${id}`);
+      const res = await axiosInstance.get(`/api/Apprentice/GetApprenticeByIdAdmi/${id}`);
       return res.data || {};
     },
     enabled: !!id,
@@ -69,7 +71,7 @@ export default function UpdateApprentice({ id }) {
         tel_responsible: data.tel_responsible || "",
         email_responsible: data.email_responsible || "",
         id_municipality: data.Id_municipality || 0, // Ajusta según el ID real
-        file_Id: data.file_Id || 0,
+        stratum_Apprentice: data.stratum_apprentice || "",
       }));
     }
   }, [data]);
@@ -81,6 +83,14 @@ export default function UpdateApprentice({ id }) {
       return res.data;
     },
   });
+
+  const { data: files = [] } = useQuery({
+    queryKey: ["files"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/Api/File/GetFiles");
+      return res.data;
+    },
+  })
 
   const [id_department, setDepartmentId] = useState(null);
 
@@ -99,7 +109,7 @@ export default function UpdateApprentice({ id }) {
   const mutation = useMutation({
     mutationFn: async () => {
       console.log("Enviando datos:", formData);
-      await axiosInstance.put(`/api/Apprentice/${id}`, formData);
+      await axiosInstance.put(`/api/Apprentice/UpdateApprentice/${id}`, formData);
     },
     onSuccess: () => {
       alert("Aprendiz actualizado correctamente");
@@ -121,19 +131,15 @@ export default function UpdateApprentice({ id }) {
   };
 
   if (isLoading) return <p>Cargando datos del aprendiz...</p>;
-
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 ">
-     
-    <Label>Estado del Aprendiz: {data.status_Apprentice}</Label>
-    <hr></hr>
-    <Label>Nombre</Label>
-    <Input
-      name="first_name_apprentice"
-      value={formData.first_name_apprentice}
-      onChange={handleChange}
-      required
-    />
+      <Label>Nombre</Label>
+      <Input
+        name="first_name_apprentice"
+        value={formData.first_name_apprentice}
+        onChange={handleChange}
+        required
+      />
       <Label>Apellido</Label>
       <Input
         name="last_name_apprentice"
@@ -166,13 +172,13 @@ export default function UpdateApprentice({ id }) {
 
       <Label>Género</Label>
       <Select
-        value={formData.gender_apprentice}
+        value={formData.gender_Apprentice}
         onValueChange={(value) =>
           setFormData((prev) => ({ ...prev, gender_apprentice: value }))
         }
       >
         <SelectTrigger>
-          <SelectValue placeholder="Seleccionar Género" />
+          <SelectValue placeholder={data.gender_Apprentice} />
         </SelectTrigger>
         <SelectContent>
           {genders.map((gender) => (
@@ -198,7 +204,7 @@ export default function UpdateApprentice({ id }) {
         }
       >
         <SelectTrigger>
-          <SelectValue placeholder="Seleccionar tipo" />
+          <SelectValue placeholder={data.address_Type_Apprentice} />
         </SelectTrigger>
         <SelectContent>
           {addressTypes.map((type) => (
@@ -216,6 +222,14 @@ export default function UpdateApprentice({ id }) {
         onChange={handleChange}
       />
 
+      <Label>Estrato</Label>
+      <Input
+        placeholder={data.stratum_Apprentice}
+        name="stratum_apprentice"
+        value={formData.stratum_Apprentice || data.stratum_Apprentice}
+        onChange={handleChange}
+      />
+
       <Label>Tipo de Aprendiz</Label>
       <Select
         value={formData.tip_Apprentice}
@@ -224,7 +238,7 @@ export default function UpdateApprentice({ id }) {
         }
       >
         <SelectTrigger>
-          <SelectValue placeholder="Seleccionar tipo" />
+          <SelectValue placeholder={data.tip_Apprentice} />
         </SelectTrigger>
         <SelectContent>
           {apprenticeTypes.map((type) => (
@@ -271,7 +285,7 @@ export default function UpdateApprentice({ id }) {
         }}
       >
         <SelectTrigger>
-          <SelectValue placeholder="Seleccionar Departamento" />
+          <SelectValue placeholder={data.departmentName} />
         </SelectTrigger>
         <SelectContent>
           {departments.map((dept) => (
@@ -285,39 +299,54 @@ export default function UpdateApprentice({ id }) {
         </SelectContent>
       </Select>
 
-      <Label>
-        Municipio Seleccionado: {data.municipalityName || "Sin municipio seleccionado"}
-      </Label>
-
+      <Label>Municipio</Label>
       <Select
         value={formData.id_municipality?.toString() || ""}
         onValueChange={(value) =>
-          setFormData((prev) => ({ ...prev, id_municipality: parseInt(value) }))
+          setFormData((prev) => ({
+            ...prev,
+            id_municipality: parseInt(value), 
+          }))
         }
       >
         <SelectTrigger>
-          <SelectValue placeholder={data.municipalityName} />
+          <SelectValue placeholder={data.municipalityName || "Selecciona un municipio"} />
         </SelectTrigger>
         <SelectContent>
           {municipalities.map((mun) => (
             <SelectItem
-              key={mun.id_municipality}
-              value={mun.id_municipality.toString()}
+              key={municipalities.id_municipality}
+              value={municipalities.id_municipality.toString()} 
             >
-              {mun.municipality}
+              {municipalities.municipality}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      <Label>Ficha:</Label>
-      <Input
-        type="number"
-        name="file_Id"
-        value={formData.file_Id}
-        onChange={handleChange}
-      />
-      
+      <Label>Ficha</Label>
+      <Select
+        value={formData.file_Id?.toString() || ""}
+        onValueChange={(value) =>
+          setFormData((prev) => ({
+            ...prev,
+            file_Id: parseInt(value),
+          }))
+        }
+      >
+        <SelectTrigger>
+          <SelectValue placeholder={data.file_Id || "Selecciona una ficha"} />
+        </SelectTrigger>
+        <SelectContent>
+          {files.map((file) => (
+            <SelectItem key={file.file_Id} value={file.file_Id.toString()}>
+              {file.file_Id} - {file.programName}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+
       <Button type="submit" disabled={mutation.isLoading}>
         {mutation.isLoading ? "Actualizando..." : "Actualizar"}
       </Button>

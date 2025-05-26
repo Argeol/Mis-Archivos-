@@ -42,6 +42,7 @@ export default function RegisterApprentice({ onSuccess }) {
     ape_responsible: "",
     tel_responsible: "",
     email_responsible: "",
+    stratum_Apprentice: "",
   });
   const [step, setStep] = useState(1);
   const [id_department, setDepartmentId] = useState(null);
@@ -207,7 +208,17 @@ export default function RegisterApprentice({ onSuccess }) {
                   placeholder="Teléfono"
                   onChange={handleChange}
                   required
-                />
+                />               
+              </div>
+              <div>
+                <Label>Estrato</Label>
+                <Input
+                name="stratum_Apprentice"
+                value={formData.stratum_Apprentice || ""}
+                placeholder="Escribe letra y número"
+                onChange={handleChange}
+                required
+                />                 
               </div>
               <div>
                 <Label>Género</Label>
