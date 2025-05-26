@@ -20,11 +20,14 @@ export default function RegisterPermission({ onSuccess }) {
   const { user, isLoading, error } = useAuthUser();
   
   const queryClient = useQueryClient();
-  // const { user, isLoading, error } = useAuthUser();
 
   const [formData, setFormData] = useState({
     departureDate: "",
+    departureDateOnly: "",
+    departureTimeOnly: "",
     entryDate: "",
+    entryDateOnly: "",
+    entryTimeOnly: "",
     adress: "",
     destination: "",
     motive: "",
@@ -46,11 +49,11 @@ export default function RegisterPermission({ onSuccess }) {
     internado: "/api/Responsible/GetResponsiblesByRole/roleid=4",
   };
 
- const ordenRoles = ["instructor", "cordinador", "liderBienestar"];
+  const ordenRoles = ["instructor", "cordinador", "liderBienestar"];
+  if (user?.tip_Apprentice === "interno") {
+    ordenRoles.push("internado");
+  }
 
-if (user?.tip_Apprentice === "interno") {
-  ordenRoles.push("internado");
-}
   const fetchResponsables = async () => {
     const roles = Object.keys(getConsult);
     for (const rol of roles) {
@@ -89,7 +92,11 @@ if (user?.tip_Apprentice === "interno") {
       toast.success(`${data.message}`);
       setFormData({
         departureDate: "",
+        departureDateOnly: "",
+        departureTimeOnly: "",
         entryDate: "",
+        entryDateOnly: "",
+        entryTimeOnly: "",
         adress: "",
         destination: "",
         motive: "",
@@ -126,37 +133,59 @@ if (user?.tip_Apprentice === "interno") {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Combinar fecha y hora
+    const departureDate = `${formData.departureDateOnly}T${formData.departureTimeOnly}`;
+    const entryDate = `${formData.entryDateOnly}T${formData.entryTimeOnly}`;
+
+    setFormData((prev) => ({
+      ...prev,
+      departureDate,
+      entryDate,
+    }));
+
     mutation.mutate();
   };
-    if (isLoading) return <div>Cargando usuario...</div>;
-    if (error) return <div>Error al cargar usuario: {error.message}</div>;
-    if (!user) return <div>No se encontró información del usuario</div>;
-    console.log(user);
-    console.log("Tipo de aprendiz:", user?.tip_Apprentice);
+
+  if (isLoading) return <div>Cargando usuario...</div>;
+  if (error) return <div>Error al cargar usuario: {error.message}</div>;
+  if (!user) return <div>No se encontró información del usuario</div>;
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="p-6 "
-    >
-
+    <form onSubmit={handleSubmit} className="p-6">
       <div className="space-y-2">
-        <Label htmlFor="departureDate">Fecha de salida</Label>
+        <Label htmlFor="departureDateOnly">Fecha de salida</Label>
         <Input
-          type="datetime-local"
-          name="departureDate"
-          value={formData.departureDate}
+          type="date"
+          name="departureDateOnly"
+          value={formData.departureDateOnly}
+          onChange={handleChange}
+          required
+        />
+        <Label htmlFor="departureTimeOnly">Hora de salida</Label>
+        <Input
+          type="time"
+          name="departureTimeOnly"
+          value={formData.departureTimeOnly}
           onChange={handleChange}
           required
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="entryDate">Fecha de entrada</Label>
+        <Label htmlFor="entryDateOnly">Fecha de entrada</Label>
         <Input
-          type="datetime-local"
-          name="entryDate"
-          value={formData.entryDate}
+          type="date"
+          name="entryDateOnly"
+          value={formData.entryDateOnly}
+          onChange={handleChange}
+          required
+        />
+        <Label htmlFor="entryTimeOnly">Hora de entrada</Label>
+        <Input
+          type="time"
+          name="entryTimeOnly"
+          value={formData.entryTimeOnly}
           onChange={handleChange}
           required
         />
