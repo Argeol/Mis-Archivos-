@@ -86,7 +86,7 @@ export default function PermissionFSDashboard() {
         idKey="permissionFS_Id"
         tableCell={tableCell}
         translations={translations}
-        ignorar={["permissionFS_Id","apprenticeInfo"]}
+        ignorar={["permissionFS_Id"]}
         inf="apprentice.Aprenttice_Id"
         botonExtra={<ExportExcelButton/>}
       />

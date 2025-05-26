@@ -34,7 +34,7 @@ namespace bienesoft.Services
                 p.Alojamiento,
                 p.Sen_Empresa,
                 p.Direccion,
-                ApprenticeInfo = p.Apprentice
+                ApprenticeInfo = p.Apprentice?.First_Name_Apprentice + p.Apprentice?.Last_Name_Apprentice 
             });
 
             return result;
