@@ -14,7 +14,7 @@ function ModalDialog({ TitlePage, RegisterComponets, }) {
 
   return (
     <>
-      <Button onClick={handleOpen}>registrar {TitlePage}</Button>
+      <Button onClick={handleOpen}>Registrar {TitlePage}</Button>
       <Dialog open={isOpen} onOpenChange={handleCloseForm}>
         <DialogContent className="w-[95%] max-w-md sm:max-w-xl sm:rounded-xl max-h-[95vh] overflow-auto">
           <DialogHeader>

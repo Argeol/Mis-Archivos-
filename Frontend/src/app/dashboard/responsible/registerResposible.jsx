@@ -28,8 +28,6 @@ export default function RegisterResponsible() {
     state: "Activo", 
   });
 
-  const [localLoading, setLocalLoading] = useState(false); // ✅ Declarado correctamente
-
   // ✅ Mutación para Registrar Responsable
   const mutation = useMutation({
     mutationFn: async () => {
@@ -56,15 +54,10 @@ export default function RegisterResponsible() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Manejo del submit con localLoading
+  // ✅ Manejo del submit usando solo mutation
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLocalLoading(true);
-    mutation.mutate(undefined, {
-      onSettled: () => {
-        setLocalLoading(false);
-      },
-    });
+    mutation.mutate();
   };
 
   const { data: roles = [] } = useQuery({
@@ -152,10 +145,10 @@ export default function RegisterResponsible() {
 
       <Button
         type="submit"
-        disabled={localLoading}
+        disabled={mutation.isLoading}
         className="mt-4 bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200 rounded-md mx-auto block w-full flex items-center justify-center gap-2"
       >
-        {localLoading ? (
+        {mutation.isLoading ? (
           <>
             <svg
               className="animate-spin h-5 w-5 text-white"
