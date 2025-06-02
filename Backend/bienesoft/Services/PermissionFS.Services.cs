@@ -17,6 +17,20 @@ namespace bienesoft.Services
             _apprenticeService = apprenticeService;
         }
 
+        public bool GetEstadoPermisoFS()
+        {
+            return _context.activarfs.FirstOrDefault()?.PermisFSActivo ?? false;
+        }
+
+        public void SetEstadoPermisoFS(bool estado)
+        {
+            var config = _context.activarfs.FirstOrDefault();
+            if (config != null)
+            {
+                config.PermisFSActivo = estado;
+                _context.SaveChanges();
+            }
+        }
         public async Task<IEnumerable<object>> GetAllAsync()
         {
             var result = await _context.permissionFS

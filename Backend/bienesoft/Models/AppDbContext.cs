@@ -28,6 +28,8 @@ namespace bienesoft.Models
         public DbSet<Role> role { get; set; }
 
         public DbSet<Municipality> municipality { get; set; }
+        public DbSet<ActivarFS> activarfs { get; set; }
+
 
 
 
