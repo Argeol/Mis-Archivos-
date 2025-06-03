@@ -23,6 +23,10 @@ namespace bienesoft.Controllers
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromBody] CreatePermissionFS model)
         {
+            var activo = _service.GetEstadoPermisoFS();
+            if (!activo)
+                return BadRequest("El registro de permisos FS está desactivado actualmente.");
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -101,6 +105,21 @@ namespace bienesoft.Controllers
 
             var permisos = await _service.GetPermisosFSDeAprendizAsync(Id);
             return Ok(permisos);
+        }
+
+        //[Authorize(Roles = "Administrador")]
+        [HttpGet("estado-permisoFS")]
+        public IActionResult GetEstadoPermisoFS()
+        {
+            return Ok(new { activo = _service.GetEstadoPermisoFS() });
+        }
+
+        //[Authorize(Roles = "Administrador")]
+        [HttpPost("estado-permisoFS")]
+        public IActionResult SetEstadoPermisoFS([FromBody] bool estado)
+        {
+            _service.SetEstadoPermisoFS(estado);
+            return Ok(new { mensaje = "Estado actualizado correctamente" });
         }
     }
 }

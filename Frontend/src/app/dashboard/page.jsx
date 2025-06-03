@@ -27,7 +27,6 @@ import ApprenticePermissionList from "./permissionGeneral/ApprenticePermissionLi
 import ModalDialog from "@/components/utils/ModalDialog";
 import RegisterPermission from "./permissionGeneral/RegisterPermission";
 
-
 export default function DashboardPage() {
   const { data: totalApprentices, isLoading: loadingApprentices } =
     useTotalApprentices();
@@ -111,12 +110,17 @@ export default function DashboardPage() {
   const formattedDate =
     currentDate.charAt(0).toUpperCase() + currentDate.slice(1);
 
+  const [activo, setActivo] = useState(null);
+  const [cargando, setCargando] = useState(false);
+  const [mensaje, setMensaje] = useState("");
+
   return (
     <PrivateNav titlespage="Contenido Principal">
       <div className="min-h-screen">
         <main
-          className={`flex-1 overflow-y-auto p-4 sm:p-6 bg-white/80 backdrop-blur-md rounded-t-2xl shadow-inner ${isMobile ? "mx-auto" : "ml-[60px]"
-            }`}
+          className={`flex-1 overflow-y-auto p-4 sm:p-6 bg-white/80 backdrop-blur-md rounded-t-2xl shadow-inner ${
+            isMobile ? "mx-auto" : "ml-[60px]"
+          }`}
         >
           {/* Encabezado del Dashboard */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
@@ -140,7 +144,6 @@ export default function DashboardPage() {
                 RegisterComponets={RegisterPermission}
               />
             )}
-
           </div>
           <div className="p-6">
             {tip === "Responsable" && (
@@ -164,6 +167,25 @@ export default function DashboardPage() {
           </div>
           {tip === "Administrador" && (
             <>
+
+              {/* <div className="p-4 border rounded w-fit">
+                <h2 className="text-lg font-bold mb-2">
+                  Control de Permisos FS
+                </h2>
+                <button
+                  onClick={manejarCambio}
+                  disabled={cargando}
+                  className={`px-4 py-2 rounded font-semibold text-white ${
+                    activo ? "bg-red-600" : "bg-green-600"
+                  }`}
+                >
+                  {activo ? "Desactivar Permiso FS" : "Activar Permiso FS"}
+                </button>
+                {mensaje && (
+                  <p className="mt-2 text-sm text-gray-700">{mensaje}</p>
+                )}
+              </div> */}
+
               {/* Tarjetas de estadísticas */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-6">
                 <Card className="overflow-hidden">

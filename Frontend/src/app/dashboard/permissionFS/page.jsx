@@ -33,11 +33,9 @@ export default function PermissionFSDashboard() {
   //   : "Sin nombre";
 
   const tableCell = [
-    (row) => `${row.apprenticeInfo.first_Name_Apprentice}`,
-    // fullName,
+    "apprenticeInfo",
     "destino", 
-    "dia_Salida", 
-    // "alojamiento", 
+    "dia_Salida",
     "sen_Empresa", 
     "direccion",
   ];
@@ -52,7 +50,7 @@ export default function PermissionFSDashboard() {
     alojamiento: "Alojamiento",
     sen_Empresa: "Sena Empresa",
     direccion: "Dirección",
-    fullName :"Nombre",
+    apprenticeInfo :"Nombre Aprendiz",
   };
 
   const handleExport = async () => {
@@ -87,7 +85,7 @@ export default function PermissionFSDashboard() {
         tableCell={tableCell}
         translations={translations}
         ignorar={["permissionFS_Id"]}
-        inf="apprentice.Aprenttice_Id"
+        inf={"apprentice_Id"}
         botonExtra={<ExportExcelButton/>}
       />
     </PrivateNav>

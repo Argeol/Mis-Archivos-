@@ -17,6 +17,20 @@ namespace bienesoft.Services
             _apprenticeService = apprenticeService;
         }
 
+        public bool GetEstadoPermisoFS()
+        {
+            return _context.activarfs.FirstOrDefault()?.PermisFSActivo ?? false;
+        }
+
+        public void SetEstadoPermisoFS(bool estado)
+        {
+            var config = _context.activarfs.FirstOrDefault();
+            if (config != null)
+            {
+                config.PermisFSActivo = estado;
+                _context.SaveChanges();
+            }
+        }
         public async Task<IEnumerable<object>> GetAllAsync()
         {
             var result = await _context.permissionFS
@@ -25,8 +39,8 @@ namespace bienesoft.Services
                     p.PermissionFS_Id,
                     p.Apprentice_Id,
                     p.Destino,
-                    p.Fec_Salida,
-                    p.Fec_Entrada,
+                    Fec_Salida = p.Fec_Salida.HasValue ? p.Fec_Salida.Value.ToString("yyyy-MM-dd") : null,
+                    Fec_Entrada = p.Fec_Entrada.HasValue ? p.Fec_Entrada.Value.ToString("yyyy-MM-dd") : null,
                     p.Dia_Salida,
                     p.Alojamiento,
                     p.Sen_Empresa,
