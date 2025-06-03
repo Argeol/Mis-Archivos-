@@ -135,10 +135,7 @@ namespace Bienesoft.Services
         public IEnumerable<object> GetAllPermissions()
         {
             var permisos = _context.permissionGN
-                .Include(a => a.Apprentice)
-                .Include(p => p.Approvals)
-                .ToList(); // <-- Ejecuta la consulta y trae los datos a memoria
-
+                .Include(p => p.Approvals);
             var resultado = permisos.Select(p => new
             {
                 p.PermissionId,

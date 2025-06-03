@@ -48,23 +48,51 @@ public class PermissionApprovalService
         if (aprendiz == null)
             return "Aprendiz no encontrado.";
 
-        var aprobacionExistente = await _context.permissionApproval
+        var aprobacionActual = await _context.permissionApproval
+            .Include(pa => pa.Responsible)
             .FirstOrDefaultAsync(pa => pa.PermissionId == idPermiso && pa.ResponsibleId == idResponsable);
 
-        if (aprobacionExistente == null)
+        if (aprobacionActual == null)
             return "No se encontró la aprobación correspondiente para este responsable.";
 
-        if (aprobacionExistente.ApprovalStatus != ApprovalStatus.Pendiente)
+        if (aprobacionActual.ApprovalStatus != ApprovalStatus.Pendiente)
             return "Usted ya ha aprobado o rechazado el permiso.";
 
-        aprobacionExistente.ApprovalStatus = ApprovalStatus.Aprobado;
-        aprobacionExistente.ApprovalDate = DateTime.Now;
-        await _context.SaveChangesAsync();
-
+        // ORDEN de aprobación
         var ordenRoles = aprendiz.Tip_Apprentice == "interno"
             ? new List<int> { 1, 2, 3, 4 }
             : new List<int> { 1, 2, 3 };
 
+        var roleActual = aprobacionActual.Responsible.RoleId;
+        var indexRolActual = ordenRoles.IndexOf(roleActual);
+
+        // Validar si todos los roles anteriores ya aprobaron
+        if (indexRolActual > 0) // si NO es el primero en la lista
+        {
+            var rolesPrevios = ordenRoles.Take(indexRolActual).ToList();
+
+            var aprobaciones = await _context.permissionApproval
+                .Include(pa => pa.Responsible)
+                .Where(pa => pa.PermissionId == idPermiso)
+                .ToListAsync();
+
+            var rolesPreviosAprobados = aprobaciones
+                .Where(pa => rolesPrevios.Contains(pa.Responsible.RoleId) && pa.ApprovalStatus == ApprovalStatus.Aprobado)
+                .Select(pa => pa.Responsible.RoleId)
+                .ToList();
+
+            if (rolesPrevios.Except(rolesPreviosAprobados).Any())
+            {
+                return "No puede aprobar aún. Debe esperar a que el responsable anterior apruebe el permiso.";
+            }
+        }
+
+        // Aprobación válida
+        aprobacionActual.ApprovalStatus = ApprovalStatus.Aprobado;
+        aprobacionActual.ApprovalDate = DateTime.Now;
+        await _context.SaveChangesAsync();
+
+        // Verificar si todos ya aprobaron
         var aprobacionesActuales = await _context.permissionApproval
             .Where(pa => pa.PermissionId == idPermiso)
             .Include(pa => pa.Responsible)
@@ -80,18 +108,13 @@ public class PermissionApprovalService
         {
             permiso.Status = Status.Aprobado;
             await _context.SaveChangesAsync();
-            if (aprendiz != null)
-            {
-                var nombreAprendiz = $"{aprendiz.First_Name_Apprentice} {aprendiz.Last_Name_Apprentice}";
-                var emailAprendiz = aprendiz.Email_Apprentice;
 
-                var res = await GeneralFunction.NotifyAprendizAsync(emailAprendiz, nombreAprendiz);
-            }
+            var nombreAprendiz = $"{aprendiz.First_Name_Apprentice} {aprendiz.Last_Name_Apprentice}";
+            var emailAprendiz = aprendiz.Email_Apprentice;
+            var res = await GeneralFunction.NotifyAprendizAsync(emailAprendiz, nombreAprendiz);
         }
         else
         {
-            string nombreAprendiz = $"{aprendiz.First_Name_Apprentice} {aprendiz.Last_Name_Apprentice}";
-
             var siguienteAprobacionPendiente = aprobacionesActuales
                 .Where(pa => pa.ApprovalStatus == ApprovalStatus.Pendiente)
                 .OrderBy(pa => pa.Responsible.RoleId)
@@ -101,6 +124,7 @@ public class PermissionApprovalService
             {
                 var siguienteResponsable = siguienteAprobacionPendiente.Responsible;
                 string emailDestino = siguienteResponsable.Email_Responsible;
+                string nombreAprendiz = $"{aprendiz.First_Name_Apprentice} {aprendiz.Last_Name_Apprentice}";
                 string nombreRol = ObtenerNombreRol(siguienteResponsable.RoleId);
 
                 await GeneralFunction.NotifyResponsibleAsync(emailDestino, nombreRol, nombreAprendiz);

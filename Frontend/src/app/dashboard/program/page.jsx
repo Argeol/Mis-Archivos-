@@ -7,8 +7,6 @@ import RegisterProgram from "./registerComponet";
 import UpdateProgram from "./UpdateComponet";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import Spinner from "@/components/Loading/spinner";
-import { Button } from "@/components/ui/button";
 import LoadingPage from "@/components/utils/LoadingPage";
 
 export default function Dashboard() {
@@ -74,7 +72,7 @@ export default function Dashboard() {
   return (
     <PrivateNav titlespage="Programas">
       {isLoading ? (
-        <Spinner />
+        <LoadingPage />
       ) : error ? (
         <p className="text-red-500 text-center">⚠️ Error al cargar programas</p>
       ) : (

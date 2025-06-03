@@ -54,7 +54,7 @@ export default function PermissionDashboard() {
     <PrivateNav titlespage="Permisos">
       <ContecPage
         registerComponets={RegisterPermission} // Puedes poner null si no lo tienes
-        titlesPage="Permisos"
+        titlesPage="Permisos" 
         titlesData={fieldLabels}
         Data={dataPermissions}
         idKey="permissionId"
