@@ -1,3 +1,7 @@
+
+// este es el de responsable aseptar y rechazar
+
+
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -9,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import ModalInfoApprentice from "../apprentice/ApprenticeInfoModal";
 import { useState } from "react";
+import { ApprovalStatusModal } from "./ApprovalStatusModal";
 
 async function fetchPendingPermissions() {
   const response = await axiosInstance.get("/api/permission/GetPendingPermissionsForResponsible", {
@@ -25,7 +30,14 @@ function formatDateTime(fecha) {
 // const [selectedApprenticeId, setSelectedApprenticeId] = useState(null);
 
 export function PendingPermissionsList() {
+  const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
+  const [selectedPermissionId, setSelectedPermissionId] = useState(null);
+  const handleViewStatus = (id) => {
+    setSelectedPermissionId(id);
+    setOpen(true);
+  };
+
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["pending-permissions"],
@@ -33,6 +45,7 @@ export function PendingPermissionsList() {
   });
   const [isOpenApprenticeModal, setIsOpenApprenticeModal] = useState(false);
   const [selectedApprenticeId, setSelectedApprenticeId] = useState(null);
+
   const aprobarPermiso = useMutation({
     mutationFn: async (idPermiso) => {
       const res = await axiosInstance.put(
@@ -147,11 +160,18 @@ export function PendingPermissionsList() {
                 variant="outline"
                 onClick={() => {
                   setSelectedApprenticeId(
-                    permiso.permission.apprentice?.id_Apprentice || null
+                    permiso.permission?.id_Apprentice || null
                   );
                   setIsOpenApprenticeModal(true);
                 }}
               >Inf Completa Aprendiz</Button>
+              <Button
+                variant="outline"
+                className="mt-2"
+                onClick={() => handleViewStatus(permiso.permission.permissionId)}
+              >
+                Ver estado de aprobación
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -164,6 +184,14 @@ export function PendingPermissionsList() {
         }}
         apprenticeId={selectedApprenticeId}
       />
+
+      {selectedPermissionId && (
+        <ApprovalStatusModal
+          permisoId={selectedPermissionId}
+          open={open}
+          onClose={() => setOpen(false)}
+        />
+      )}
     </div>
   );
 }

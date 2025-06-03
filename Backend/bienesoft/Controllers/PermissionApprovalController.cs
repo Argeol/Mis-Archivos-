@@ -32,7 +32,7 @@ namespace Bienesoft.Controllers
 
             return Ok(new { message = result });
         }
-        
+
         [Authorize(Roles = "Responsable")]
         [HttpPut("rechazar")]
         public async Task<IActionResult> RechazarPermiso([FromQuery] int idPermiso)
@@ -64,5 +64,6 @@ namespace Bienesoft.Controllers
             var data = _approvalService.GetPendingApprovalsBy(permissionId);
             return Ok(data);
         }
+        
     }
 }

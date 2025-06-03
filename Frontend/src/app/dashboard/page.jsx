@@ -110,9 +110,9 @@ export default function DashboardPage() {
   const formattedDate =
     currentDate.charAt(0).toUpperCase() + currentDate.slice(1);
 
-  const [activo, setActivo] = useState(null);
-  const [cargando, setCargando] = useState(false);
-  const [mensaje, setMensaje] = useState("");
+  // const [activo, setActivo] = useState(null);
+  // const [cargando, setCargando] = useState(false);
+  // const [mensaje, setMensaje] = useState("");
 
   return (
     <PrivateNav titlespage="Contenido Principal">

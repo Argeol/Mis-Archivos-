@@ -31,7 +31,6 @@ export default function UpdatePermission({ id }) {
       const response = await axiosInstance.get(
         `api/permission/GetPermisoById/${id}`
       );
-      console.log("📌 Datos recibidos del permiso:", response.data);
       return response.data;
     },
     enabled: !!id, // Solo ejecutar si hay un ID válido
