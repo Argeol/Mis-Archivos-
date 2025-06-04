@@ -19,7 +19,7 @@ namespace bienesoft.Controllers
             _service = service;
         }
 
-        [Authorize(Roles = "Aprendiz")]
+        [Authorize(Roles = "Aprendiz, Administrador ")]
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromBody] CreatePermissionFS model)
         {
@@ -108,14 +108,14 @@ namespace bienesoft.Controllers
         }
 
         //[Authorize(Roles = "Administrador")]
-        [HttpGet("estado-permisoFS")]
+        [HttpGet("consulta-estado-permisoFS")]
         public IActionResult GetEstadoPermisoFS()
         {
             return Ok(new { activo = _service.GetEstadoPermisoFS() });
         }
 
         //[Authorize(Roles = "Administrador")]
-        [HttpPost("estado-permisoFS")]
+        [HttpPost("cambia-estado-permisoFS")]
         public IActionResult SetEstadoPermisoFS([FromBody] bool estado)
         {
             _service.SetEstadoPermisoFS(estado);

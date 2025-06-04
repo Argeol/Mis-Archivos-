@@ -23,7 +23,7 @@ export default function RegisterPermissionFS() {
     fec_Entrada: "",
     dia_Salida: "",
     alojamiento: "",
-    sen_Empresa: "Si, No",
+    sen_Empresa: "",
     direccion: "",
   });
 
@@ -160,7 +160,7 @@ export default function RegisterPermissionFS() {
           <SelectContent>
             <SelectItem value="Miercoles">Miércoles</SelectItem>
             <SelectItem value="Domingo">Domingo</SelectItem>
-            <SelectItem value="Fin de semana">Fin de semana</SelectItem>
+            <SelectItem value="Findesemana">Fin de semana</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -168,7 +168,7 @@ export default function RegisterPermissionFS() {
       {/* ¿Sale para empresa o SENA? */}
       <div className="space-y-1 px-2">
         <Label>SENA o Empresa</Label>
-        <Select onValueChange={handleSelectSenEmpresa} defaultValue="Si">
+        <Select onValueChange={handleSelectSenEmpresa} defaultValue="No">
           <SelectTrigger>
             <SelectValue placeholder="¿Sale para empresa?" />
           </SelectTrigger>
