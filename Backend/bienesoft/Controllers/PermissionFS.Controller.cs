@@ -87,13 +87,15 @@ namespace bienesoft.Controllers
         }
 
         [HttpGet("export")]
-        public async Task<IActionResult> ExportToExcel()
+        public async Task<IActionResult> ExportToExcel([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
         {
-            var content = await _service.ExportToExcelAsync();
+            var content = await _service.ExportToExcelAsync(startDate, endDate);
             return File(content,
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        "PermisosFS.xlsx");
+                        $"PermisosFS_{startDate:yyyyMMdd}_{endDate:yyyyMMdd}.xlsx");
         }
+
+
         [Authorize(Roles = "Aprendiz")]
         [HttpGet("apprenticePermiId")]
         public async Task<IActionResult> GetPermisosDeAprendiz()

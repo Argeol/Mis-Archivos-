@@ -120,16 +120,23 @@ namespace bienesoft.Services
             return permission;
         }
 
-        public async Task<byte[]> ExportToExcelAsync()
+        public async Task<byte[]> ExportToExcelAsync(DateTime? startDate, DateTime? endDate)
         {
             using var workbook = new XLWorkbook();
             var worksheet = workbook.Worksheets.Add("Permisos");
 
-            var permisos = await _context.permissionFS
+            var query = _context.permissionFS
                 .Include(p => p.Apprentice)
                     .ThenInclude(a => a.File)
                         .ThenInclude(f => f.program)
-                .ToListAsync();
+                .AsQueryable();
+
+            if (startDate.HasValue && endDate.HasValue)
+            {
+                query = query.Where(p => p.Fec_Salida >= startDate && p.Fec_Salida <= endDate);
+            }
+
+            var permisos = await query.ToListAsync();
 
             // Encabezados
             worksheet.Cell(1, 1).Value = "Documento Aprendiz";
@@ -171,11 +178,11 @@ namespace bienesoft.Services
                 row++;
             }
 
-            int total = await _context.permissionFS
+            int total = permisos
                 .Where(p => p.Fec_Salida != null)
                 .Select(p => p.Apprentice_Id)
                 .Distinct()
-                .CountAsync();
+                .Count();
 
             worksheet.Cell(row, 14).Value = "Total:";
             worksheet.Cell(row, 15).Value = total;
@@ -184,6 +191,7 @@ namespace bienesoft.Services
             workbook.SaveAs(stream);
             return stream.ToArray();
         }
+
 
         public async Task<IEnumerable<object>> GetPermisosFSDeAprendizAsync(int apprenticeId)
         {

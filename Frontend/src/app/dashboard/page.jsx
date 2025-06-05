@@ -24,6 +24,7 @@ import { PendingPermissionsList } from "./permissionGeneral/PendingPermissionsLi
 import ApprenticePermissionList from "./permissionGeneral/ApprenticePermissionList";
 import ModalDialog from "@/components/utils/ModalDialog";
 import RegisterPermission from "./permissionGeneral/RegisterPermission";
+import RegisterPermissionFS from "./permissionFS/RegisterPermissionFS";
 import axiosInstance from "@/lib/axiosInstance";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -213,7 +214,8 @@ export default function DashboardPage() {
                 TitlePage="Permiso"
                 RegisterComponets={RegisterPermission}
               />
-            )}
+            )
+            }
           </div>
 
           {/* Sección para Responsables */}
