@@ -130,7 +130,7 @@ namespace bienesoft.Controllers
             if (string.IsNullOrEmpty(idresponsableClaim) || !int.TryParse(idresponsableClaim, out int id))
                 return Unauthorized(new { message = "ID de responsable inválido." });
 
-            var permisos = await _permissionApproval.ObtenerPermisosPendientesPorResponsableAsync(id);
+            var permisos = _permissionApproval.ObtenerPermisosPendientesPorResponsableAsync(id);
             return Ok(permisos);
         }
 

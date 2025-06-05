@@ -58,12 +58,12 @@ namespace Bienesoft.Controllers
             var result = await _approvalService.GetEstadoPermisoAsync(idPermiso);
             return Ok(result);
         }
-        [HttpGet("pendientes-aprobar")]
-        public IActionResult GetPendingApprovals([FromQuery] int permissionId)
-        {
-            var data = _approvalService.GetPendingApprovalsBy(permissionId);
-            return Ok(data);
-        }
+        // [HttpGet("pendientes-aprobar")]
+        // public IActionResult GetPendingApprovals([FromQuery] int permissionId)
+        // {
+        //     var data = _approvalService.GetPendingApprovalsBy(permissionId);
+        //     return Ok(data);
+        // }
         
     }
 }

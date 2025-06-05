@@ -1,7 +1,3 @@
-
-// este es el de responsable aseptar y rechazar
-
-
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -26,35 +22,28 @@ function formatDateTime(fecha) {
   const date = new Date(fecha);
   return format(date, "hh:mm a dd-MM-yyyy");
 }
-// const [isOpenApprenticeModal, setIsOpenApprenticeModal] = useState(false);
-// const [selectedApprenticeId, setSelectedApprenticeId] = useState(null);
 
 export function PendingPermissionsList() {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
   const [selectedPermissionId, setSelectedPermissionId] = useState(null);
-  const handleViewStatus = (id) => {
-    setSelectedPermissionId(id);
-    setOpen(true);
-  };
-
+  const [isOpenApprenticeModal, setIsOpenApprenticeModal] = useState(false);
+  const [selectedApprenticeId, setSelectedApprenticeId] = useState(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["pending-permissions"],
     queryFn: fetchPendingPermissions,
   });
-  const [isOpenApprenticeModal, setIsOpenApprenticeModal] = useState(false);
-  const [selectedApprenticeId, setSelectedApprenticeId] = useState(null);
 
   const aprobarPermiso = useMutation({
     mutationFn: async (idPermiso) => {
-      const res = await axiosInstance.put(
-        `/api/PermissionApproval/aprobar?idPermiso=${idPermiso}`
-      );
+      const res = await axiosInstance.put(`/api/PermissionApproval/aprobar?idPermiso=${idPermiso}`);
       return res.data.message;
     },
     onSuccess: (message) => {
-      toast.success(message);
+     toast.success(message, {
+        duration: 5000, // duración en milisegundos
+      });
       queryClient.invalidateQueries(["pending-permissions"]);
     },
     onError: (error) => {
@@ -64,13 +53,13 @@ export function PendingPermissionsList() {
 
   const rechazarPermiso = useMutation({
     mutationFn: async (idPermiso) => {
-      const res = await axiosInstance.put(
-        `/api/PermissionApproval/rechazar?idPermiso=${idPermiso}`
-      );
+      const res = await axiosInstance.put(`/api/PermissionApproval/rechazar?idPermiso=${idPermiso}`);
       return res.data.message;
     },
     onSuccess: (message) => {
-      toast.success(message);
+      toast.success(message, {
+        duration: 5000, // duración en milisegundos
+      });
       queryClient.invalidateQueries(["pending-permissions"]);
     },
     onError: (error) => {
@@ -102,44 +91,28 @@ export function PendingPermissionsList() {
         <Card key={permiso.permissionId}>
           <CardContent className="p-4 space-y-1">
             <p className="text-sm font-medium">
-              Aprendiz: {permiso.permission.apprentice?.first_Name_Apprentice}{" "}
-              {permiso.permission.apprentice?.last_Name_Apprentice}
+              Aprendiz: {permiso.first_Name_Apprentice} {permiso.last_Name_Apprentice}
             </p>
             <p className="text-xs text-gray-600">
-              Fecha de salida:{" "}
-              {formatDateTime(permiso.permission.departureDate)}
+              Fecha de salida: {formatDateTime(permiso.departureDate)}
             </p>
             <p className="text-xs text-gray-600">
-              Fecha de entrada: {formatDateTime(permiso.permission.entryDate)}
+              Fecha de entrada: {formatDateTime(permiso.entryDate)}
+            </p>
+            <p className="text-xs text-gray-600">Dirección: {permiso.adress}</p>
+            <p className="text-xs text-gray-600">Destino: {permiso.destination}</p>
+            <p className="text-xs text-gray-600">Motivo: {permiso.motive}</p>
+            <p className="text-xs text-gray-600">Observación: {permiso.observation}</p>
+            <p className="text-xs text-gray-600">Tipo de aprendiz: {permiso.tip_Apprentice}</p>
+            <p className="text-xs text-gray-600">Ficha: {permiso.file_Id}</p>
+            <p className="text-xs text-gray-600">
+              Responsable: {permiso.nom_responsible} {permiso.ape_responsible}
             </p>
             <p className="text-xs text-gray-600">
-              Dirección: {permiso.permission.adress}
-            </p>
-            <p className="text-xs text-gray-600">
-              Destino: {permiso.permission.destination}
-            </p>
-            <p className="text-xs text-gray-600">
-              Motivo: {permiso.permission.motive}
-            </p>
-            <p className="text-xs text-gray-600">
-              Observación: {permiso.permission.observation}
-            </p>
-            <p className="text-xs text-gray-600">
-              Tipo de aprendiz: {permiso.permission.apprentice?.tip_Apprentice}
-            </p>
-            <p className="text-xs text-gray-600">
-              Ficha: {permiso.permission.apprentice?.file_Id}
-            </p>
-            <p className="text-xs text-gray-600">
-              Responsable: {permiso.permission.apprentice?.nom_responsible}{" "}
-              {permiso.permission.apprentice?.ape_responsible}
-            </p>
-            <p className="text-xs text-gray-600">
-              Teléfono del responsable:{" "}
-              {permiso.permission.apprentice?.tel_responsible}
+              Teléfono del responsable: {permiso.tel_responsible}
             </p>
 
-            <div className="space-x-2">
+            <div className="space-x-2 mt-2">
               <Button
                 size="sm"
                 onClick={() => aprobarPermiso.mutate(permiso.permissionId)}
@@ -147,6 +120,7 @@ export function PendingPermissionsList() {
               >
                 Aceptar
               </Button>
+
               <Button
                 size="sm"
                 variant="destructive"
@@ -155,20 +129,26 @@ export function PendingPermissionsList() {
               >
                 Rechazar
               </Button>
+
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => {
-                  setSelectedApprenticeId(
-                    permiso.permission?.id_Apprentice || null
-                  );
+                  setSelectedApprenticeId(permiso.id_aprendiz || null);
                   setIsOpenApprenticeModal(true);
                 }}
-              >Inf Completa Aprendiz</Button>
+              >
+                Inf Completa Aprendiz
+              </Button>
+
               <Button
+                size="sm"
                 variant="outline"
                 className="mt-2"
-                onClick={() => handleViewStatus(permiso.permission.permissionId)}
+                onClick={() => {
+                  setSelectedPermissionId(permiso.permissionId);
+                  setOpen(true);
+                }}
               >
                 Ver estado de aprobación
               </Button>
@@ -176,6 +156,7 @@ export function PendingPermissionsList() {
           </CardContent>
         </Card>
       ))}
+
       <ModalInfoApprentice
         isOpen={isOpenApprenticeModal}
         onClose={() => {

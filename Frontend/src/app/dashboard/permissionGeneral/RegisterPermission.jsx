@@ -49,10 +49,15 @@ export default function RegisterPermission({ onSuccess }) {
     internado: "/api/Responsible/GetResponsiblesByRole/roleid=4",
   };
 
-  const ordenRoles = ["instructor", "cordinador", "Bienestar"];
-  if (user?.tip_Apprentice === "interno") {
-    ordenRoles.push("internado");
-  }
+  const ordenRoles = (() => {
+    if (!user) return [];
+    const roles = ["instructor", "cordinador", "Bienestar"];
+    if (user.tip_Apprentice === "interno") {
+      roles.push("internado");
+    }
+    return roles;
+  })();
+
   const motivos = ["Médico", "Personal", "Académico", "Familiar"];
 
   const fetchResponsables = async () => {
@@ -82,7 +87,7 @@ export default function RegisterPermission({ onSuccess }) {
         responsablesSeleccionados: Object.values(formData.responsablesSeleccionados),
       };
 
-      const res = await axiosInstance.post("/api/permission/CrearPermiso", payload);
+      const res = await axiosInstance.post("/api/permission/CrearPermiso", payload,);
       return res.data;
     },
     onSuccess: (data) => {

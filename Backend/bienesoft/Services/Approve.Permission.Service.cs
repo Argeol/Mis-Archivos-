@@ -134,7 +134,6 @@ public class PermissionApprovalService
         return "Permiso aprobado exitosamente.";
     }
 
-
     public async Task<string> RechazarPermisoAsync(int idPermiso, int idResponsable)
     {
         // 1. Verifica que el responsable exista
@@ -153,8 +152,19 @@ public class PermissionApprovalService
         if (permiso == null)
             return "Permiso no encontrado.";
 
-        // 3. Busca la aprobación ya creada para este responsable
+        if (permiso.Status == Status.Aprobado || permiso.Status == Status.Rechazado)
+            return "El permiso ya fue aprobado o rechazado.";
+
+        // 3. Busca el aprendiz
+        var aprendiz = await _context.apprentice
+            .FirstOrDefaultAsync(a => a.Id_Apprentice == permiso.Id_Apprentice);
+
+        if (aprendiz == null)
+            return "Aprendiz no encontrado.";
+
+        // 4. Busca la aprobación ya creada para este responsable
         var aprobacion = await _context.permissionApproval
+            .Include(pa => pa.Responsible)
             .FirstOrDefaultAsync(pa =>
                 pa.PermissionId == idPermiso &&
                 pa.ResponsibleId == idResponsable);
@@ -162,18 +172,51 @@ public class PermissionApprovalService
         if (aprobacion == null)
             return "No existe aprobación previa para este responsable.";
 
-        // 4. Verifica que esté pendiente
         if (aprobacion.ApprovalStatus != ApprovalStatus.Pendiente)
             return "Este responsable ya respondió este permiso.";
 
-        // 5. Actualiza la aprobación a Rechazado
+        // 5. Verifica el orden de aprobación
+        var ordenRoles = aprendiz.Tip_Apprentice == "interno"
+            ? new List<int> { 1, 2, 3, 4 }
+            : new List<int> { 1, 2, 3 };
+
+        var roleActual = aprobacion.Responsible.RoleId;
+        var indexRolActual = ordenRoles.IndexOf(roleActual);
+
+        if (indexRolActual > 0)
+        {
+            var rolesPrevios = ordenRoles.Take(indexRolActual).ToList();
+
+            var aprobaciones = await _context.permissionApproval
+                .Include(pa => pa.Responsible)
+                .Where(pa => pa.PermissionId == idPermiso)
+                .ToListAsync();
+
+            var rolesPreviosAprobados = aprobaciones
+                .Where(pa => rolesPrevios.Contains(pa.Responsible.RoleId) &&
+                            pa.ApprovalStatus == ApprovalStatus.Aprobado)
+                .Select(pa => pa.Responsible.RoleId)
+                .ToList();
+
+            if (rolesPrevios.Except(rolesPreviosAprobados).Any())
+            {
+                return "No puede rechazar aún. Debe esperar a que el responsable anterior apruebe o rechace el permiso.";
+            }
+        }
+
+        // 6. Rechazo válido
         aprobacion.ApprovalStatus = ApprovalStatus.Rechazado;
         aprobacion.ApprovalDate = DateTime.Now;
-
-        // 6. Cambia el estado global del permiso a "Rechazado"
         permiso.Status = Status.Rechazado;
 
         await _context.SaveChangesAsync();
+
+        // // 7. Notificar al aprendiz del rechazo
+        // var nombreAprendiz = $"{aprendiz.First_Name_Apprentice} {aprendiz.Last_Name_Apprentice}";
+        // var emailAprendiz = aprendiz.Email_Apprentice;
+        // var nombreRol = ObtenerNombreRol(responsable.RoleId);
+
+        // await GeneralFunction.NotifyRechazoAprendizAsync(emailAprendiz, nombreAprendiz, nombreRol);
 
         return "Permiso rechazado exitosamente.";
     }
@@ -248,40 +291,34 @@ public class PermissionApprovalService
             }).ToList()
         };
     }
-    public object GetPendingApprovalsBy(int permissionId)
+    public object ObtenerPermisosPendientesPorResponsableAsync(int idResponsable)
     {
         var pendientes = _context.permissionApproval
-            .Include(pa => pa.Permission)
-                .ThenInclude(p => p.Apprentice)
-                    .ThenInclude(a => a.File)
-                        .ThenInclude(f => f.program)
-            .Include(pa => pa.Responsible)
-                .ThenInclude(r => r.Role)
-        .Where(pa => pa.PermissionId == permissionId && pa.Permission.Status == Status.Pendiente)
-            .Select(pa => new
-            {
-                pa.Id, // ApprovalId
-                pa.PermissionId,
-                pa.Permission.Motive,
-                pa.Permission.DepartureDate,
-                pa.Permission.EntryDate,
-                pa.Permission.Apprentice.Tip_Apprentice,
-                RolResponsable = pa.Responsible.Role.Name_role,
-                id_aprendiz = pa.Permission.Apprentice.Id_Apprentice
-            })
-            .ToList(); // <-- ahora retorna todos
+        .Where(pa => pa.ResponsibleId == idResponsable && pa.Permission.Status == Status.Pendiente)
+        .Select(pa => new
+        {
+            pa.Id,
+            //aprendiz nom
+            pa.Permission.Apprentice.First_Name_Apprentice,
+            pa.Permission.Apprentice.Last_Name_Apprentice,
+            //permiso
+            pa.PermissionId,
+            pa.Permission.DepartureDate,
+            pa.Permission.EntryDate,
+            pa.Permission.Adress,
+            pa.Permission.Destination,
+            pa.Permission.Motive,
+            pa.Permission.Observation,
+            pa.Permission.Apprentice.Tip_Apprentice,
+            pa.Permission.Apprentice.File_Id,
+            pa.Permission.Apprentice.nom_responsible,
+            pa.Permission.Apprentice.ape_responsible,
+            pa.Permission.Apprentice.tel_responsible,
+            id_aprendiz = pa.Permission.Id_Apprentice
+        })
+        .ToList();
 
         return pendientes;
-    }
-    public async Task<List<PermissionApproval>> ObtenerPermisosPendientesPorResponsableAsync(int idResponsable)
-    {
-        var permisosPendientes = await _context.permissionApproval
-            .Include(pa => pa.Permission) // Incluye los datos del permiso
-                .ThenInclude(p => p.Apprentice) // si quieres también el aprendiz
-            .Where(pa => pa.ResponsibleId == idResponsable && pa.ApprovalStatus == ApprovalStatus.Pendiente)
-            .ToListAsync();
-
-        return permisosPendientes;
     }
 }
 
