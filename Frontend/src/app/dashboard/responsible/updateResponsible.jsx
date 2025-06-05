@@ -6,6 +6,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 export default function UpdateResponsible() {
   const queryClient = useQueryClient();
@@ -18,17 +19,16 @@ export default function UpdateResponsible() {
     email_Responsible: "",
   });
 
-  // Obtener datos del responsable actual desde un endpoint tipo "Me"
   const { data, isLoading } = useQuery({
     queryKey: ["responsible"],
     queryFn: async () => {
-      const res = await axiosInstance.get("/api/Responsible/GetResponsibleID"); // <-- debes tener este endpoint
+      const res = await axiosInstance.get("/api/Responsible/GetResponsibleID");
       return res.data || {};
     },
   });
 
   useEffect(() => {
-    if (useState) {
+    if (data) {
       setFormData((prev) => ({
         ...prev,
         ...data,
@@ -38,14 +38,14 @@ export default function UpdateResponsible() {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      await axiosInstance.put("/api/Responsible/UpdateResponsible", formData); // <-- sin ID en la URL
+      await axiosInstance.put("/api/Responsible/UpdateResponsible", formData);
     },
     onSuccess: () => {
-      alert("Responsable actualizado correctamente");
+      toast("Responsable actualizado correctamente");
       queryClient.invalidateQueries(["responsible"]);
     },
     onError: (error) => {
-      alert(error.response?.data?.message || "Error al actualizar");
+      toast(error.response?.data?.message || "Error al actualizar");
     },
   });
 
@@ -96,14 +96,44 @@ export default function UpdateResponsible() {
       <Label>Email</Label>
       <Input
         type="email"
-        name="Email_Responsible"
+        name="email_Responsible"
         value={formData.email_Responsible}
         onChange={handleChange}
         required
       />
 
-      <Button type="submit" disabled={mutation.isLoading}>
-        {mutation.isLoading ? "Actualizando..." : "Actualizar"}
+      <Button
+        type="submit"
+        disabled={mutation.isLoading}
+        className="mt-4 bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200 rounded-md mx-auto block w-full flex items-center justify-center gap-2"
+      >
+        {mutation.isLoading ? (
+          <>
+            <svg
+              className="animate-spin h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              ></path>
+            </svg>
+            Actualizando...
+          </>
+        ) : (
+          <>Actualizar</>
+        )}
       </Button>
     </form>
   );

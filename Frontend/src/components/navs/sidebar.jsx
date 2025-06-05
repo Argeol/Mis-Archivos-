@@ -4,8 +4,7 @@ import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { FaHouseUser, FaHome, FaCheckCircle, FaUsersCog, FaListAlt, FaBars, FaTimes } from "react-icons/fa"
 import GroupIcon from "@mui/icons-material/Group"
-import { useIsMobile } from "./useIsMobile"
-
+import { useIsMobile } from "@/hooks/use-mobile"
 const menuItems = [
   { href: "/dashboard/apprentice", icon: FaHouseUser, label: "Aprendiz" },
   { href: "/dashboard/file", icon: FaListAlt, label: "Ficha" },

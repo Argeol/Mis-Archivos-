@@ -50,13 +50,13 @@ function PrivateNav({ children, titlespage }) {
       className={`flex h-screen ${theme === "dark" ? "bg-gray-900" : "bg-white"
         }`}
     >
+
       {/* Sidebar solo visible para administradores */}
       {tip === "Administrador" && (
         <div className="mt-4">
           <Sidebar className="h-full shadow-md bg-white/80 backdrop-blur-md" />
         </div>
       )}
-
       {/* Contenedor principal */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Navbar superior */}
@@ -64,6 +64,7 @@ function PrivateNav({ children, titlespage }) {
           <h1 className="text-xl font-semibold text-gray-800 ms-20">
             {pageTitle}
           </h1>
+
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -78,7 +79,7 @@ function PrivateNav({ children, titlespage }) {
                   <span className="truncate">{user?.email_Apprentice || user?.email_Responsible || user?.email}</span>
                 </div>
               </DropdownMenuItem>
-
+             
               {(tip === "Aprendiz" || tip === "Responsable") && (
                 <DropdownMenuItem onClick={() => setIsModalOpen(true)}>
                   <div className="flex items-center space-x-2">

@@ -14,17 +14,16 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { data } from "react-router-dom";
 
-
-
-const genders = ["masculino", "femenino", "otro"];
+const genders = ["Masculino", "Femenino", "Otro"];
 const addressTypes = ["Barrio", "Vereda", "Corregimiento", "Comuna"];
-const tips = ["interno", "externo"];
+const tips = ["Interno", "Externo"];
 
 export default function RegisterApprentice({ onSuccess }) {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
-    id_Apprentice: 0,
+    id_Apprentice: "",
     first_Name_Apprentice: "",
     last_Name_Apprentice: "",
     birth_Date_Apprentice: "",
@@ -45,9 +44,10 @@ export default function RegisterApprentice({ onSuccess }) {
     stratum_Apprentice: "",
   });
   const [step, setStep] = useState(1);
-  const [id_department, setDepartmentId] = useState(null);
   const [program_Id, setProgramId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [errorMessage, setErrorMessage] = useState("");
 
   const { data: departments = [] } = useQuery({
     queryKey: ["departments"],
@@ -57,23 +57,17 @@ export default function RegisterApprentice({ onSuccess }) {
     },
   });
 
+  const [id_department, setDepartmentId] = useState(null);
+
   const { data: files = [] } = useQuery({
-    queryKey: ["files", program_Id],
+    queryKey: ["files"],
     queryFn: async () => {
-      if (!program_Id) return [];
-      const res = await axiosInstance.get(
-        `Api/File/GetFileProgram/${program_Id}`
-      );
+      const res = await axiosInstance.get("/Api/File/GetFiles");
       return res.data;
     },
-  });
-  const { data: program = [] } = useQuery({
-    queryKey: ["program"],
-    queryFn: async () => {
-      const res = await axiosInstance.get("/Api/Program/GetProgram");
-      return res.data;
-    },
-  });
+  })
+
+
   const { data: municipalities = [] } = useQuery({
     queryKey: ["municipalities", id_department],
     queryFn: async () => {
@@ -86,6 +80,16 @@ export default function RegisterApprentice({ onSuccess }) {
     enabled: !!id_department,
   });
 
+
+  const { data: program = [] } = useQuery({
+    queryKey: ["program"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/Api/Program/GetProgram");
+      return res.data;
+    },
+  });
+
+
   const mutation = useMutation({
     mutationFn: async () => {
       const res = await axiosInstance.post("/api/Apprentice", formData);
@@ -93,7 +97,6 @@ export default function RegisterApprentice({ onSuccess }) {
     },
     onSuccess: (data) => {
       toast.success(`${data.message}\n${data.detalle}`);
-    
       setIsModalOpen(false);
       if (onSuccess) onSuccess(); // Ejecuta callback externo si existe
       queryClient.invalidateQueries(["apprentices"]);
@@ -123,12 +126,72 @@ export default function RegisterApprentice({ onSuccess }) {
   const handleprogramChange = (value) => {
     const program_Id = parseInt(value);
     setProgramId(program_Id);
-    setFormData((prev) => ({ ...prev, file_id: 0 }));
+    setFormData((prev) => ({ ...prev, file_Id: 0 }));
+  };
+
+  const validateStep = (currentStep) => {
+    setErrorMessage("");
+    if (currentStep === 1) {
+      if (
+        !formData.id_Apprentice ||
+        formData.id_Apprentice.length < 10 ||
+        !formData.first_Name_Apprentice.trim() ||
+        !formData.last_Name_Apprentice.trim() ||
+        !formData.birth_Date_Apprentice ||
+        !formData.email_Apprentice.trim() ||
+        !formData.phone_Apprentice.trim() ||
+        !formData.stratum_Apprentice ||
+        !formData.gender_Apprentice
+      ) {
+        setErrorMessage("Por favor completa todos los campos obligatorios del paso 1 correctamente.");
+        return false;
+      }
+    }
+    if (currentStep === 2) {
+      if (
+        !formData.address_Type_Apprentice ||
+        !formData.address_Apprentice.trim() ||
+        !formData.tip_Apprentice ||
+        !id_department ||
+        !formData.Id_municipality === 0
+      ) {
+        setErrorMessage("Por favor completa todos los campos obligatorios del paso 2.");
+        return false;
+      }
+    }
+    if (currentStep === 3) {
+      if (!formData.program_Id || !formData.file_Id) {
+        setErrorMessage("Por favor selecciona Programa y Ficha en el paso 3.");
+        return false;
+      }
+    }
+    if (currentStep === 4) {
+      if (
+        !formData.email_responsible.trim() ||
+        !formData.nom_responsible.trim() ||
+        !formData.ape_responsible.trim() ||
+        !formData.tel_responsible.trim()
+      ) {
+        setErrorMessage("Por favor completa todos los campos obligatorios del paso 4.");
+        return false;
+      }
+    }
+    setErrorMessage("");
+    return true;
+  };
+
+  const handleNextStep = () => {
+    if (validateStep(step)) {
+      setStep(step + 1);
+      setErrorMessage("");
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    mutation.mutate();
+    if (validateStep(step)) {
+      mutation.mutate();
+    }
   };
 
   return (
@@ -138,27 +201,49 @@ export default function RegisterApprentice({ onSuccess }) {
         onKeyDown={(e) => {
           if (e.key === "Enter" && step < 4) {
             e.preventDefault(); // evita enviar el form por accidente
-            setStep(step + 1); // opcional, si quieres avanzar con Enter
+            if (validateStep(step)) {
+              setStep(step + 1);
+            }
           }
         }}
-        
         className="p-4 rounded-2xl bg-white space-y-6"
       >
-        {/* Paso 1: Datos personales */}
+        {/* Paso 1 · Datos personales */}
         {step === 1 && (
           <>
             <h2 className="text-lg font-semibold">Paso 1: Datos personales</h2>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Documento */}
               <div>
                 <Label>Documento</Label>
                 <Input
                   name="id_Apprentice"
                   value={formData.id_Apprentice}
                   placeholder="Documento"
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d*$/.test(value)) {
+                      setFormData({ ...formData, id_Apprentice: value });
+                    }
+                  }}
+                  min="0"
                   required
                 />
+                {formData.id_Apprentice.length > 0 &&
+                  formData.id_Apprentice.length < 8 && (
+                    <p className="text-yellow-600 text-sm mt-1">
+                      Debe tener al menos 8 dígitos.
+                    </p>
+                  )}
+                {formData.id_Apprentice.length > 10 && (
+                  <p className="text-red-600 text-sm mt-1">
+                    No puede tener más de 10 dígitos.
+                  </p>
+                )}
               </div>
+
+              {/* Nombre */}
               <div>
                 <Label>Nombre</Label>
                 <Input
@@ -169,6 +254,8 @@ export default function RegisterApprentice({ onSuccess }) {
                   required
                 />
               </div>
+
+              {/* Apellido */}
               <div>
                 <Label>Apellido</Label>
                 <Input
@@ -179,6 +266,8 @@ export default function RegisterApprentice({ onSuccess }) {
                   required
                 />
               </div>
+
+              {/* Fecha de nacimiento */}
               <div>
                 <Label>Fecha de Nacimiento</Label>
                 <Input
@@ -189,6 +278,8 @@ export default function RegisterApprentice({ onSuccess }) {
                   required
                 />
               </div>
+
+              {/* Correo */}
               <div>
                 <Label>Correo</Label>
                 <Input
@@ -196,41 +287,108 @@ export default function RegisterApprentice({ onSuccess }) {
                   type="email"
                   value={formData.email_Apprentice || ""}
                   placeholder="Correo"
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Permitir escribir siempre
+                    setFormData({ ...formData, email_Apprentice: value });
+                  }}
                   required
                 />
+                {/* Validación en tiempo real (opcional): */}
+                {!/^[^\s@]+@[^\s@]+\.com$/.test(formData.email_Apprentice || "") &&
+                  formData.email_Apprentice && (
+                    <p style={{ color: "red" }}>Correo inválido: debe contener @ y terminar en .com</p>
+                  )}
               </div>
+
+              {/* Teléfono */}
               <div>
                 <Label>Teléfono</Label>
                 <Input
                   name="phone_Apprentice"
                   value={formData.phone_Apprentice || ""}
                   placeholder="Teléfono"
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Permitir solo números
+                    if (/^\d*$/.test(value)) {
+                      setFormData({ ...formData, phone_Apprentice: value });
+                    }
+                  }}
                   required
-                />               
+                />
+                {/* Validación del largo del teléfono */}
+                {formData.phone_Apprentice.length > 0 &&
+                  formData.phone_Apprentice.length < 10 && (
+                    <p className="text-yellow-600 text-sm mt-1">
+                      Debe tener al menos 10 dígitos.
+                    </p>
+                  )}
+                {formData.phone_Apprentice.length > 10 && (
+                  <p className="text-red-600 text-sm mt-1">
+                    No puede tener más de 10 dígitos.
+                  </p>
+                )}
               </div>
+
+              {/* Grupo SISBÉN */}
               <div>
-                <Label>Estrato</Label>
-                <Input
-                name="stratum_Apprentice"
-                value={formData.stratum_Apprentice || ""}
-                placeholder="Escribe letra y número"
-                onChange={handleChange}
-                required
-                />                 
+                <Label>Grupo SISBÉN</Label>
+                <Select
+                  value={formData.stratum_Apprentice}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, stratum_Apprentice: value }))
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecciona tu grupo SISBÉN" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {/* Grupo A */}
+                    {["A1", "A2", "A3", "A4", "A5"].map((g) => (
+                      <SelectItem key={g} value={g}>
+                        {g}
+                      </SelectItem>
+                    ))}
+
+                    {/* Grupo B */}
+                    {[...Array(7)].map((_, i) => (
+                      <SelectItem key={`B${i + 1}`} value={`B${i + 1}`}>
+                        B{i + 1}
+                      </SelectItem>
+                    ))}
+
+                    {/* Grupo C */}
+                    {[...Array(18)].map((_, i) => (
+                      <SelectItem key={`C${i + 1}`} value={`C${i + 1}`}>
+                        C{i + 1}
+                      </SelectItem>
+                    ))}
+
+                    {/* Grupo D */}
+                    {[...Array(21)].map((_, i) => (
+                      <SelectItem key={`D${i + 1}`} value={`D${i + 1}`}>
+                        D{i + 1}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
+
+              {/* Género */}
               <div>
                 <Label>Género</Label>
                 <Select
-                  value={formData.gender_Apprentice || ""}
+                  value={formData.gender_Apprentice}
                   onValueChange={(value) =>
-                    setFormData({ ...formData, gender_Apprentice: value })
+                    setFormData((prev) => ({ ...prev, gender_Apprentice: value }))
                   }
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar Género" />
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecciona género" />
                   </SelectTrigger>
+
                   <SelectContent>
                     {genders.map((gender) => (
                       <SelectItem key={gender} value={gender}>
@@ -244,66 +402,18 @@ export default function RegisterApprentice({ onSuccess }) {
           </>
         )}
 
-        {/* Paso 2: Dirección */}
+        {/* Paso 2 · Datos personales */}
         {step === 2 && (
           <>
-            <h2 className="text-lg font-semibold">Paso 2: Dirección</h2>
+            <h2 className="text-lg font-semibold">Paso 2: Dirección y ubicación</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label>Tipo de Dirección</Label>
-                <Select
-                  value={formData.address_Type_Apprentice || ""}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, address_Type_Apprentice: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Tipo de Dirección" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {addressTypes.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="md:col-span-2">
-                <Label>Dirección</Label>
-                <Input
-                  value={formData.address_Apprentice || ""}
-                  name="address_Apprentice"
-                  placeholder="Dirección (Cr4 #10-15)"
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <Label>Tipo de Aprendiz</Label>
-                <Select
-                  value={formData.tip_Apprentice || ""}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, tip_Apprentice: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Interno / Externo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {tips.map((tip) => (
-                      <SelectItem key={tip} value={tip}>
-                        {tip}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
               <div>
                 <Label>Departamento</Label>
                 <Select
                   value={id_department?.toString() || ""}
-                  onValueChange={handleDepartmentChange}
+                  onValueChange={(value) => {
+                    setDepartmentId(parseInt(value));
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar Departamento" />
@@ -320,35 +430,83 @@ export default function RegisterApprentice({ onSuccess }) {
                   </SelectContent>
                 </Select>
               </div>
+
               <div>
                 <Label>Municipio</Label>
                 <Select
-                  value={formData.Id_municipality?.toString() || ""}
                   onValueChange={(value) =>
-                    setFormData({
-                      ...formData,
-                      Id_municipality: parseInt(value),
-                    })
+                    setFormData((prev) => ({ ...prev, id_municipality: Number(value) }))
                   }
+                  value={formData.id_municipality ? formData.id_municipality.toString() : ""}
+                  placeholder="Selecciona municipio"
+                  disabled={!id_department}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar Municipio" />
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecciona Municipio" />
                   </SelectTrigger>
                   <SelectContent>
-                    {municipalities.length === 0 ? (
-                      <p className="text-gray-500 p-2">
-                        No hay municipios disponibles
-                      </p>
-                    ) : (
-                      municipalities.map((municipality) => (
-                        <SelectItem
-                          key={municipality.id_municipality}
-                          value={municipality.id_municipality.toString()}
-                        >
-                          {municipality.municipality}
-                        </SelectItem>
-                      ))
-                    )}
+                    {municipalities.map((m) => (
+                      <SelectItem
+                        key={m.id_municipality}
+                        value={m.id_municipality.toString()}
+                      >
+                        {m.municipality}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Tipo de dirección</Label>
+                <Select
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, address_Type_Apprentice: value }))
+                  }
+                  value={formData.address_Type_Apprentice}
+                  placeholder="Selecciona tipo"
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecciona tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {addressTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Dirección</Label>
+                <Input
+                  name="address_Apprentice"
+                  placeholder="Dirección"
+                  onChange={handleChange}
+                  value={formData.address_Apprentice || ""}
+                />
+              </div>
+
+              <div>
+                <Label>Tipo de aprendiz</Label>
+                <Select
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, tip_Apprentice: value }))
+                  }
+                  value={formData.tip_Apprentice}
+                  placeholder="Selecciona tipo"
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecciona tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {tips.map((tip) => (
+                      <SelectItem key={tip} value={tip}>
+                        {tip}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -356,29 +514,27 @@ export default function RegisterApprentice({ onSuccess }) {
           </>
         )}
 
-        {/* Paso 3: Formación */}
+        {/* Paso 3: Programa y ficha */}
         {step === 3 && (
           <>
-            <h2 className="text-lg font-semibold">
-              Paso 3: Información académica
-            </h2>
+            <h2 className="text-lg font-semibold">Paso 3: Programa y ficha</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label>Programas</Label>
+                <Label>Programa</Label>
                 <Select
-                  value={program_Id?.toString() || ""}
-                  onValueChange={handleprogramChange}
+                  onValueChange={(value) => {
+                    setFormData((prev) => ({ ...prev, program_Id: Number(value) }));
+                  }}
+                  value={formData.program_Id ? formData.program_Id.toString() : ""}
+                  placeholder="Selecciona programa"
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar Programa" />
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecciona Programa" />
                   </SelectTrigger>
                   <SelectContent>
-                    {program.map((Program) => (
-                      <SelectItem
-                        key={Program.program_Id}
-                        value={Program.program_Id.toString()}
-                      >
-                        {Program.program_Name}
+                    {program.map((p) => (
+                      <SelectItem key={p.program_Id} value={p.program_Id.toString()}>
+                        {p.program_Name} - {p.area_Name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -387,21 +543,21 @@ export default function RegisterApprentice({ onSuccess }) {
               <div>
                 <Label>Ficha</Label>
                 <Select
-                  value={formData.file_id?.toString() || ""}
+                  value={formData.file_Id?.toString() || ""}
                   onValueChange={(value) =>
-                    setFormData({ ...formData, file_id: parseInt(value) })
+                    setFormData((prev) => ({
+                      ...prev,
+                      file_Id: parseInt(value),
+                    }))
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar Ficha" />
+                    <SelectValue placeholder="Selecciona una ficha" />
                   </SelectTrigger>
                   <SelectContent>
                     {files.map((file) => (
-                      <SelectItem
-                        key={file.file_Id}
-                        value={file.file_Id.toString()}
-                      >
-                        {file.file_Id} - {file.program.program_Name}
+                      <SelectItem key={file.file_Id} value={file.file_Id.toString()}>
+                        {file.file_Id}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -411,86 +567,144 @@ export default function RegisterApprentice({ onSuccess }) {
           </>
         )}
 
-        {/* Paso 4: Datos del acudiente */}
+        {/* Paso 4: Responsable */}
         {step === 4 && (
           <>
-            <h2 className="text-lg font-semibold">
-              Paso 4: Datos del acudiente
-            </h2>
+            <h2 className="text-lg font-semibold">Paso 4: Responsable</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label>Correo del Acudiente</Label>
-                <Input
-                  name="email_responsible"
-                  value={formData.email_responsible}
-                  placeholder="Correo del Acudiente"
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <Label>Nombre del Acudiente</Label>
+                <Label>Nombre responsable</Label>
                 <Input
                   name="nom_responsible"
-                  value={formData.nom_responsible}
-                  placeholder="Nombre del Acudiente"
+                  placeholder="Nombre responsable"
                   onChange={handleChange}
-                  required
+                  value={formData.nom_responsible || ""}
                 />
               </div>
               <div>
-                <Label>Apellido del Acudiente</Label>
+                <Label>Apellido responsable</Label>
                 <Input
                   name="ape_responsible"
-                  value={formData.ape_responsible}
-                  placeholder="Apellido del Acudiente"
+                  placeholder="Apellido responsable"
                   onChange={handleChange}
-                  required
+                  value={formData.ape_responsible || ""}
                 />
               </div>
               <div>
-                <Label>Teléfono del Acudiente</Label>
+                <Label>Teléfono responsable</Label>
                 <Input
                   name="tel_responsible"
-                  value={formData.tel_responsible}
-                  placeholder="Teléfono del Acudiente"
-                  onChange={handleChange}
+                  value={formData.tel_responsible || ""}
+                  placeholder="Teléfono responsable"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Permitir solo números
+                    if (/^\d*$/.test(value)) {
+                      setFormData({ ...formData, tel_responsible: value });
+                    }
+                  }}
                   required
                 />
+                {/* Validación del largo del teléfono */}
+                {formData.tel_responsible && formData.tel_responsible.length < 10 && (
+                  <p className="text-yellow-600 text-sm mt-1">
+                    Debe tener al menos 10 dígitos.
+                  </p>
+                )}
+                {formData.tel_responsible && formData.tel_responsible.length > 10 && (
+                  <p className="text-red-600 text-sm mt-1">
+                    No puede tener más de 10 dígitos.
+                  </p>
+                )}
+              </div>
+              <div>
+                <Label>Correo responsable</Label>
+                <Input
+                  name="email_responsible"
+                  type="email"
+                  placeholder="Correo responsable"
+                  value={formData.email_responsible || ""}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Permitir escribir siempre
+                    setFormData({ ...formData, email_responsible: value });
+                  }}
+                  required
+                />
+                {/* Validación en tiempo real (opcional): */}
+                {!/^[^\s@]+@[^\s@]+\.com$/.test(formData.email_responsible || "") &&
+                  formData.email_responsible && (
+                    <p style={{ color: "red" }}>Correo inválido: debe contener @ y terminar en .com</p>
+                  )}
               </div>
             </div>
           </>
         )}
 
-        {/* Botones de navegación */}
-        <div className="flex justify-between pt-4">
+        <div className="flex justify-between items-center mt-4">
           {step > 1 && (
             <Button
-              type="button"
               variant="outline"
-              onClick={() => setStep(step - 1)}
+              type="button"
+              onClick={() => {
+                setErrorMessage("");
+                setStep(step - 1);
+              }}
             >
-              Atrás
+              Anterior
             </Button>
           )}
-          {step < 4 ? (
-            <Button
-              type="button" // 👈 Súper importante
-              onClick={() => setStep(step + 1)}
-            >
+
+          {step < 4 && (
+            <Button type="button" onClick={handleNextStep}>
               Siguiente
             </Button>
-          ) 
-          : (
+          )}
+
+          {step === 4 && (
             <Button
-            type="button"
-            onClick={handleSubmit} // 👈 Aquí le das control total
-          >
-            Registrar Aprendiz 
-          </Button>
+              type="submit"
+              disabled={mutation.isLoading}
+              className="mt-[-1px] bg-blue-500 text-white text-sm px-4 py-1 hover:bg-blue-600 transition-colors duration-200 rounded-sm flex items-center justify-center gap-2"
+
+            >
+              {mutation.isLoading ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    ></path>
+                  </svg>
+                  Registrando...
+                </>
+              ) : (
+                <>Registrar</>
+              )}
+            </Button>
+
           )}
         </div>
-      </form>
+
+        {/* Mensaje de error de validación */}
+        {errorMessage && (
+          <p className="text-red-600 text-center mt-2 font-semibold">{errorMessage}</p>
+        )}
+      </form >
     </>
   );
 }

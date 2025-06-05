@@ -135,10 +135,7 @@ namespace Bienesoft.Services
         public IEnumerable<object> GetAllPermissions()
         {
             var permisos = _context.permissionGN
-                .Include(a => a.Apprentice)
-                .Include(p => p.Approvals)
-                .ToList(); // <-- Ejecuta la consulta y trae los datos a memoria
-
+                .Include(p => p.Approvals);
             var resultado = permisos.Select(p => new
             {
                 p.PermissionId,
@@ -279,5 +276,29 @@ namespace Bienesoft.Services
 
             return permisos;
         }
+        public async Task<string> EliminarPermisoPorAprendizAsync(int idPermiso, int idAprendiz)
+        {
+            var permiso = await _context.permissionGN
+                .FirstOrDefaultAsync(p => p.PermissionId == idPermiso && p.Id_Apprentice == idAprendiz);
+
+            if (permiso == null)
+                return "Permiso no encontrado o no pertenece al aprendiz.";
+
+            if (permiso.Status != Status.Pendiente)
+                return "Solo se pueden eliminar permisos en estado Pendiente.";
+
+            // Eliminar todas las aprobaciones relacionadas con ese permiso
+            var aprobaciones = await _context.permissionApproval
+                .Where(pa => pa.PermissionId == idPermiso)
+                .ToListAsync();
+
+            _context.permissionApproval.RemoveRange(aprobaciones);
+            _context.permissionGN.Remove(permiso);
+
+            await _context.SaveChangesAsync();
+
+            return "Permiso y todas sus aprobaciones eliminados exitosamente.";
+        }
+
     }
 }

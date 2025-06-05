@@ -248,7 +248,7 @@ namespace bienesoft.Controllers
                 await _UserServices.UpdateUserAsync(user);
 
                 // Enlace para restablecer la contraseña
-                string resetLink = $"http://localhost:3000/reset-password?token={token}";
+                string resetLink = $"http://localhost:3000/user/reset-password?token={token}";
 
                 // Enviar correo con el enlace
                 var emailResponse = await GeneralFunction.SendEmail(model.Email, resetLink);

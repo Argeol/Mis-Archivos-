@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { ApprovalStatusModal } from "./ApprovalStatusModal";
+import DeletePermissionButton from "./DeletePermission";
 
 async function fetchMyPermissions() {
   const response = await axiosInstance.get("/api/permission/GetPermissionsByApprentice", {
@@ -58,13 +59,12 @@ export default function ApprenticePermissionList() {
             <p className="text-sm font-semibold text-gray-800">
               Estado:{" "}
               <span
-                className={`${
-                  permiso.status === "Aprobado"
+                className={`${permiso.status === "Aprobado"
                     ? "text-green-600"
                     : permiso.status === "Rechazado"
-                    ? "text-red-600"
-                    : "text-yellow-600"
-                }`}
+                      ? "text-red-600"
+                      : "text-yellow-600"
+                  }`}
               >
                 {permiso.status}
               </span>
@@ -91,6 +91,10 @@ export default function ApprenticePermissionList() {
             >
               Ver estado de aprobación
             </Button>
+            {permiso.status === "Pendiente" && (
+              <DeletePermissionButton idPermiso={permiso.permissionId} />
+            )}
+
           </CardContent>
         </Card>
       ))}

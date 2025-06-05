@@ -185,26 +185,35 @@ export default function DashboardPage() {
 
   const formattedDate =
     currentDate.charAt(0).toUpperCase() + currentDate.slice(1);
-
   return (
     <PrivateNav titlespage="Contenido Principal">
       <div className="min-h-screen">
         <main
-          className={`flex-1 overflow-y-auto p-4 sm:p-6 bg-white/80 backdrop-blur-md rounded-t-2xl shadow-inner ${
-            isMobile ? "mx-auto" : "ml-[60px]"
-          }`}
+          className={`flex-1 overflow-y-auto p-4 sm:p-6 bg-white/80 backdrop-blur-md rounded-t-2xl shadow-inner ${isMobile ? "mx-auto" : "ml-[60px]"
+            }`}
         >
+          {tip === "Aprendiz" && (
+            <div className="flex justify-center items-center mt-10">
+              <img
+                src="assets/img/bienesoft.webp"
+                title="BIENESOFT"
+                className="w-20 h-20 object-contain animate-bounce"
+              />
+            </div>
+          )}
+
           {/* Encabezado del Dashboard */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
-              <div className="mt-4">
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800 drop-shadow-sm">
-                  Bienvenido a BIENESOFT,{" "}
+              <div className="mt-20">
+                <h1 className="ml-20 -mt-[55] text-2xl sm:text-3xl font-extrabold text-gray-800 drop-shadow-sm">
+                  Bienvenido,{" "}
                   {user?.first_Name_Apprentice || user?.nom_Responsible}{" "}
                   {user?.last_Name_Apprentice || user?.ape_Responsible} ({tip})
                 </h1>
               </div>
-              <p className="text-sm sm:text-base text-gray-600 mt-1">
+
+              <p className="ml-20 text-sm sm:text-base text-gray-600 mt-1">
                 {formattedDate} • Sistema de Gestión de Permisos
               </p>
             </div>
@@ -214,8 +223,27 @@ export default function DashboardPage() {
                 TitlePage="Permiso"
                 RegisterComponets={RegisterPermission}
               />
-            )
-            }
+            )}
+          </div>
+          <div className="p-6">
+            {tip === "Responsable" && (
+              <>
+                <h2 className="text-lg font-semibold mb-4">
+                  Permisos Pendientes
+                </h2>
+                <PendingPermissionsList />
+              </>
+            )}
+          </div>
+          <div className="p-6 ml-12">
+            {tip === "Aprendiz" && (
+              <>
+                <h2 className="text-lg font-semibold mb-4">
+                  Permisos Pendientes
+                </h2>
+                <ApprenticePermissionList />
+              </>
+            )}
           </div>
 
           {/* Sección para Responsables */}
