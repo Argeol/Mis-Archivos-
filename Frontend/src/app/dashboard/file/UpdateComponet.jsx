@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { CalendarIcon, Users, BookOpen, ClipboardList } from "lucide-react"
+import { toast } from "sonner";
 
 export default function UpdateFile({ id }) {
   const queryClient = useQueryClient();
@@ -43,13 +44,13 @@ export default function UpdateFile({ id }) {
     mutationFn: (updatedData) =>
       axiosInstance.put(`/Api/File/UpdateFile/${id}`, updatedData),
     onSuccess: (res) => {
-      alert(res.data.message);
+      toast.success(res.data.message); 
       queryClient.invalidateQueries(["file", id]);
     },
     onError: (error) => {
       const errorMessage =
         error.response?.data?.message || "Error desconocido.";
-      alert(errorMessage);
+      toast.error(errorMessage);
     },
   });
 
@@ -143,7 +144,7 @@ export default function UpdateFile({ id }) {
               <div className="flex items-center gap-2">
                 <BookOpen className="h-4 w-4 text-[#218EED]" />
                 <Label className="font-medium">Programa de Formación</Label>
-                
+
               </div>
               <Select
                 value={formData.program_Id?.toString() || ""}
@@ -179,9 +180,40 @@ export default function UpdateFile({ id }) {
         </CardContent>
 
         <CardFooter className="dark:bg-green-900/20 border-blue-100 dark:border-blue-800 flex justify-end ">
-          <Button type="submit" disabled={updateMutation.isLoading}>
-            {updateMutation.isLoading ? "Actualizando..." : "Actualizar Ficha"}
+          <Button
+            type="submit"
+            disabled={updateMutation.isLoading}
+            className="mt-4 bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200 rounded-md mx-auto block w-full flex items-center justify-center gap-2"
+          >
+            {updateMutation.isLoading ? (
+              <>
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
+                </svg>
+                Actualizando...
+              </>
+            ) : (
+              <>Actualizar Ficha</>
+            )}
           </Button>
+
         </CardFooter>
       </form>
     </Card>
