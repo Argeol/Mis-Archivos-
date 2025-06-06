@@ -115,6 +115,7 @@ namespace Bienesoft.Services
                     a.Stratum_Apprentice,
                     a.Gender_Apprentice,
                     a.Tip_Apprentice,
+                    a.tip_document,
                     a.nom_responsible,
                     a.ape_responsible,
                     a.email_responsible,
@@ -153,6 +154,7 @@ namespace Bienesoft.Services
                     a.Stratum_Apprentice,
                     a.Gender_Apprentice,
                     a.Tip_Apprentice,
+                    a.tip_document,
                     a.nom_responsible,
                     a.ape_responsible,
                     a.email_responsible,
@@ -216,6 +218,9 @@ namespace Bienesoft.Services
 
             if (!string.IsNullOrWhiteSpace(update.Tip_Apprentice))
                 exiteapprentice.Tip_Apprentice = update.Tip_Apprentice;
+
+            if (!string.IsNullOrWhiteSpace(update.tip_document))
+                exiteapprentice.tip_document = update.tip_document;
 
             if (!string.IsNullOrWhiteSpace(update.nom_responsible))
                 exiteapprentice.nom_responsible = update.nom_responsible;
