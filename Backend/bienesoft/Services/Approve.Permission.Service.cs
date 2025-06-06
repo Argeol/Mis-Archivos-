@@ -29,7 +29,76 @@ public class PermissionApprovalService
         GeneralFunction = new GeneralFunction(_configuration); // Inicializa GeneralFunction aquí
 
     }
+    public async Task<object> GetEstadoPermisoAsync(int idPermiso)
+    {
+        var permiso = await _context.permissionGN
+            .Include(p => p.Approvals)
+            .ThenInclude(pa => pa.Responsible)
+                .ThenInclude(r => r.Role)
+            .Include(a => a.Apprentice)
+            .FirstOrDefaultAsync(p => p.PermissionId == idPermiso);
 
+        if (permiso == null)
+        {
+            return new { success = false, message = "Permiso no encontrado." };
+        }
+
+        var aprendiz = await _context.apprentice
+            .FirstOrDefaultAsync(a => a.Id_Apprentice == permiso.Id_Apprentice);
+
+        if (aprendiz == null)
+        {
+            return new { success = false, message = "Aprendiz no encontrado." };
+        }
+
+        // Determinar los roles necesarios
+        List<int> rolesRequeridos = aprendiz.Tip_Apprentice == "interno"
+            ? new List<int> { 1, 2, 3, 4 }
+            : new List<int> { 1, 2, 3 };
+
+        // Extraer los roles que ya aprobaron
+        var aprobaciones = permiso.Approvals
+            .Where(pa => pa.ApprovalStatus == ApprovalStatus.Aprobado)
+            .Select(pa => pa.Responsible.RoleId)
+            .Distinct()
+            .ToList();
+
+        var rechazos = permiso.Approvals
+            .Any(pa => pa.ApprovalStatus == ApprovalStatus.Rechazado && rolesRequeridos.Contains(pa.Responsible.RoleId));
+
+        string estado;
+
+        if (rechazos)
+        {
+            estado = Status.Rechazado.ToString();
+        }
+        else if (rolesRequeridos.All(r => aprobaciones.Contains(r)))
+        {
+            estado = Status.Aprobado.ToString();
+        }
+        else
+        {
+            estado = Status.Pendiente.ToString();
+        }
+
+        return new
+        {
+            success = true,
+            estadoPermiso = estado,
+            aprendiz = new
+            {
+                aprendiz = permiso.Apprentice.First_Name_Apprentice + " " + permiso.Apprentice.Last_Name_Apprentice,
+                permiso.Apprentice.Tip_Apprentice
+            },
+            aprobaciones = permiso.Approvals.Select(pa => new
+            {
+                Nombre = pa.Responsible.Nom_Responsible + " " + pa.Responsible.Ape_Responsible,
+                pa.Responsible.Role.Name_role,
+                pa.ApprovalStatus,
+                pa.ApprovalDate
+            }).ToList()
+        };
+    }
     public async Task<string> AprobarPermisoAsync(int idPermiso, int idResponsable)
     {
         var permiso = await _context.permissionGN
@@ -109,10 +178,20 @@ public class PermissionApprovalService
             permiso.Status = Status.Aprobado;
             await _context.SaveChangesAsync();
 
+            // var estadoPermiso = await GetEstadoPermisoAsync(idPermiso);
+
             var nombreAprendiz = $"{aprendiz.First_Name_Apprentice} {aprendiz.Last_Name_Apprentice}";
             var emailAprendiz = aprendiz.Email_Apprentice;
-            var res = await GeneralFunction.NotifyAprendizAsync(emailAprendiz, nombreAprendiz);
+            var tipoAprendiz = aprendiz.Tip_Apprentice;
+            var acudiente = $"{aprendiz.nom_responsible} {aprendiz.ape_responsible}";
+            var acudienteTel = $"{aprendiz.tel_responsible}";
+
+            // Convertir aprobaciones a lista HTML
+            var aprobaciones = await GetAprobacionesHtmlAsync(idPermiso);
+
+            var resultadoEnvio = await GeneralFunction.NotifyAprendizAsync(emailAprendiz, nombreAprendiz, tipoAprendiz, aprobaciones, acudiente,acudienteTel);
         }
+
         else
         {
             var siguienteAprobacionPendiente = aprobacionesActuales
@@ -124,6 +203,7 @@ public class PermissionApprovalService
             {
                 var siguienteResponsable = siguienteAprobacionPendiente.Responsible;
                 string emailDestino = siguienteResponsable.Email_Responsible;
+
                 string nombreAprendiz = $"{aprendiz.First_Name_Apprentice} {aprendiz.Last_Name_Apprentice}";
                 string nombreRol = ObtenerNombreRol(siguienteResponsable.RoleId);
 
@@ -132,6 +212,18 @@ public class PermissionApprovalService
         }
 
         return "Permiso aprobado exitosamente.";
+    }
+    public async Task<List<string>> GetAprobacionesHtmlAsync(int idPermiso)
+    {
+        var aprobaciones = await _context.permissionApproval
+            .Include(pa => pa.Responsible)
+                .ThenInclude(r => r.Role)
+            .Where(pa => pa.PermissionId == idPermiso && pa.ApprovalStatus == ApprovalStatus.Aprobado)
+            .ToListAsync();
+
+        return aprobaciones
+            .Select(a => $"{a.Responsible.Nom_Responsible} {a.Responsible.Ape_Responsible} ({a.Responsible.Role.Name_role}) - {a.ApprovalDate:yyyy-MM-dd}")
+            .ToList();
     }
 
     public async Task<string> RechazarPermisoAsync(int idPermiso, int idResponsable)
@@ -210,7 +302,6 @@ public class PermissionApprovalService
         permiso.Status = Status.Rechazado;
 
         await _context.SaveChangesAsync();
-
         // // 7. Notificar al aprendiz del rechazo
         // var nombreAprendiz = $"{aprendiz.First_Name_Apprentice} {aprendiz.Last_Name_Apprentice}";
         // var emailAprendiz = aprendiz.Email_Apprentice;
@@ -221,76 +312,7 @@ public class PermissionApprovalService
         return "Permiso rechazado exitosamente.";
     }
 
-    public async Task<object> GetEstadoPermisoAsync(int idPermiso)
-    {
-        var permiso = await _context.permissionGN
-            .Include(p => p.Approvals)
-            .ThenInclude(pa => pa.Responsible)
-                .ThenInclude(r => r.Role)
-            .Include(a => a.Apprentice)
-            .FirstOrDefaultAsync(p => p.PermissionId == idPermiso);
 
-        if (permiso == null)
-        {
-            return new { success = false, message = "Permiso no encontrado." };
-        }
-
-        var aprendiz = await _context.apprentice
-            .FirstOrDefaultAsync(a => a.Id_Apprentice == permiso.Id_Apprentice);
-
-        if (aprendiz == null)
-        {
-            return new { success = false, message = "Aprendiz no encontrado." };
-        }
-
-        // Determinar los roles necesarios
-        List<int> rolesRequeridos = aprendiz.Tip_Apprentice == "interno"
-            ? new List<int> { 1, 2, 3, 4 }
-            : new List<int> { 1, 2, 3 };
-
-        // Extraer los roles que ya aprobaron
-        var aprobaciones = permiso.Approvals
-            .Where(pa => pa.ApprovalStatus == ApprovalStatus.Aprobado)
-            .Select(pa => pa.Responsible.RoleId)
-            .Distinct()
-            .ToList();
-
-        var rechazos = permiso.Approvals
-            .Any(pa => pa.ApprovalStatus == ApprovalStatus.Rechazado && rolesRequeridos.Contains(pa.Responsible.RoleId));
-
-        string estado;
-
-        if (rechazos)
-        {
-            estado = Status.Rechazado.ToString();
-        }
-        else if (rolesRequeridos.All(r => aprobaciones.Contains(r)))
-        {
-            estado = Status.Aprobado.ToString();
-        }
-        else
-        {
-            estado = Status.Pendiente.ToString();
-        }
-
-        return new
-        {
-            success = true,
-            estadoPermiso = estado,
-            aprendiz = new
-            {
-                aprendiz = permiso.Apprentice.First_Name_Apprentice + " " + permiso.Apprentice.Last_Name_Apprentice,
-                permiso.Apprentice.Tip_Apprentice
-            },
-            aprobaciones = permiso.Approvals.Select(pa => new
-            {
-                Nombre = pa.Responsible.Nom_Responsible + " " + pa.Responsible.Ape_Responsible,
-                pa.Responsible.Role.Name_role,
-                pa.ApprovalStatus,
-                pa.ApprovalDate
-            }).ToList()
-        };
-    }
     public object ObtenerPermisosPendientesPorResponsableAsync(int idResponsable)
     {
         var pendientes = _context.permissionApproval

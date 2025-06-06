@@ -20,7 +20,7 @@ import { useTotalApprentices } from "@/app/dashboard/apprentice/totalApprentices
 import { usePermissionSummary } from "@/app/dashboard/permissionGeneral/ResumenPermission";
 import { useAuthUser } from "../user/login/useCurrentUser";
 import LoadingPage from "@/components/utils/LoadingPage";
-import { PendingPermissionsList } from "./permissionGeneral/PendingPermissionsList";
+import { PendingPermissionsList } from "./permissionGeneral/ResponsiblePermissionsList";
 import ApprenticePermissionList from "./permissionGeneral/ApprenticePermissionList";
 import ModalDialog from "@/components/utils/ModalDialog";
 import RegisterPermission from "./permissionGeneral/RegisterPermission";
