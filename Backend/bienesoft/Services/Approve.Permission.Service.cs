@@ -179,17 +179,47 @@ public class PermissionApprovalService
             await _context.SaveChangesAsync();
 
             // var estadoPermiso = await GetEstadoPermisoAsync(idPermiso);
-
             var nombreAprendiz = $"{aprendiz.First_Name_Apprentice} {aprendiz.Last_Name_Apprentice}";
             var emailAprendiz = aprendiz.Email_Apprentice;
             var tipoAprendiz = aprendiz.Tip_Apprentice;
             var acudiente = $"{aprendiz.nom_responsible} {aprendiz.ape_responsible}";
             var acudienteTel = $"{aprendiz.tel_responsible}";
-
+            var fechaSalida = permiso.DepartureDate.ToString("dd 'de' MMMM 'de' yyyy - hh:mm tt");
+            var fechaEntrada = permiso.EntryDate.ToString("dd 'de' MMMM 'de' yyyy - hh:mm tt");
+            var direccion = permiso.Adress;
+            var motivo = permiso.Motive;
+            var observacion = permiso.Observation;
+            var emailAcudiente = aprendiz.email_responsible;
+            var nombreAcudiente = $"{aprendiz.nom_responsible} {aprendiz.ape_responsible}";
             // Convertir aprobaciones a lista HTML
             var aprobaciones = await GetAprobacionesHtmlAsync(idPermiso);
 
-            var resultadoEnvio = await GeneralFunction.NotifyAprendizAsync(emailAprendiz, nombreAprendiz, tipoAprendiz, aprobaciones, acudiente,acudienteTel);
+            var resultadoEnvio = await GeneralFunction.NotifyAprendizAsync(
+                emailAprendiz,       // 1
+                nombreAprendiz,      // 2
+                tipoAprendiz,        // 3
+                aprobaciones,        // 4 <- esto es una List<string>
+                acudiente,           // 5
+                acudienteTel,        // 6
+                fechaSalida,         // 7
+                fechaEntrada,        // 8
+                observacion,         // 9
+                motivo,              // 10
+                direccion);// 11
+             // Solo notificar al acudiente si el correo no está vacío
+            if (!string.IsNullOrWhiteSpace(emailAcudiente))
+            {
+                var resultadoAcudiente = await GeneralFunction.NotifyAcudienteAsync(
+                    emailAcudiente,
+                    nombreAcudiente,
+                    nombreAprendiz,
+                    fechaSalida,
+                    fechaEntrada,
+                    direccion,
+                    motivo,
+                    observacion
+                );
+            }
         }
 
         else

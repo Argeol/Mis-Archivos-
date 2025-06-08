@@ -15,13 +15,15 @@ namespace bienesoft.Controllers
     public class ApprenticeController : ControllerBase
     {
         private readonly ApprenticeService _apprenticeService;
+        private readonly ApprenticeImportService _apprenticeImportService;
         // private readonly IConfiguration _configuration;
 
         public GeneralFunction GeneralFunction;
 
-        public ApprenticeController(ApprenticeService apprenticeService)
+        public ApprenticeController(ApprenticeService apprenticeService, ApprenticeImportService apprenticeImportService)
         {
             _apprenticeService = apprenticeService;
+            _apprenticeImportService = apprenticeImportService;
             // _configuration = configuration;
 
             // Asignar la instancia del GeneralFunction al servicio
@@ -81,7 +83,7 @@ namespace bienesoft.Controllers
             {
                 // Sacamos el Id_Apprentice del token
                 var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
-                if(!int.TryParse(idApprenticeClaim, out int idApprentice))
+                if (!int.TryParse(idApprenticeClaim, out int idApprentice))
                     return Unauthorized(new { message = "No se encontró el Id_Apprentice en el token." });
                 var apprentice = _apprenticeService.GetApprenticeById(idApprentice);
                 if (apprentice == null)
@@ -92,7 +94,8 @@ namespace bienesoft.Controllers
             catch (Exception ex)
             {
                 GeneralFunction.Addlog(ex.ToString());
-                return StatusCode(500, ex.ToString());            }
+                return StatusCode(500, ex.ToString());
+            }
         }
 
         [Authorize(Roles = "Administrador")]
@@ -135,6 +138,24 @@ namespace bienesoft.Controllers
                 return StatusCode(500, new { Message = "Error al contar los aprendices.", Details = ex.Message });
             }
         }
+        [Authorize(Roles = "Administrador")]
+        [HttpPost("import")]
+        public async Task<IActionResult> ImportApprentices(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("Debe proporcionar un archivo válido.");
+
+            try
+            {
+                var result = await _apprenticeImportService.ImportApprenticesAsync(file);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Error al importar", detalle = ex.Message });
+            }
+        }
+
         // [Authorize(Roles = "Aprendiz")]
         // [HttpGet("apprendiz-only")]
         // public IActionResult GetApprenticeData()

@@ -62,13 +62,13 @@ namespace bienesoft.Models
         [Required, Phone, StringLength(12)]
         public string tel_responsible { get; set; } = string.Empty;
 
-        [Required, EmailAddress]
+        [EmailAddress]
         public string email_responsible { get; set; } = string.Empty;
 
         [Required]
         public int File_Id { get; set; }
 
-        [Required]
+        // [Required]
         public int id_municipality { get; set; }
 
         public Municipality? Municipality { get; set; }

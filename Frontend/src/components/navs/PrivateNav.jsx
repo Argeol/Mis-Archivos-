@@ -14,9 +14,13 @@ import Sidebar from "./sidebar";
 import { useAuthUser } from "@/app/user/login/useCurrentUser";
 import { UserInfoModal } from "@/app/user/login/useUserInfo";
 import axiosInstance from "@/lib/axiosInstance";
+import { toast } from "sonner";
+import { useEffect } from "react";
 
 function PrivateNav({ children, titlespage }) {
-  const pathname = usePathname();
+
+const [isTokenValid, setIsTokenValid] = useState(null); // null: cargando, true/false: resultado
+  // const pathname = usePathname();
   const { user, tip, isLoading: loadingUser, error: errorUser } = useAuthUser();
   const [theme, setTheme] = useState("light"); // Estado local para el tema
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,16 +28,38 @@ function PrivateNav({ children, titlespage }) {
 
   const handleLogout = async () => {
     try {
-      await axiosInstance.post(
-        "/api/User/Logout",
+      const response = await axiosInstance.post(
+        "/api/User/logout",
         {},
         { withCredentials: true }
       );
+      toast(response.data.message)
       router.push("/user/login");
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
     }
   };
+  useEffect(() => {
+    const validateToken = async () => {
+      try {
+        const response = await axiosInstance.get("/api/User/ValidateToken", {
+          withCredentials: true,
+        });
+
+        if (response.data.isValid === true) {
+          setIsTokenValid(true);
+        } else {
+          setIsTokenValid(false);
+        }
+      } catch (error) {
+        console.error("Error al validar token:", error);
+        setIsTokenValid(false);
+      }
+    };
+
+    validateToken();
+  }, []);
+
 
   // Manejo de la carga y error antes de renderizar el componente
 
@@ -44,7 +70,25 @@ function PrivateNav({ children, titlespage }) {
     titlespage === "Contenido Principal"
       ? titlespage
       : `Gestionar ${titlespage}`;
+  if (isTokenValid === null) return <p>Validando sesión...</p>;
 
+  if (!isTokenValid) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="p-6 bg-white rounded shadow text-center">
+          <h2 className="text-lg font-semibold text-gray-800">
+            Sesión no válida
+          </h2>
+          <p className="text-sm text-gray-600 mt-2">
+            Inicia sesión con tu usuario para acceder a esta página.
+          </p>
+          <Button className="mt-4" onClick={() => router.push("/user/login")}>
+            Ir al inicio de sesión
+          </Button>
+        </div>
+      </div>
+    );
+  }
   return (
     <div
       className={`flex h-screen ${theme === "dark" ? "bg-gray-900" : "bg-white"
@@ -89,7 +133,7 @@ function PrivateNav({ children, titlespage }) {
                   <span className="truncate">{user?.email_Apprentice || user?.email_Responsible || user?.email}</span>
                 </div>
               </DropdownMenuItem>
-             
+
               {(tip === "Aprendiz" || tip === "Responsable") && (
                 <DropdownMenuItem onClick={() => setIsModalOpen(true)}>
                   <div className="flex items-center space-x-2">

@@ -413,13 +413,18 @@ namespace bienesoft.Funcions
         }
 
         public async Task<ResponseSend> NotifyAprendizAsync(
-    string emailDestino,
-    string nombreAprendiz,
-    string tipoAprendiz,
-    List<string> aprobaciones,
-    string acudiente,
-    string acudienteTel
-)
+            string emailDestino,
+            string nombreAprendiz,
+            string tipoAprendiz,
+            List<string> aprobaciones,
+            string acudiente,
+            string acudienteTel,
+            string fechaSalida,
+            string fechaEntrada,
+            string observacion,
+            string motivo,
+            string direccion
+            )
         {
             ResponseSend response = new ResponseSend();
             try
@@ -442,26 +447,37 @@ namespace bienesoft.Funcions
 
                         // Cuerpo del correo
                         message.Body = $@"
-                    <html>
-                        <body style='font-family: Arial, sans-serif;'>
-                            <p>Hola <strong>{nombreAprendiz}</strong>,</p>
-                            <p>Nos complace informarte que tu permiso ha sido <strong>aprobado</strong> por todos los responsables asignados.</p>
-                            
-                            <p><strong>Tipo de aprendiz:</strong> {tipoAprendiz}</p>
-                            <p><strong>Acudiente:</strong> {acudiente}</p>
-                            <p><strong>Tel Acudiente:</strong> {acudienteTel}</p>
+                        <html>
+                            <body style='font-family: Arial, sans-serif;'>
+                                <p>Hola <strong>{nombreAprendiz}</strong>,</p>
+                                <p>Nos complace informarte que tu permiso ha sido <strong>aprobado</strong> por todos los responsables asignados.</p>
+                                
+                                <h3>📋 Detalles del permiso:</h3>
+                                <ul>
+                                    <li><strong>Tipo de aprendiz:</strong> {tipoAprendiz}</li>
+                                    <li><strong>Acudiente:</strong> {acudiente}</li>
+                                    <li><strong>Tel. Acudiente:</strong> {acudienteTel}</li>
+                                    <li><strong>Fecha de salida:</strong> {fechaSalida}</li>
+                                    <li><strong>Fecha de entrada:</strong> {fechaEntrada}</li>
+                                    <li><strong>Dirección destino:</strong> {direccion}</li>
+                                    <li><strong>Motivo:</strong> {motivo}</li>
+                                    <li><strong>Observaciones:</strong> {observacion}</li>
+                                </ul>
 
-                            <p><strong>Responsables que aprobaron:</strong></p>
-                            <ul>
-                                {aprobacionesHtml}
-                            </ul>
+                                <h3>✅ Responsables que aprobaron:</h3>
+                                <ul>
+                                    {aprobacionesHtml}
+                                </ul>
 
-                            <p>Por favor, conserva este correo como constancia de tu permiso aprobado.</p>
-                            <p>Tu acudiente <strong>{acudiente}</strong> ha sido notificado.</p>
-                            <p>Atentamente,</p>
-                            <p>Equipo de Bienesoft</p>
-                        </body>
-                    </html>";
+                                <hr style='margin: 20px 0;' />
+                                <p>Tu acudiente {acudiente} fue informado de tu salida del Centro Agropecuario la granja</p>
+
+                                <p><strong>🔒 Nota para portería:</strong> Este correo sirve como constancia de aprobación. Por favor, verifique identidad, fecha de salida y entrada del aprendiz.</p>
+
+                                <p>Atentamente,<br><strong>Equipo de Bienesoft</strong></p>
+                            </body>
+                        </html>";
+
 
                         message.BodyEncoding = Encoding.UTF8;
 
@@ -480,6 +496,70 @@ namespace bienesoft.Funcions
 
             return response;
         }
+        public async Task<ResponseSend> NotifyAcudienteAsync(
+    string emailAcudiente,
+    string nombreAcudiente,
+    string nombreAprendiz,
+    string fechaSalida,
+    string fechaEntrada,
+    string direccion,
+    string motivo,
+    string observacion)
+        {
+            ResponseSend response = new ResponseSend();
+
+            try
+            {
+                using (SmtpClient smtpClient = new SmtpClient(configServer.HostName, configServer.PortHost))
+                {
+                    smtpClient.Credentials = new NetworkCredential(configServer.Email, configServer.Password);
+                    smtpClient.EnableSsl = true;
+
+                    MailAddress remitente = new MailAddress(configServer.Email, "Bienesoft", Encoding.UTF8);
+                    MailAddress destinatario = new MailAddress(emailAcudiente);
+
+                    using (MailMessage message = new MailMessage(remitente, destinatario))
+                    {
+                        message.IsBodyHtml = true;
+                        message.Subject = $"Se ha aprobado un permiso para {nombreAprendiz}";
+
+                        message.Body = $@"
+                <html>
+                    <body style='font-family: Arial, sans-serif;'>
+                        <p>Estimado(a) <strong>{nombreAcudiente}</strong>,</p>
+                        <p>Le informamos que el aprendiz <strong>{nombreAprendiz}</strong> ha recibido autorización para salir, y usted ha sido notificado como acudiente.</p>
+                        <p><strong>Detalles del permiso:</strong></p>
+                        <ul>
+                            <li><strong>Fecha de salida:</strong> {fechaSalida}</li>
+                            <li><strong>Fecha de entrada:</strong> {fechaEntrada}</li>
+                            <li><strong>Dirección destino:</strong> {direccion}</li>
+                            <li><strong>Motivo:</strong> {motivo}</li>
+                            <li><strong>Observaciones:</strong> {observacion}</li>
+                        </ul>
+                        <p>Por favor, esté atento(a) a cualquier novedad.</p>
+                        <p>Gracias por su atención.</p>
+                        <p><strong>Bienesoft</strong></p>
+                    </body>
+                </html>";
+
+                        message.BodyEncoding = Encoding.UTF8;
+
+                        await smtpClient.SendMailAsync(message);
+                    }
+                }
+
+                response.Status = true;
+            }
+            catch (Exception ex)
+            {
+                Addlog($"Error al notificar al acudiente: {ex}");
+                response.Message = ex.Message;
+                response.Status = false;
+            }
+
+            return response;
+        }
+
 
 
 

@@ -15,17 +15,16 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use(
   response => response,
   error => {
-    if (error.response?.status === 403  || error.response.status === 401){
+    if (error.response?.status === 403){
       // Puedes mostrar un toast si tienes UI
       toast({
-        title: "Sesión expirada",
-        description: "Tu sesión ha expirado. Por favor, inicia sesión de nuevo.",
+        title: "Error",
+        description: "No tiene permisos para acceder a este recurso",
         variant: "destructive",
       });
-
       // Redirige al login después de un breve tiempo
       setTimeout(() => {
-        window.location.href = "/user/login";
+        window.location.href = "/dashboard";
       }, 3000);
     }
 

@@ -82,6 +82,7 @@ builder.Services.AddScoped<PermissionApprovalService>();
 builder.Services.AddScoped<RoleServices>();
 builder.Services.AddScoped<PermissionService>();
 builder.Services.AddScoped<GeneralFunction>();
+builder.Services.AddScoped<ApprenticeImportService>();
 
 // ---------------------------------
 // Configurar JWT
@@ -146,10 +147,19 @@ builder.Services.AddAuthentication(options =>
                 error = context.Error,
                 error_description = context.ErrorDescription
             }));
+
+        }, // ✅ Manejar el 403 aquí
+        OnForbidden = context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            context.Response.ContentType = "application/json";
+            return context.Response.WriteAsync(JsonSerializer.Serialize(new
+            {
+                message = "No tiene permisos para acceder a este recurso."
+            }));
         }
     };
 });
-
 // ---------------------------------
 
 var app = builder.Build();

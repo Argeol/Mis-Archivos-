@@ -32,6 +32,26 @@ namespace bienesoft.Controllers
             _UserServices = userServices;
             GeneralFunction = new GeneralFunction(_configuration); // Inicializa GeneralFunction aquí
         }
+        //cerrar sesion borrar el token de los cookies 
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            // Borrar la cookie con el nombre que usaste para guardar el token (por ejemplo: "jwt")
+            Response.Cookies.Delete("token");
+            return Ok(new { message = "Sesión cerrada correctamente" });
+
+        }
+        [HttpGet("ValidateToken")]
+        public IActionResult ValidateToken()
+        {
+            if (HttpContext.User.Identity.IsAuthenticated)
+            {
+                return Ok(new { isValid = true });
+            }
+
+            return Unauthorized(new { isValid = false });
+        }
+
 
         [HttpPost("Login")]
         public IActionResult Login(LoginUser login)
@@ -365,15 +385,6 @@ namespace bienesoft.Controllers
                 GeneralFunction.Addlog(ex.ToString());
                 return StatusCode(500, ex.ToString());
             }
-        }
-
-
-
-        [HttpPost("Logout")]
-        public IActionResult Logout()
-        {
-            Response.Cookies.Delete("token");
-            return Ok(new { message = "Sesión cerrada correctamente" });
         }
     }
 
