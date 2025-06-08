@@ -41,14 +41,14 @@ export default function RegisterProgram() {
       return await axiosInstance.post("/api/Program/CreateProgram", newProgram);
     },
     onSuccess: () => {
-      alert("✅ Programa registrado exitosamente");
+      alert("Programa registrado exitosamente");
       setProgramId("");
       setProgramName("");
       setSelectedAreaId(null);
       queryClient.invalidateQueries(["programs"]);
     },
     onError: () => {
-      alert("❌ Error al registrar el programa.");
+      alert(" Error al registrar el programa.");
     },
   });
 

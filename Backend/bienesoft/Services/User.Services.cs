@@ -123,35 +123,43 @@ namespace bienesoft.Services
             _GeneralFunction = generalFunction;
         }
 
-        public async Task<string>
-            CreateUserAsync(string email)
+        public async Task<string> CreateUserAsync(string email)
         {
+            // Validar si el email ya existe
             if (await UserByEmail(email))
                 throw new ArgumentException("El correo ya está registrado.");
-
-         
 
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                // Generar contraseña, salt y hashedPassword
                 string plainPassword = PasswordGenerator.Generate(8);
                 string salt = PasswordHasher.GenerateSalt();
                 string hashedPassword = PasswordHasher.HashPassword(plainPassword, salt);
+
+                // Crear nuevo usuario con los campos que se generan automáticamente
                 var user = new User
                 {
                     Email = email,
                     HashedPassword = hashedPassword,
                     Salt = salt,
-                    UserType = "Administrador",
+                    UserType = "Administrador",  // Se asigna automáticamente
                     SessionCount = 0,
                     Blockade = false,
-                    Asset = true
+                    Asset = true,
+                    TokJwt = null,
+                    ResetToken = null,
+                    ResetTokenExpiration = null,
+                    Id_Apprentice = null,
+                    Responsible_Id = null,
                 };
 
-                 _context.user.Add(user);
+                // Agregar y guardar cambios
+                _context.user.Add(user);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
+                // Intentar enviar correo con la contraseña generada
                 string mensajeCorreo = "Correo enviado correctamente.";
                 try
                 {
@@ -159,11 +167,10 @@ namespace bienesoft.Services
                 }
                 catch (Exception ex)
                 {
-                    mensajeCorreo = "No se pudo enviar el correo, revisa tu conexión a internet. Detalles: " + ex.Message;
+                    mensajeCorreo = "No se pudo enviar el correo. Detalles: " + ex.Message;
                 }
 
                 return mensajeCorreo;
-
             }
             catch (Exception ex)
             {
@@ -175,23 +182,30 @@ namespace bienesoft.Services
 
 
 
-
-
-        public async Task<IEnumerable<User>> AllUsersAsync()
+        public async Task<object> GetUserByIdAsync(int id)
         {
-            return await _context.user.ToListAsync();
-        }
-
-        public IEnumerable<object> GetUsers()
-        {
-            return _context.user
+            return await _context.user
+                .Where(u => u.User_Id == id)
                 .Select(u => new
                 {
                     u.Email,
                     u.UserType,
                 })
-                .ToList();
+                .FirstOrDefaultAsync();
         }
+
+        public async Task<List<object>> GetAllAdminsAsync()
+        {
+            return await _context.user
+                .Where(u => u.UserType == "Administrador")
+                .Select(u => new
+                {
+                    u.Email,
+                    u.UserType
+                })
+                .ToListAsync<object>();
+        }
+
 
         public async Task DeleteByEmailAsync(string email)
         {

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Card } from "@/components/ui/card"
-import { FaHouseUser, FaHome, FaCheckCircle, FaUsersCog, FaListAlt, FaBars, FaTimes } from "react-icons/fa"
+import { FaHouseUser, FaHome, FaCheckCircle, FaUsersCog, FaListAlt, FaBars, FaTimes, FaUserShield } from "react-icons/fa"
 import GroupIcon from "@mui/icons-material/Group"
 import { useIsMobile } from "@/hooks/use-mobile"
 const menuItems = [
@@ -11,6 +11,7 @@ const menuItems = [
   { href: "/dashboard/permissionGeneral", icon: FaCheckCircle, label: "Permisos" },
   { href: "/dashboard/program", icon: FaUsersCog, label: "Programa" },
   { href: "/dashboard/responsible", icon: GroupIcon, label: "Responsables" },
+  { href: "/dashboard/admin", icon: FaUserShield, label: "Administradores" }, 
 ]
 
 export default function Sidebar() {

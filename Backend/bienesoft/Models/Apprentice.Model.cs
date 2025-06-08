@@ -50,6 +50,8 @@ namespace bienesoft.Models
         [Required, StringLength(20)]
         public string Tip_Apprentice { get; set; } = "interno";
 
+        [Required, StringLength(5)]
+        public string tip_document { get; set; } = "CC";
 
         [Required, StringLength(45)]
         public string nom_responsible { get; set; } = string.Empty;
@@ -88,6 +90,7 @@ namespace bienesoft.Models
         public string? Stratum_apprentice { get; set; }
         public string? status_Apprentice { get; set; } = "Activo";
         public string? Tip_Apprentice {get; set;}
+        public string? tip_document {  get; set;}
         public string? nom_responsible { get; set; }
         public string? ape_responsible { get; set; }
         public string? tel_responsible { get; set; }

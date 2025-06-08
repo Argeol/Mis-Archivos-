@@ -19,6 +19,7 @@ import { data } from "react-router-dom";
 const genders = ["Masculino", "Femenino", "Otro"];
 const addressTypes = ["Barrio", "Vereda", "Corregimiento", "Comuna"];
 const tips = ["Interno", "Externo"];
+const documentstypes = ["TI", "CC"];
 
 export default function RegisterApprentice({ onSuccess }) {
   const queryClient = useQueryClient();
@@ -214,6 +215,29 @@ export default function RegisterApprentice({ onSuccess }) {
             <h2 className="text-lg font-semibold">Paso 1: Datos personales</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              <div>
+                <Label>Tipo de Documento</Label>
+                <Select
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, tip_document: value }))
+                  }
+                  value={formData.tip_document}
+                  placeholder="Selecciona tipo"
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecciona tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {documentstypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Documento */}
               <div>
                 <Label>Documento</Label>

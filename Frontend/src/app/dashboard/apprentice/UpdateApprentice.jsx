@@ -21,6 +21,7 @@ const genders = ["Masculino", "Femenino", "Otro"];
 const addressTypes = ["Barrio", "Vereda", "Corregimiento", "Comuna"];
 const apprenticeTypes = ["Interno", "Externo"];
 const statusOptions = ["Active", "Inactive"];
+const documentstypes = ["TI", "CC"];
 
 
 
@@ -187,6 +188,25 @@ export default function UpdateApprentice({ id }) {
           onChange={handleChange}
           required
         />
+
+        <Label>Tipo de Documento</Label>
+        <Select
+          value={formData.tip_document}
+          onValueChange={(value) =>
+            setFormData((prev) => ({ ...prev, tip_document: value }))
+          }
+        >
+          <SelectTrigger>
+            <SelectValue placeholder={data.tip_document} />
+          </SelectTrigger>
+          <SelectContent>
+            {documentstypes.map((type) => (
+              <SelectItem key={type} value={type}>
+                {type}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         <Label>Email</Label>
         <Input
