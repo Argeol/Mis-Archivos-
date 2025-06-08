@@ -40,11 +40,11 @@ namespace Bienesoft.Models
         public Apprentice? Apprentice { get; set; }
 
         // Propiedades auxiliares para trabajar con enums en C#
-        [NotMapped]
-        public DiaSalidaEnum DiaSalidaEnum => Enum.Parse<DiaSalidaEnum>(Dia_Salida);
+        //[NotMapped]
+        //public DiaSalidaEnum DiaSalidaEnum => Enum.Parse<DiaSalidaEnum>(Dia_Salida);
 
-        [NotMapped]
-        public SenaEmpresaEnum SenaEmpresaEnum => Enum.Parse<SenaEmpresaEnum>(Sen_Empresa);
+        //[NotMapped]
+        //public SenaEmpresaEnum SenaEmpresaEnum => <SenaEmpresaEnum>(Sen_Empresa);
 
         public DateTime? Fec_Diligenciado { get; set; }
     }
@@ -58,11 +58,11 @@ namespace Bienesoft.Models
     }
 
     // Enum para 'Sen_Empresa'
-    public enum SenaEmpresaEnum
-    {
-        Si = 1,
-        No = 2
-    }
+    //public enum SenaEmpresaEnum
+    //{
+    //    Si,
+    //    No
+    //}
 
     public class CreatePermissionFS
     {

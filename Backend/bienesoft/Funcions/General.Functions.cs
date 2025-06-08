@@ -412,7 +412,14 @@ namespace bienesoft.Funcions
     ";
         }
 
-        public async Task<ResponseSend> NotifyAprendizAsync(string emailDestino, string nombreAprendiz)
+        public async Task<ResponseSend> NotifyAprendizAsync(
+    string emailDestino,
+    string nombreAprendiz,
+    string tipoAprendiz,
+    List<string> aprobaciones,
+    string acudiente,
+    string acudienteTel
+)
         {
             ResponseSend response = new ResponseSend();
             try
@@ -429,14 +436,39 @@ namespace bienesoft.Funcions
                     {
                         message.IsBodyHtml = true;
                         message.Subject = $"Tu permiso ha sido aprobado";
-                        message.Body = $"<p>Hola {nombreAprendiz},</p><p>Tu permiso ha sido aprobado por todos los responsables.</p>";
+
+                        // Construir la lista de aprobaciones en HTML
+                        string aprobacionesHtml = string.Join("", aprobaciones.Select(a => $"<li>{a}</li>"));
+
+                        // Cuerpo del correo
+                        message.Body = $@"
+                    <html>
+                        <body style='font-family: Arial, sans-serif;'>
+                            <p>Hola <strong>{nombreAprendiz}</strong>,</p>
+                            <p>Nos complace informarte que tu permiso ha sido <strong>aprobado</strong> por todos los responsables asignados.</p>
+                            
+                            <p><strong>Tipo de aprendiz:</strong> {tipoAprendiz}</p>
+                            <p><strong>Acudiente:</strong> {acudiente}</p>
+                            <p><strong>Tel Acudiente:</strong> {acudienteTel}</p>
+
+                            <p><strong>Responsables que aprobaron:</strong></p>
+                            <ul>
+                                {aprobacionesHtml}
+                            </ul>
+
+                            <p>Por favor, conserva este correo como constancia de tu permiso aprobado.</p>
+                            <p>Tu acudiente <strong>{acudiente}</strong> ha sido notificado.</p>
+                            <p>Atentamente,</p>
+                            <p>Equipo de Bienesoft</p>
+                        </body>
+                    </html>";
+
                         message.BodyEncoding = Encoding.UTF8;
 
                         await smtpClient.SendMailAsync(message);
                     }
                 }
 
-                // response.Message = "Correo enviado exitosamente al aprendiz";
                 response.Status = true;
             }
             catch (Exception ex)
@@ -448,7 +480,6 @@ namespace bienesoft.Funcions
 
             return response;
         }
-
 
 
 

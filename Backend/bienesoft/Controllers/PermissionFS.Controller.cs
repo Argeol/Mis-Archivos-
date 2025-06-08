@@ -19,7 +19,7 @@ namespace bienesoft.Controllers
             _service = service;
         }
 
-        [Authorize(Roles = "Aprendiz")]
+        [Authorize(Roles = "Aprendiz, Administrador ")]
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromBody] CreatePermissionFS model)
         {
@@ -87,13 +87,15 @@ namespace bienesoft.Controllers
         }
 
         [HttpGet("export")]
-        public async Task<IActionResult> ExportToExcel()
+        public async Task<IActionResult> ExportToExcel([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
         {
-            var content = await _service.ExportToExcelAsync();
+            var content = await _service.ExportToExcelAsync(startDate, endDate);
             return File(content,
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        "PermisosFS.xlsx");
+                        $"PermisosFS_{startDate:yyyyMMdd}_{endDate:yyyyMMdd}.xlsx");
         }
+
+
         [Authorize(Roles = "Aprendiz")]
         [HttpGet("apprenticePermiId")]
         public async Task<IActionResult> GetPermisosDeAprendiz()
@@ -108,14 +110,14 @@ namespace bienesoft.Controllers
         }
 
         //[Authorize(Roles = "Administrador")]
-        [HttpGet("estado-permisoFS")]
+        [HttpGet("consulta-estado-permisoFS")]
         public IActionResult GetEstadoPermisoFS()
         {
             return Ok(new { activo = _service.GetEstadoPermisoFS() });
         }
 
         //[Authorize(Roles = "Administrador")]
-        [HttpPost("estado-permisoFS")]
+        [HttpPost("cambia-estado-permisoFS")]
         public IActionResult SetEstadoPermisoFS([FromBody] bool estado)
         {
             _service.SetEstadoPermisoFS(estado);

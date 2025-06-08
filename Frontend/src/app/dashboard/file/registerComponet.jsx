@@ -13,8 +13,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { CalendarIcon, Users, BookOpen, ClipboardList } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { CalendarIcon, Users, BookOpen } from "lucide-react";
+import { toast } from "sonner";
 
 const statusOptions = ["Activa", "Inactiva"];
 
@@ -26,26 +31,26 @@ export default function RegisterFile() {
     apprentice_count: "",
     start_Date: "",
     end_Date: "",
-    program_Id: "",
+    program_Id: 0,
     status: "Activo",
   });
-  console.log(formData)
 
-  // ✅ Mutación para Registrar Ficha
+  // Mutación para Registrar Ficha
   const mutation = useMutation({
     mutationFn: async () => {
       const res = await axiosInstance.post("/Api/File/CreateFile", formData);
       return res.data;
     },
     onSuccess: (data) => {
-      alert(data.message);
-      queryClient.invalidateQueries(["files"]); // 🔄 Refrescar lista de fichas
+      toast(data.message);
+      queryClient.invalidateQueries(["files"]);
     },
     onError: (error) => {
-      const errorMessage = error.response?.data?.message || "Error desconocido.";
-      alert(errorMessage);
+      const errorMessage = error.response?.data?.message || error.message || "Error desconocido.";
+      toast.error(errorMessage);
     },
   });
+
   const { data: program = [] } = useQuery({
     queryKey: ["program"],
     queryFn: async () => {
@@ -54,16 +59,21 @@ export default function RegisterFile() {
     },
   });
 
-  // ✅ Manejo de Cambios en el Formulario
+  // Manejo de Cambios en el Formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Enviar Formulario
-  const handleSubmit = async (e) => {
+  // Manejo selección programa
+  const handleSelectProgram = (value) => {
+    setFormData((prev) => ({ ...prev, program_Id: Number.parseInt(value) }));
+  };
+
+  // Enviar Formulario
+  const handleSubmit = (e) => {
     e.preventDefault();
-    mutation.mutate(); // Ejecutar la mutación
+    mutation.mutate();
   };
 
   return (
@@ -75,7 +85,7 @@ export default function RegisterFile() {
               <div className="flex items-center gap-2">
                 <BookOpen className="h-4 w-4 text-[#218EED]" />
                 <Label htmlFor="file_Id" className="font-medium">
-                  Codigo de Ficha
+                  Código de Ficha
                 </Label>
               </div>
               <Input
@@ -148,16 +158,16 @@ export default function RegisterFile() {
               <BookOpen className="h-4 w-4 text-[#218EED]" />
               <Label className="font-medium">Programa de Formación</Label>
             </div>
-            <Select
-              onValueChange={(value) => setFormData({ ...formData, program_Id: Number.parseInt(value) })}
-              required
-            >
+            <Select onValueChange={handleSelectProgram} required>
               <SelectTrigger className="border-blue-200 focus:ring-blue-500">
                 <SelectValue placeholder="Seleccionar Programa" />
               </SelectTrigger>
               <SelectContent>
                 {program.map((Program) => (
-                  <SelectItem key={Program.program_Id} value={Program.program_Id.toString()}>
+                  <SelectItem
+                    key={Program.program_Id}
+                    value={Program.program_Id.toString()}
+                  >
                     {Program.program_Name}
                   </SelectItem>
                 ))}
@@ -166,11 +176,41 @@ export default function RegisterFile() {
           </div>
         </CardContent>
 
-        <CardFooter className=" dark:bg-green-900/20  border-blue-100 dark:border-blue-800 flex justify-end pt-5">
-          <Button type="submit" disabled={mutation.isLoading} >
-            {mutation.isLoading ? "Registrando..." : "Registrar Ficha"}
+        <CardFooter className="dark:bg-green-900/20 border-blue-100 dark:border-blue-800 flex justify-end pt-5">
+          <Button
+            type="submit"
+            disabled={mutation.isLoading}
+            className="mt-4 bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200 rounded-md mx-auto block w-full flex items-center justify-center gap-2"
+          >
+            {mutation.isLoading ? (
+              <>
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
+                </svg>
+                Registrando...
+              </>
+            ) : (
+              <>Registrar Ficha</>
+            )}
           </Button>
-        </CardFooter> 
+        </CardFooter>
       </form>
     </Card>
   );

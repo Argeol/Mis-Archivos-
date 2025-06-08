@@ -110,7 +110,7 @@ namespace bienesoft.Controllers
             var result = await _permissionService.UpdatePermissionAsync(id, permiso);
             return Ok(result);
         }
-      
+
         [Authorize(Roles = "Aprendiz")]
         [HttpGet("GetPermissionsByApprentice")]
         public async Task<IActionResult> GetPermissionsByApprentice()
@@ -130,10 +130,28 @@ namespace bienesoft.Controllers
             if (string.IsNullOrEmpty(idresponsableClaim) || !int.TryParse(idresponsableClaim, out int id))
                 return Unauthorized(new { message = "ID de responsable inválido." });
 
-            var permisos = await _permissionApproval.ObtenerPermisosPendientesPorResponsableAsync(id);
+            var permisos = _permissionApproval.ObtenerPermisosPendientesPorResponsableAsync(id);
             return Ok(permisos);
         }
 
+        [Authorize(Roles = "Aprendiz")]
+        [HttpDelete("EliminarPermisoPorAprendiz")]
+        public async Task<IActionResult> EliminarPermiso(int idPermiso)
+        {
+            var idresponsableClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
+            if (string.IsNullOrEmpty(idresponsableClaim) || !int.TryParse(idresponsableClaim, out int idAprendiz))
+                return Unauthorized(new { message = "ID de responsable inválido." });
 
+            var resultado = await _permissionService.EliminarPermisoPorAprendizAsync(idPermiso, idAprendiz);
+
+            if (resultado.Contains("no encontrado") || resultado.Contains("no puede"))
+            {
+                return BadRequest(new { message = resultado });
+            }
+
+            return Ok(new { message = resultado });
+        }
     }
+
+
 }

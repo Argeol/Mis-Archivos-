@@ -3,14 +3,13 @@
 import { useState, useEffect } from "react";
 import PrivateNav from "@/components/navs/PrivateNav";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import {
   Users,
   FileCheck,
   Clock,
-  Plus,
   CalendarDays,
   Clock3,
   CalendarCheck,
@@ -21,60 +20,137 @@ import { useTotalApprentices } from "@/app/dashboard/apprentice/totalApprentices
 import { usePermissionSummary } from "@/app/dashboard/permissionGeneral/ResumenPermission";
 import { useAuthUser } from "../user/login/useCurrentUser";
 import LoadingPage from "@/components/utils/LoadingPage";
-import { PendingPermissionsList } from "./permissionGeneral/PendingPermissionsList";
+import { PendingPermissionsList } from "./permissionGeneral/ResponsiblePermissionsList";
 import ApprenticePermissionList from "./permissionGeneral/ApprenticePermissionList";
-
 import ModalDialog from "@/components/utils/ModalDialog";
 import RegisterPermission from "./permissionGeneral/RegisterPermission";
+import RegisterPermissionFS from "./permissionFS/RegisterPermissionFS";
+import axiosInstance from "@/lib/axiosInstance";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 
 export default function DashboardPage() {
+  // Todos los hooks deben llamarse siempre en el mismo orden
   const { data: totalApprentices, isLoading: loadingApprentices } =
     useTotalApprentices();
   const { data: permissionSummary, isLoading: loadingSummary } =
     usePermissionSummary();
-
   const { user, tip, isLoading: loadingUser, error: errorUser } = useAuthUser();
-
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
   const isMobile = useIsMobile();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isModalopen, setIsModalOpne] = useState(false);
+  // Estados locales
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [activo, setActivo] = useState(null);
+  const [cargando, setCargando] = useState(false);
+  const [mensaje, setMensaje] = useState("");
 
-  // const handleLogout = async () => {
-  //   try {
-  //     return (
-  //       <ContactPage
-  //         registerComponets={RegisterPermission}
-  //       />
-  //     );
-  //   } catch (error) {
-  //     console.error("Error al cerrar sesión:", error);
-  //   }
-  // };
-
+  // useEffect para el loading general
   useEffect(() => {
-    // Solo quitamos loading general si todos cargan
     if (!loadingUser && !loadingApprentices && !loadingSummary) {
       setLoading(false);
     }
   }, [loadingUser, loadingApprentices, loadingSummary]);
 
+  // useEffect para obtener el estado del permiso FS
+  useEffect(() => {
+    const obtenerEstadoPermisoFS = async () => {
+      try {
+        const res = await axiosInstance.get(
+          "/api/PermissionFS/consulta-estado-permisoFS"
+        );
+        console.log("Respuesta del GET:", res.data);
+        setActivo(res.data?.activo ?? false);
+      } catch (error) {
+        console.error("Error al obtener el estado del permiso FS", error);
+        setActivo(false);
+      }
+    };
+
+    if (tip === "Administrador") {
+      obtenerEstadoPermisoFS();
+    }
+  }, [tip]);
+
+  // Función para manejar el cambio de estado del permiso FS
+  const manejarCambio = async () => {
+    setCargando(true);
+    setMensaje("");
+
+    try {
+      const nuevoEstado = !activo;
+      const payload3 = nuevoEstado.toString(); // solo el stringn
+
+      console.log("Estado actual:", activo);
+      console.log("Nuevo estado:", nuevoEstado);
+
+      let response;
+      try {
+        // Tercer intento: solo el string
+        response = await axiosInstance.post(
+          "/api/PermissionFS/cambia-estado-permisoFS",
+          payload3,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log("✅ Éxito con payload3 (solo string)");
+      } catch (error3) {
+        console.log(
+          "❌ Falló payload3, intentando payload4 (solo boolean):",
+          payload4
+        );
+      }
+
+      console.log("Respuesta del POST:", response.data);
+
+      // Actualizar el estado local
+      setActivo(nuevoEstado);
+      setMensaje(
+        `Permiso FS ${nuevoEstado ? "activado" : "desactivado"} correctamente.`
+      );
+    } catch (error) {
+      console.error("Error al cambiar el estado del permiso FS:", error);
+
+      // Mostrar más detalles del error
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        console.error("Error response headers:", error.response.headers);
+
+        // Mostrar el mensaje de error específico si está disponible
+        const errorMessage = error.response.data?.errors
+          ? Object.values(error.response.data.errors).flat().join(", ")
+          : error.response.data?.title || "Error desconocido";
+
+        setMensaje(`Error: ${errorMessage}`);
+      } else {
+        setMensaje("Ocurrió un error al cambiar el estado.");
+      }
+
+      // En caso de error, volver a obtener el estado actual
+      try {
+        const res = await axiosInstance.get(
+          "/api/PermissionFS/consulta-estado-permisoFS"
+        );
+        setActivo(res.data?.activo ?? false);
+      } catch (getError) {
+        console.error("Error al recargar el estado:", getError);
+      }
+    } finally {
+      setCargando(false);
+      setTimeout(() => setMensaje(""), 5000); // Aumenté el tiempo para leer el error
+    }
+  };
+
+  // Renderizado condicional para loading y errores
   if (loading || loadingUser) return <LoadingPage />;
 
   if (errorUser) return <div>Error al cargar usuario: {errorUser.message}</div>;
 
-  // if (!user) {
-  //   return (
-  //     <div className="flex items-center justify-center min-h-screen">
-  //       <p className="text-gray-700">
-  //         No estás autenticado. Por favor inicia sesión.
-  //       </p>
-  //     </div>
-  //   );
-  // }
-
+  // Cálculo de estadísticas
   const stats = {
     totalApprentices: totalApprentices ?? 0,
     activePermissions: permissionSummary?.aprobadosActivos ?? 0,
@@ -84,7 +160,7 @@ export default function DashboardPage() {
     permissionsThisMonth: permissionSummary?.permisosMes ?? 0,
   };
 
-  const MAX_APPRENTICES = 1300; // 100% = capacidad total
+  const MAX_APPRENTICES = 1300;
   const progressApprentices = Math.min(
     Math.round((stats.totalApprentices / MAX_APPRENTICES) * 100),
     100
@@ -109,29 +185,25 @@ export default function DashboardPage() {
 
   const formattedDate =
     currentDate.charAt(0).toUpperCase() + currentDate.slice(1);
-
-  
-
   return (
     <PrivateNav titlespage="Contenido Principal">
       <div className="min-h-screen">
         <main
-          className={`flex-1 overflow-y-auto p-4 sm:p-6 bg-white/80 backdrop-blur-md rounded-t-2xl shadow-inner ${
-            isMobile ? "mx-auto" : "ml-[60px]"
-          }`}
+          className={`flex-1 overflow-y-auto p-4 sm:p-6 bg-white/80 backdrop-blur-md rounded-t-2xl shadow-inner ${isMobile ? "mx-auto" : "ml-[60px]"
+            }`}
         >
           {/* Encabezado del Dashboard */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
-              <div className="mt-4">
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800 drop-shadow-sm">
-                  Bienvenido a BIENESOFT,{" "}
+              <div className="mt-16">
+                <h1 className=" -mt-[55] text-2xl sm:text-3xl font-extrabold text-gray-800 drop-shadow-sm">
+                  Bienvenido,{" "}
                   {user?.first_Name_Apprentice || user?.nom_Responsible}{" "}
                   {user?.last_Name_Apprentice || user?.ape_Responsible} ({tip})
                 </h1>
               </div>
 
-              <p className="text-sm sm:text-base text-gray-600 mt-1">
+              <p className=" text-sm sm:text-base text-gray-600 mt-1">
                 {formattedDate} • Sistema de Gestión de Permisos
               </p>
             </div>
@@ -143,7 +215,6 @@ export default function DashboardPage() {
               />
             )}
           </div>
-          <div className="p-6">
             {tip === "Responsable" && (
               <>
                 <h2 className="text-lg font-semibold mb-4">
@@ -152,8 +223,6 @@ export default function DashboardPage() {
                 <PendingPermissionsList />
               </>
             )}
-          </div>
-          <div className="p-6">
             {tip === "Aprendiz" && (
               <>
                 <h2 className="text-lg font-semibold mb-4">
@@ -162,27 +231,29 @@ export default function DashboardPage() {
                 <ApprenticePermissionList />
               </>
             )}
-          </div>
+          {/* Sección para Responsables */}
+          {/* {tip === "Responsable" && (
+            <div className="p-6">
+              <h2 className="text-lg font-semibold mb-4">
+                Permisos Pendientes
+              </h2>
+              <PendingPermissionsList />
+            </div>
+          )} */}
+
+          {/* Sección para Aprendices */}
+          {/* {tip === "Aprendiz" && (
+            <div className="p-6">
+              <h2 className="text-lg font-semibold mb-4">
+                Permisos Pendientes
+              </h2>
+              <ApprenticePermissionList />
+            </div>
+          )} */}
+          {/* Sección para Administradores */}
           {tip === "Administrador" && (
             <>
-
-              {/* <div className="p-4 border rounded w-fit">
-                <h2 className="text-lg font-bold mb-2">
-                  Control de Permisos FS
-                </h2>
-                <button
-                  onClick={manejarCambio}
-                  disabled={cargando}
-                  className={`px-4 py-2 rounded font-semibold text-white ${
-                    activo ? "bg-red-600" : "bg-green-600"
-                  }`}
-                >
-                  {activo ? "Desactivar Permiso FS" : "Activar Permiso FS"}
-                </button>
-                {mensaje && (
-                  <p className="mt-2 text-sm text-gray-700">{mensaje}</p>
-                )}
-              </div> */}
+              {/* Control de Permisos FS */}
 
               {/* Tarjetas de estadísticas */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-6">
@@ -196,7 +267,6 @@ export default function DashboardPage() {
                         <h3 className="text-xl sm:text-2xl font-bold mt-1">
                           {loadingApprentices ? "..." : stats.totalApprentices}
                         </h3>
-                        {/* Mostrar solo el porcentaje */}
                         {!loadingApprentices && (
                           <p className="text-xs sm:text-sm text-gray-500 mt-1">
                             {progressApprentices}%
@@ -207,12 +277,10 @@ export default function DashboardPage() {
                         <Users className="h-4 w-4 sm:h-6 sm:w-6 text-[#218EED]" />
                       </div>
                     </div>
-
-                    {/* Barra de progreso */}
                     <div className="mt-3 sm:mt-4">
                       <Progress
                         value={progressApprentices}
-                        className="h-1.5 bg-blue-100 "
+                        className="h-1.5 bg-blue-100"
                         indicatorClassName="bg-[#218EED]"
                       />
                     </div>
@@ -239,12 +307,11 @@ export default function DashboardPage() {
                         <FileCheck className="h-4 w-4 sm:h-6 sm:w-6 text-green-600" />
                       </div>
                     </div>
-
                     <div className="mt-3 sm:mt-4">
                       <Progress
                         value={progressactivePermissions}
                         className="h-1.5 bg-blue-100"
-                        indicatorClassName=" bg-green-600"
+                        indicatorClassName="bg-green-600"
                       />
                     </div>
                   </CardContent>
@@ -270,7 +337,6 @@ export default function DashboardPage() {
                         <Clock className="h-4 w-4 sm:h-6 sm:w-6 text-amber-600" />
                       </div>
                     </div>
-
                     <div className="mt-3 sm:mt-4">
                       <Progress
                         value={progresspendientesPermissions}
@@ -280,9 +346,82 @@ export default function DashboardPage() {
                     </div>
                   </CardContent>
                 </Card>
+                <Card className="mb-6 w-full">
+                  <CardContent className="p-4 sm:p-6">
+                    <CardTitle className="text-base sm:text-lg mb-3 sm:mb-4">
+                      Control de Permisos Internos
+                    </CardTitle>
+
+                    {/* Layout responsive: vertical en móvil, horizontal en desktop */}
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                      <div className="space-y-2 flex-1 min-w-0">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                          <Label
+                            htmlFor="permiso-fs"
+                            className="text-sm sm:text-base font-medium whitespace-nowrap"
+                          >
+                            Permiso
+                          </Label>
+                          <Badge
+                            variant={
+                              activo === null
+                                ? "outline"
+                                : activo
+                                ? "default"
+                                : "destructive"
+                            }
+                            className={`text-xs sm:text-sm w-fit ${
+                              activo === null
+                                ? "bg-gray-100 text-gray-600"
+                                : activo
+                                ? "bg-green-100 text-green-700 border-green-300"
+                                : "bg-red-100 text-red-700 border-red-300"
+                            }`}
+                          >
+                            {activo === null
+                              ? "Cargando..."
+                              : activo
+                              ? "Activado"
+                              : "Desactivado"}
+                          </Badge>
+                        </div>
+                        <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                          {activo === null
+                            ? "Verificando estado..."
+                            : activo
+                            ? "Permiso habilitado globalmente"
+                            : "El permiso está deshabilitado"}
+                        </p>
+                      </div>
+
+                      {/* Switch alineado a la derecha en desktop, centrado en móvil */}
+                      <div className="flex justify-center sm:justify-end">
+                        <Switch
+                          id="permiso-fs"
+                          checked={activo === true}
+                          onCheckedChange={manejarCambio}
+                          disabled={cargando || activo === null}
+                          className="data-[state=checked]:bg-green-600 data-[state=unchecked]:bg-red-600"
+                        />
+                      </div>
+                    </div>
+
+                    {mensaje && (
+                      <div
+                        className={`mt-3 sm:mt-4 p-3 rounded-lg text-xs sm:text-sm transition-all ${
+                          mensaje.includes("Error") || mensaje.includes("error")
+                            ? "bg-red-50 text-red-700 border border-red-200"
+                            : "bg-green-50 text-green-700 border border-green-200"
+                        }`}
+                      >
+                        {mensaje}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
 
-              {/* Tabs de resumen */}
+              {/* Tabs de resumen */}  
               <Tabs
                 defaultValue="overview"
                 value={activeTab}
@@ -291,39 +430,12 @@ export default function DashboardPage() {
               >
                 <TabsContent value="overview">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Gráfico Simplificado */}
-                    {/* <Card className="p-4">
-                  <CardTitle className="text-lg mb-4">Actividad de Permisos Solicitados</CardTitle>
-                  <ResponsiveContainer width="100%" height={250}>
-                    <PieChart>
-                      <Pie
-                        data={chartData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                        nameKey="name"
-                        label={({  percent }) =>  ${(percent * 100).toFixed(0)}%}
-                      >
-                        {chartData.map((entry, index) => (
-                          <Cell key={cell-${index}} fill={COLORS[index % COLORS.length]}/>
-                        ))}
-                      </Pie>
-                      <Tooltip formatter={(value) => [${value} permisos, "Cantidad"]} />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </Card> */}
-
-                    {/* Resumen con íconos */}
                     <Card className="p-4 space-y-4">
                       <CardTitle className="text-lg">
                         Resumen de Permisos
                       </CardTitle>
                       <div className="space-y-3 text-sm">
-                        <div className="flex items-center justify-between ">
+                        <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <CalendarDays className="w-5 h-5" />
                             <span>Diligenciados hoy</span>
@@ -332,7 +444,7 @@ export default function DashboardPage() {
                             {stats.permissionsToday}
                           </span>
                         </div>
-                        <div className="flex items-center justify-between ">
+                        <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Clock3 className="w-5 h-5" />
                             <span>Esta semana</span>
@@ -341,7 +453,7 @@ export default function DashboardPage() {
                             {stats.permissionsThisWeek}
                           </span>
                         </div>
-                        <div className="flex items-center justify-between ">
+                        <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <CalendarCheck className="w-5 h-5" />
                             <span>Este mes</span>
@@ -355,10 +467,8 @@ export default function DashboardPage() {
                   </div>
                 </TabsContent>
               </Tabs>
-              {/* Tarjetas de estadísticas */}
             </>
           )}
-          {/* ... (el resto del código sigue igual) */}
         </main>
       </div>
     </PrivateNav>
