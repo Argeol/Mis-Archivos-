@@ -28,6 +28,7 @@ import RegisterPermissionFS from "./permissionFS/RegisterPermissionFS";
 import axiosInstance from "@/lib/axiosInstance";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Footer } from "react-day-picker";
 
 export default function DashboardPage() {
   // Todos los hooks deben llamarse siempre en el mismo orden

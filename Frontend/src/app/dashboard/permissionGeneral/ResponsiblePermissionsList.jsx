@@ -30,6 +30,9 @@ export function PendingPermissionsList() {
   const [isOpenApprenticeModal, setIsOpenApprenticeModal] = useState(false);
   const [selectedApprenticeId, setSelectedApprenticeId] = useState(null);
 
+  const [approvingId, setApprovingId] = useState(null);
+  const [rejectingId, setRejectingId] = useState(null);
+
   const { data, isLoading, isError } = useQuery({
     queryKey: ["pending-permissions"],
     queryFn: fetchPendingPermissions,
@@ -37,33 +40,39 @@ export function PendingPermissionsList() {
 
   const aprobarPermiso = useMutation({
     mutationFn: async (idPermiso) => {
+      setApprovingId(idPermiso);
+      await new Promise((resolve) => setTimeout(resolve, 3000));
       const res = await axiosInstance.put(`/api/PermissionApproval/aprobar?idPermiso=${idPermiso}`);
       return res.data.message;
     },
     onSuccess: (message) => {
-     toast.success(message, {
-        duration: 5000, // duración en milisegundos
-      });
+      toast.success(message, { duration: 5000 });
       queryClient.invalidateQueries(["pending-permissions"]);
     },
     onError: (error) => {
       toast.error("Error al aprobar el permiso: " + error.message);
     },
+    onSettled: () => {
+      setApprovingId(null);
+    },
   });
 
   const rechazarPermiso = useMutation({
     mutationFn: async (idPermiso) => {
+      setRejectingId(idPermiso);
+      await new Promise((resolve) => setTimeout(resolve, 3000));
       const res = await axiosInstance.put(`/api/PermissionApproval/rechazar?idPermiso=${idPermiso}`);
       return res.data.message;
     },
     onSuccess: (message) => {
-      toast.success(message, {
-        duration: 5000, // duración en milisegundos
-      });
+      toast.success(message, { duration: 5000 });
       queryClient.invalidateQueries(["pending-permissions"]);
     },
     onError: (error) => {
       toast.error("Error al rechazar el permiso: " + error.message);
+    },
+    onSettled: () => {
+      setRejectingId(null);
     },
   });
 
@@ -93,43 +102,61 @@ export function PendingPermissionsList() {
             <p className="text-sm font-medium">
               Aprendiz: {permiso.first_Name_Apprentice} {permiso.last_Name_Apprentice}
             </p>
-            <p className="text-xs text-gray-600">
-              Fecha de salida: {formatDateTime(permiso.departureDate)}
-            </p>
-            <p className="text-xs text-gray-600">
-              Fecha de entrada: {formatDateTime(permiso.entryDate)}
-            </p>
+            <p className="text-xs text-gray-600">Fecha de salida: {formatDateTime(permiso.departureDate)}</p>
+            <p className="text-xs text-gray-600">Fecha de entrada: {formatDateTime(permiso.entryDate)}</p>
             <p className="text-xs text-gray-600">Dirección: {permiso.adress}</p>
             <p className="text-xs text-gray-600">Destino: {permiso.destination}</p>
             <p className="text-xs text-gray-600">Motivo: {permiso.motive}</p>
             <p className="text-xs text-gray-600">Observación: {permiso.observation}</p>
             <p className="text-xs text-gray-600">Tipo de aprendiz: {permiso.tip_Apprentice}</p>
             <p className="text-xs text-gray-600">Ficha: {permiso.file_Id}</p>
-            <p className="text-xs text-gray-600">
-              Responsable: {permiso.nom_responsible} {permiso.ape_responsible}
-            </p>
-            <p className="text-xs text-gray-600">
-              Teléfono del responsable: {permiso.tel_responsible}
-            </p>
+            <p className="text-xs text-gray-600">Responsable: {permiso.nom_responsible} {permiso.ape_responsible}</p>
+            <p className="text-xs text-gray-600">Teléfono del responsable: {permiso.tel_responsible}</p>
 
-            <div className="space-x-2 mt-2">
+            <div className="flex flex-wrap gap-2 mt-2">
+              {/* Botón Aceptar */}
               <Button
-                size="sm"
+                type="button"
+                disabled={approvingId === permiso.permissionId}
+                className="hover:bg-blue-700 bg-blue-600"
                 onClick={() => aprobarPermiso.mutate(permiso.permissionId)}
-                disabled={aprobarPermiso.isLoading}
-              >
-                Aceptar
-              </Button>
-
-              <Button
                 size="sm"
-                variant="destructive"
-                onClick={() => rechazarPermiso.mutate(permiso.permissionId)}
-                disabled={rechazarPermiso.isLoading}
               >
-                Rechazar
+                {approvingId === permiso.permissionId ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                    </svg>
+                    <span>Aceptando...</span>
+                  </>
+                ) : (
+                  <>Aceptar</>
+                )}
               </Button>
 
+              {/* Botón Rechazar */}
+              <Button
+                type="button"
+                disabled={rejectingId === permiso.permissionId}
+                className="bg-red-600 hover:bg-red-700 text-white rounded-md px-4 py-1 flex items-center gap-2"
+                onClick={() => rechazarPermiso.mutate(permiso.permissionId)}
+                size="sm"
+              >
+                {rejectingId === permiso.permissionId ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                    </svg>
+                    <span>Rechazando...</span>
+                  </>
+                ) : (
+                  <>Rechazar</>
+                )}
+              </Button>
+
+              {/* Info aprendiz */}
               <Button
                 size="sm"
                 variant="outline"
@@ -141,10 +168,10 @@ export function PendingPermissionsList() {
                 Inf Completa Aprendiz
               </Button>
 
+              {/* Estado de aprobación */}
               <Button
                 size="sm"
                 variant="outline"
-                className="mt-2"
                 onClick={() => {
                   setSelectedPermissionId(permiso.permissionId);
                   setOpen(true);

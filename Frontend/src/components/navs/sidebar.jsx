@@ -29,7 +29,7 @@ export default function Sidebar() {
   return (
     <>
       {isMobile && !isOpen && (
-        <button className="fixed top-4 left-4 z-50 bg-white shadow-md p-2 rounded-md" onClick={() => setIsOpen(true)}>
+        <button className="w-8 h-8 fixed top-4 left-4 z-50 bg-white shadow-md p-1 rounded-md mt-[-15px]" onClick={() => setIsOpen(true)}>
           <FaBars className="text-2xl text-gray-700" />
         </button>
       )}
@@ -54,7 +54,7 @@ export default function Sidebar() {
           {/* Botón cerrar (solo en móvil) */}
           {isMobile && (
             <button
-              className="absolute top-4 right-4 z-50 text-xl bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center"
+              className="absolute top-4 right-[3px] z-50 text-xl bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center"
               onClick={() => setIsOpen(false)}
               aria-label="Cerrar menú"
             >
