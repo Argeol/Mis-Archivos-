@@ -61,7 +61,11 @@ namespace bienesoft.models
         public int? Responsible_Id { get; set; }
         [ForeignKey("Responsible_Id")]
         public ResponsibleModel? Responsible { get; set; }
+
+        [Required, StringLength(20)]
+        public string Status_User { get; set; } = "Activo";
     }
+
 
     public class ResetPassUser
     {
@@ -76,6 +80,15 @@ namespace bienesoft.models
         public string HashedPassword { get; set; }
     }
 
+    public class RegisterAdmin
+    {
+        public string Email { get; set; }
+    }
+
+    public class UpdateAdmin
+    {
+        public string Email { get; set; }
+    }
     public class ResetPasswordModel
     {
         public string? Token { get; set; } = null;

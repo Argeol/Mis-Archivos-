@@ -186,40 +186,30 @@ namespace bienesoft.Controllers
                 return StatusCode(500, "Ocurrió un error en el servidor.");
             }
         }
-        [HttpPost]
-        public async Task<IActionResult> CreateUser([FromQuery] string email)
+
+        [HttpPost("createAdmi")]
+        public async Task<IActionResult> CreateUser([FromBody] RegisterAdmin request)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
-                var result = await _UserServices.CreateUserAsync(email);
-                return Ok(result);
+                var result = await _UserServices.CreateUserAsync(request.Email);
+                return Ok(new { message = result });
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { error = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Error al crear el usuario.", details = ex.Message });
+                return StatusCode(500, new { error = "Error interno: " + ex.Message });
             }
         }
 
 
-        // GET: api/Users
-        //[Authorize(Roles = "Administrador")]
-        [HttpGet]
-        public IActionResult GetUsers()
-        {
-            try
-            {
-                var users = _UserServices.GetUsers();
-                return Ok(users);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error al obtener los usuarios.", details = ex.Message });
-            }
-        }
+
 
         //[Authorize] // Protección de la ruta con JWT
         //[HttpGet("ProtectedRoute")]
@@ -266,14 +256,60 @@ namespace bienesoft.Controllers
             }
         }
 
-        //[Authorize(Roles = "Administrador")]
-        [HttpGet("AllUsers")]
-        //[Authorize]
-        public async Task<ActionResult<IEnumerable<User>>> AllUsers()
+        [HttpGet("GetUser{id}")]
+        public async Task<IActionResult> GetUserById(int id)
         {
-            var users = await _UserServices.AllUsersAsync();
-            return Ok(users);
+            var user = await _UserServices.GetUserByIdAsync(id);
+
+            if (user == null)
+                return NotFound(new { message = "Usuario no encontrado." });
+
+            return Ok(user);
         }
+
+        [HttpGet("GetAdmins")]
+        public async Task<IActionResult> GetAllAdmins()
+        {
+            try
+            {
+                var admins = await _UserServices.GetAllAdminsAsync();
+                return Ok(admins);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener administradores.", details = ex.Message });
+            }
+        }
+
+
+        [HttpPut("UpdateAdmi/{id}")]
+        //[Authorize] // 🔐 Descomenta si necesitas protección
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
+        {
+            if (id != user.User_Id)
+            {
+                return BadRequest(new { message = "El ID no Coincide" });
+            }
+
+            try
+            {
+                await _UserServices.UpdateUserAsync(user);
+                return Ok(new { message = "Usuario actualizado correctamente." });
+            }
+            catch (ArgumentNullException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Ocurrió un error al actualizar el usuario." });
+            }
+        }
+
 
 
         [HttpDelete("{email}")]
@@ -294,34 +330,6 @@ namespace bienesoft.Controllers
             }
         }
 
-        //[Authorize(Roles = "Administrador")]
-        [HttpGet("AllUsersInRange")]
-        //[Authorize]
-        public async Task<ActionResult<IEnumerable<User>>> GetAllInRange(int inicio, int fin)
-        {
-            try
-            {
-                if (inicio < 1 || fin < inicio)
-                {
-                    return BadRequest("Los parámetros de rango son inválidos.");
-                }
-
-                var usersInRange = await _UserServices.AllUsersAsync();
-                var paginatedUsers = usersInRange.Skip(inicio - 1).Take(fin - inicio + 1).ToList();
-
-                if (!paginatedUsers.Any())
-                {
-                    return NotFound("No se encontraron usuarios en el rango especificado.");
-                }
-
-                return Ok(paginatedUsers);
-            }
-            catch (Exception ex)
-            {
-                GeneralFunction.Addlog(ex.Message);
-                return StatusCode(500, ex.ToString());
-            }
-        }
         [HttpPost("ResetPasswordConfirm")]
 
         public async Task<IActionResult> ResetPasswordConfirm([FromBody] ResetPasswordModel model)
