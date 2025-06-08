@@ -188,6 +188,7 @@ namespace bienesoft.Services
                 .Where(u => u.User_Id == id)
                 .Select(u => new
                 {
+                    u.User_Id,
                     u.Email,
                     u.UserType,
                 })
@@ -200,6 +201,7 @@ namespace bienesoft.Services
                 .Where(u => u.UserType == "Administrador")
                 .Select(u => new
                 {
+                    u.User_Id,
                     u.Email,
                     u.UserType
                 })
@@ -252,6 +254,31 @@ namespace bienesoft.Services
             existingUser.Asset = user.Asset;
             existingUser.ResetToken = user.ResetToken;
             existingUser.ResetTokenExpiration = user.ResetTokenExpiration;
+
+            await _context.SaveChangesAsync();
+        }
+        public async Task UpdateAdmiUserAsync(Administrador user)
+        {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user), "El modelo de usuario es nulo");
+
+            var existingUser = await _context.user
+                .FirstOrDefaultAsync(u => u.User_Id == user.User_Id);
+
+            if (existingUser == null)
+                throw new ArgumentException("Usuario no encontrado");
+
+            if (existingUser.UserType != "Administrador")
+                throw new InvalidOperationException("Solo se permite actualizar administradores.");
+
+            // Verificar si el nuevo email ya lo tiene otro usuario
+            bool emailExists = await _context.user
+                .AnyAsync(u => u.Email == user.Email && u.User_Id != user.User_Id);
+
+            if (emailExists)
+                throw new InvalidOperationException("El nuevo correo ya está en uso por otro usuario.");
+
+            existingUser.Email = user.Email;
 
             await _context.SaveChangesAsync();
         }

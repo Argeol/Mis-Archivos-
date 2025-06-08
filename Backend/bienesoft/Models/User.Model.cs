@@ -80,15 +80,13 @@ namespace bienesoft.models
         public string HashedPassword { get; set; }
     }
 
-    public class RegisterAdmin
+    public class Administrador
     {
-        public string Email { get; set; }
+        public int? User_Id { get; set; }
+        public string? Email { get; set; }
+        
     }
 
-    public class UpdateAdmin
-    {
-        public string Email { get; set; }
-    }
     public class ResetPasswordModel
     {
         public string? Token { get; set; } = null;

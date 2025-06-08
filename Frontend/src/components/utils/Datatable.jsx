@@ -221,13 +221,15 @@ if (errorUser || loadingUser) return <LoadingPage />;
                                   <Info className="mr-2 h-4 w-4" /> Información
                                 </DropdownMenuItem>
                               )}
-                              <Button
+                              {idKey === "permissionId" &&(
+                              <DropdownMenuItem
                                 variant="outline"
                                 className="mt-2"
                                 onClick={() => handleViewStatus(row[idKey])}
                               >
                                 Ver estado de aprobación
-                              </Button>
+                              </DropdownMenuItem>
+                              )}
                               {fieldName && updateEndpoint && currentStatus && (
                                 <DropdownMenuItem asChild>
                                   <StatusToggleButton
@@ -300,7 +302,7 @@ if (errorUser || loadingUser) return <LoadingPage />;
               />
             )
           }
-
+          {/* { // infomacion completa el modal  */} 
           {
             translations && selectedRowInfo && (
               <RowInfoModal
@@ -337,7 +339,6 @@ if (errorUser || loadingUser) return <LoadingPage />;
             responsibleId={responsibleId}
             responsibleName={responsibleName} // 👈 Agrega esta línea
           />
-
           {selectedPermissionId && (
             <ApprovalStatusModal
               permisoId={selectedPermissionId}

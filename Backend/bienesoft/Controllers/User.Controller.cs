@@ -206,9 +206,9 @@ namespace bienesoft.Controllers
                 return StatusCode(500, "Ocurrió un error en el servidor.");
             }
         }
-
+        [Authorize(Roles = "Administrador")]
         [HttpPost("createAdmi")]
-        public async Task<IActionResult> CreateUser([FromBody] RegisterAdmin request)
+        public async Task<IActionResult> CreateUser([FromBody] Administrador request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -228,16 +228,6 @@ namespace bienesoft.Controllers
             }
         }
 
-
-
-
-        //[Authorize] // Protección de la ruta con JWT
-        //[HttpGet("ProtectedRoute")]
-        //public IActionResult ProtectedRoute()
-        //{
-        //    var userEmail = User.FindFirstValue(ClaimTypes.NameIdentifier); // Obtener el usuario desde el token
-        //    return Ok(new { message = $"Bienvenido, {userEmail}" });
-        //}
 
         // Método para restablecer la contraseña (sin protección JWT)
         [HttpPost("ResetPassUser")]
@@ -302,18 +292,17 @@ namespace bienesoft.Controllers
         }
 
 
-        [HttpPut("UpdateAdmi/{id}")]
+        [HttpPut("UpdateAdmi")]
         //[Authorize] // 🔐 Descomenta si necesitas protección
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
+        public async Task<IActionResult> UpdateUser([FromBody] Administrador user)
         {
-            if (id != user.User_Id)
-            {
-                return BadRequest(new { message = "El ID no Coincide" });
-            }
-
+            // if (id != user.User_Id)
+            // {
+            //     return BadRequest(new { message = "El ID no Coincide" });
+            // }
             try
             {
-                await _UserServices.UpdateUserAsync(user);
+                await _UserServices.UpdateAdmiUserAsync(user);
                 return Ok(new { message = "Usuario actualizado correctamente." });
             }
             catch (ArgumentNullException ex)
@@ -323,6 +312,10 @@ namespace bienesoft.Controllers
             catch (ArgumentException ex)
             {
                 return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message }); // Aquí entra si el email ya existe
             }
             catch (Exception)
             {

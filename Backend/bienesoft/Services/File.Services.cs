@@ -120,41 +120,40 @@ namespace bienesoft.Services
 
             return aprendices.Count;
         }
-        public async Task<MemoryStream> ExportFilesToExcelAsync()
-        {
-            var files = await _context.file
-                .Include(f => f.program)
-                .ToListAsync();
+        // public async Task<MemoryStream> ExportFilesToExcelAsync()
+        // {
+        //     var files = await _context.file
+        //         .Include(f => f.program)
+        //         .ToListAsync();
 
-            var workbook = new XLWorkbook();
-            var worksheet = workbook.Worksheets.Add("Fichas");
+        //     var workbook = new XLWorkbook();
+        //     var worksheet = workbook.Worksheets.Add("Fichas");
 
-            // Encabezados
-            worksheet.Cell(1, 1).Value = "ID Ficha";
-            worksheet.Cell(1, 2).Value = "Cantidad Aprendices";
-            worksheet.Cell(1, 3).Value = "Fecha Inicio";
-            worksheet.Cell(1, 4).Value = "Fecha Fin";
-            worksheet.Cell(1, 5).Value = "Programa";
-            worksheet.Cell(1, 6).Value = "Estado";
+        //     // Encabezados
+        //     worksheet.Cell(1, 1).Value = "ID Ficha";
+        //     worksheet.Cell(1, 2).Value = "Cantidad Aprendices";
+        //     worksheet.Cell(1, 3).Value = "Fecha Inicio";
+        //     worksheet.Cell(1, 4).Value = "Fecha Fin";
+        //     worksheet.Cell(1, 5).Value = "Programa";
+        //     worksheet.Cell(1, 6).Value = "Estado";
 
-            int row = 2;
-            foreach (var file in files)
-            {
-                worksheet.Cell(row, 1).Value = file.File_Id;
-                worksheet.Cell(row, 2).Value = file.Apprentice_count;
-                worksheet.Cell(row, 3).Value = file.Start_Date?.ToString("yyyy-MM-dd") ?? "N/A";
-                worksheet.Cell(row, 4).Value = file.End_Date?.ToString("yyyy-MM-dd") ?? "N/A";
-                worksheet.Cell(row, 5).Value = file.program?.Name_Program ?? "N/A";
-                worksheet.Cell(row, 6).Value = file.Status;
-                row++;
-            }
+        //     int row = 2;
+        //     foreach (var file in files)
+        //     {
+        //         worksheet.Cell(row, 1).Value = file.File_Id;
+        //         worksheet.Cell(row, 2).Value = file.Apprentice_count;
+        //         worksheet.Cell(row, 3).Value = file.Start_Date?.ToString("yyyy-MM-dd") ?? "N/A";
+        //         worksheet.Cell(row, 4).Value = file.End_Date?.ToString("yyyy-MM-dd") ?? "N/A";
+        //         worksheet.Cell(row, 5).Value = file.program?.Program_Id ?? "N/A";
+        //         worksheet.Cell(row, 6).Value = file.Status;
+        //         row++;
+        //     }
 
-            var stream = new MemoryStream();
-            workbook.SaveAs(stream);
-            stream.Position = 0;
-            return stream;
-        }
+        //     var stream = new MemoryStream();
+        //     workbook.SaveAs(stream);
+        //     stream.Position = 0;
+        //     return stream;
+        // }
     }
 }
 
-}

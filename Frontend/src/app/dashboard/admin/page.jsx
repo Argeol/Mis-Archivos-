@@ -29,7 +29,6 @@ export default function AdminDashboard() {
     email: "Correo",
     userType: "Tipo de Usuario",
   };
-
   return (
     <PrivateNav titlespage="Administradores">
       <ContecPage
@@ -39,9 +38,9 @@ export default function AdminDashboard() {
         Data={adminData}
         idKey="user_Id"                         // Ajusta si el ID en tu data tiene otro nombre
         tableCell={tableCell}
-        translations={translations}
+        // translations={translations}
         updateComponets={UpdateAdmin}
-        ignorar={["Status_User"]}                // Ignora campos que no quieras mostrar (si existen)
+        ignorar={["Status_User","user_Id"]}                // Ignora campos que no quieras mostrar (si existen)
         currentStatus="Status_User"
         updateEndpoint="/api/User/UpdateAdmi/{id}/"  // Ajusta si es necesario
         queryKey="admins"

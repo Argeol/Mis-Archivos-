@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { UserCog } from "lucide-react";
+import { toast } from "sonner";
 
 export default function UpdateAdmin({ id }) {
   const queryClient = useQueryClient();
@@ -26,7 +27,7 @@ export default function UpdateAdmin({ id }) {
   const { data: adminData, isLoading } = useQuery({
     queryKey: ["admin", id],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/api/User/GetUser/${id}`);
+      const res = await axiosInstance.get(`/api/User/GetUser${id}`);
       return res.data;
     },
     enabled: !!id,
@@ -43,27 +44,35 @@ export default function UpdateAdmin({ id }) {
   // Mutación para actualizar admin
   const updateMutation = useMutation({
     mutationFn: async (newData) => {
-      await axiosInstance.put(`/api/User/UpdateEmail${id}`, newData);
+      const res = await axiosInstance.put(`/api/User/UpdateAdmi`, newData);
+      return res.data; // Retornamos la respuesta para usar el mensaje
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      toast(data.message); // Mensaje del backend si la actualización fue exitosa
       queryClient.invalidateQueries(["users"]);
-      setModalMessage("Admin actualizado con éxito.");
+      setModalMessage(data.message);
       setModalOpen(true);
     },
-    onError: () => {
-      setModalMessage("Error al actualizar el admin.");
+    onError: (error) => {
+      const errMsg = error?.response?.data?.message || "Error desconocido al actualizar el admin.";
+      toast(errMsg); // Mensaje del backend en caso de error
+      setModalMessage(errMsg);
       setModalOpen(true);
     },
   });
 
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    updateMutation.mutate({ email, asset: estado });
+    updateMutation.mutate({ user_Id: id, email });
   };
+
 
   const toggleEstado = () => {
     setEstado((prev) => !prev);
   };
+  console.log(adminData)
 
   return (
     <Card className="w-full max-w-2xl mx-auto shadow-lg border-blue-600/20 border-2">
@@ -86,18 +95,6 @@ export default function UpdateAdmin({ id }) {
                   className="border-blue-200 focus-visible:ring-blue-500"
                   required
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="font-medium">Estado</Label>
-                <Button
-                  type="button"
-                  onClick={toggleEstado}
-                  variant={estado ? "default" : "outline"}
-                  className={`w-full ${estado ? "bg-green-600 hover:bg-green-700" : "bg-red-500 hover:bg-red-600"}`}
-                >
-                  {estado ? "Activo" : "Inactivo"}
-                </Button>
               </div>
             </>
           )}
