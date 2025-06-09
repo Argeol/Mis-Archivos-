@@ -74,6 +74,13 @@ namespace bienesoft.Controllers
                 return StatusCode(500, ex.ToString());
             }
         }
+        // GET: api/Apprentice/exists/5
+        [HttpGet("existApprentice/{id}")]
+        public IActionResult ExisteApprentice(int id)
+        {
+            bool existe = _apprenticeService.ExisteApprentice(id);
+            return Ok(new { existe });
+        }
 
         [Authorize(Roles = "Aprendiz")]
         [HttpGet("GetApprenticeById")]

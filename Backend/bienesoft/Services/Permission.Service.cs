@@ -24,6 +24,7 @@ namespace Bienesoft.Services
         }
         public async Task<string> CreatePermissionAsync(PermissionGN permissionGN, int idApprentice, List<int> responsablesOrdenados)
         {
+
             var permisoPendiente = await _context.permissionGN
                 .FirstOrDefaultAsync(p => p.Id_Apprentice == idApprentice && p.Status == Status.Pendiente);
 
@@ -66,6 +67,8 @@ namespace Bienesoft.Services
 
             return "Permiso creado con responsables asignados.";
         }
+
+
 
 
 

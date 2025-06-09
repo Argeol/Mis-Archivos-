@@ -1,8 +1,10 @@
--- MySQL dump 10.13  Distrib 8.0.38, for Win64 (x86_64)
+CREATE DATABASE  IF NOT EXISTS `bienesoft` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `bienesoft`;
+-- MySQL dump 10.13  Distrib 8.0.42, for Linux (x86_64)
 --
 -- Host: localhost    Database: bienesoft
 -- ------------------------------------------------------
--- Server version	8.0.39
+-- Server version	8.0.42-0ubuntu0.24.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -16,6 +18,30 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `activarfs`
+--
+
+DROP TABLE IF EXISTS `activarfs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `activarfs` (
+  `ID` int NOT NULL,
+  `PermisFSActivo` tinyint NOT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `activarfs`
+--
+
+LOCK TABLES `activarfs` WRITE;
+/*!40000 ALTER TABLE `activarfs` DISABLE KEYS */;
+INSERT INTO `activarfs` VALUES (1,0);
+/*!40000 ALTER TABLE `activarfs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `apprentice`
 --
 
@@ -27,20 +53,22 @@ CREATE TABLE `apprentice` (
   `first_name_apprentice` varchar(100) NOT NULL,
   `last_name_apprentice` varchar(100) NOT NULL,
   `birth_date_apprentice` date NOT NULL,
-  `gender_apprentice` enum('masculino','femenino','otro') NOT NULL,
+  `gender_apprentice` enum('masculino','femenino') NOT NULL,
   `email_apprentice` varchar(150) NOT NULL,
   `address_apprentice` varchar(200) NOT NULL,
   `address_type_apprentice` enum('Barrio','Vereda','Corregimiento','Comuna') NOT NULL,
   `phone_apprentice` varchar(20) NOT NULL,
   `status_apprentice` enum('Activo','Inactivo') NOT NULL DEFAULT 'Activo',
   `permission_count_apprentice` int unsigned DEFAULT '0',
-  `id_municipality` int unsigned NOT NULL,
-  `File_Id` int DEFAULT NULL,
+  `id_municipality` int unsigned DEFAULT NULL,
+  `File_Id` int NOT NULL,
   `Tip_apprentice` enum('interno','externo') DEFAULT NULL,
   `nom_responsible` varchar(45) NOT NULL,
   `ape_responsible` varchar(45) NOT NULL,
   `tel_responsible` varchar(12) DEFAULT NULL,
   `email_responsible` varchar(70) DEFAULT NULL,
+  `Stratum_Apprentice` varchar(3) DEFAULT NULL,
+  `tip_document` varchar(2) DEFAULT NULL,
   PRIMARY KEY (`id_apprentice`),
   UNIQUE KEY `email_apprentice` (`email_apprentice`),
   KEY `fk_apprentice_municipality` (`id_municipality`),
@@ -56,7 +84,7 @@ CREATE TABLE `apprentice` (
 
 LOCK TABLES `apprentice` WRITE;
 /*!40000 ALTER TABLE `apprentice` DISABLE KEYS */;
-INSERT INTO `apprentice` VALUES (1076200170,'Fabian Dario ','Gomez Murcia ','2004-12-21','masculino','murcia21.gmz@gmail.com','San Jose ','Vereda','3102023477','Activo',0,280,2824123,'interno','Astrid ','Murcia Ortiz ','3208837582','mama@gmail.com'),(1076200180,'Zharick ','Naranjo ','2004-03-17','femenino','zhayanaquin@gmail.com','Las cruces','Barrio','312 4100908','Activo',0,428,123412,'externo','Niyiret ','Quintero ','3207634133','pedrita@gmail.com');
+INSERT INTO `apprentice` VALUES (1076200170,'Fabian Dario ','Gomez Murcia ','2004-12-21','masculino','murcia21.gmz@gmail.com','San Jose ','Vereda','3102023477','Activo',0,280,2824123,'externo','Astrid ','Murcia Ortiz ','3208837582','Maritza.sarbarrios@gmail.com','D4','TI'),(1076200180,'Zharick ','Naranjo ','2004-03-17','femenino','zhayanaquin@gmail.com','Las cruces','Barrio','312 4100908','Activo',0,428,123412,'externo','Niyiret ','Quintero ','3207634133','pedrita@gmail.com','2','TI'),(1105056493,'Cristian Camilo ','Tique Tique','2005-09-10','masculino','cmiloty1680@gmail.com','El Palmar','Vereda','3125396493','Activo',0,250,2824123,'interno','María Lidia ','Tique Yara','3115148714','marialidia@gmail.com','B1','CC');
 /*!40000 ALTER TABLE `apprentice` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -166,13 +194,13 @@ INSERT INTO `municipality` VALUES (1,'Abriaquí',1,5),(2,'Acacías',1,50),(3,'Ac
 UNLOCK TABLES;
 
 --
--- Table structure for table `permissionapproval`
+-- Table structure for table `permissionApproval`
 --
 
-DROP TABLE IF EXISTS `permissionapproval`;
+DROP TABLE IF EXISTS `permissionApproval`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `permissionapproval` (
+CREATE TABLE `permissionApproval` (
   `Id` int NOT NULL AUTO_INCREMENT,
   `PermissionId` int NOT NULL,
   `ResponsibleId` int NOT NULL,
@@ -182,60 +210,62 @@ CREATE TABLE `permissionapproval` (
   KEY `permissionApproval_ibfk_1_idx` (`PermissionId`),
   KEY `fk_permissionApproval_1_idx` (`ResponsibleId`),
   CONSTRAINT `fk_permissionApproval_1` FOREIGN KEY (`ResponsibleId`) REFERENCES `responsible` (`Responsible_Id`),
-  CONSTRAINT `permissionApproval_ibfk_1` FOREIGN KEY (`PermissionId`) REFERENCES `permissiongn` (`PermissionId`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  CONSTRAINT `permissionApproval_ibfk_1` FOREIGN KEY (`PermissionId`) REFERENCES `permissionGN` (`PermissionId`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=111 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `permissionapproval`
+-- Dumping data for table `permissionApproval`
 --
 
-LOCK TABLES `permissionapproval` WRITE;
-/*!40000 ALTER TABLE `permissionapproval` DISABLE KEYS */;
-/*!40000 ALTER TABLE `permissionapproval` ENABLE KEYS */;
+LOCK TABLES `permissionApproval` WRITE;
+/*!40000 ALTER TABLE `permissionApproval` DISABLE KEYS */;
+INSERT INTO `permissionApproval` VALUES (65,48,13991739,'2025-05-23 22:12:59','Aprobado'),(66,48,28948910,'2025-05-23 22:13:28','Aprobado'),(67,48,987654,'2025-05-23 22:14:03','Aprobado'),(68,48,987624312,'2025-05-23 22:16:15','Aprobado'),(69,49,13991739,NULL,'Pendiente'),(70,49,28948910,'2025-06-03 13:48:45','Rechazado'),(71,49,987654,NULL,'Pendiente'),(72,49,987624312,'2025-05-27 11:12:40','Rechazado'),(73,50,110625312,NULL,'Pendiente'),(74,50,34231211,NULL,'Pendiente'),(75,50,987654,NULL,'Pendiente'),(76,50,12435421,NULL,'Pendiente'),(77,50,726253,NULL,'Pendiente'),(78,50,987624312,NULL,'Pendiente'),(79,50,13991739,'2025-06-06 08:58:42','Rechazado'),(80,50,1076200180,NULL,'Pendiente'),(81,51,13991739,'2025-05-27 11:49:59','Aprobado'),(82,51,28948910,'2025-05-27 11:51:03','Aprobado'),(83,51,987654,'2025-05-27 11:52:06','Aprobado'),(84,51,987624312,'2025-05-27 11:53:35','Aprobado'),(90,54,13991739,'2025-06-03 14:02:03','Rechazado'),(91,54,28948910,NULL,'Pendiente'),(92,54,231223,NULL,'Pendiente'),(93,54,726253,NULL,'Pendiente'),(94,55,13991739,NULL,'Pendiente'),(95,55,28948910,'2025-06-03 14:49:43','Rechazado'),(96,55,231223,NULL,'Pendiente'),(97,55,726253,NULL,'Pendiente'),(105,58,13991739,'2025-06-06 08:58:45','Aprobado'),(106,58,28948910,'2025-06-06 08:59:49','Aprobado'),(107,58,987654,'2025-06-06 09:00:19','Aprobado'),(108,59,13991739,'2025-06-06 09:12:36','Aprobado'),(109,59,28948910,NULL,'Pendiente'),(110,59,987654,NULL,'Pendiente');
+/*!40000 ALTER TABLE `permissionApproval` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `permissionfs`
+-- Table structure for table `permissionFS`
 --
 
-DROP TABLE IF EXISTS `permissionfs`;
+DROP TABLE IF EXISTS `permissionFS`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `permissionfs` (
+CREATE TABLE `permissionFS` (
   `PermissionFS_Id` int NOT NULL AUTO_INCREMENT,
   `Apprentice_Id` int unsigned NOT NULL,
   `Destino` varchar(45) NOT NULL,
   `Fec_Salida` datetime DEFAULT NULL,
   `Fec_Entrada` datetime DEFAULT NULL,
-  `Dia_Salida` enum('Miercoles','Domingo','Fin de semana') NOT NULL,
+  `Dia_Salida` enum('Miercoles','Domingo','Findesemana') NOT NULL,
   `Alojamiento` varchar(30) NOT NULL,
   `Sen_Empresa` enum('Si','No') DEFAULT NULL,
   `Direccion` varchar(45) NOT NULL,
+  `Fec_Diligenciado` datetime DEFAULT NULL,
   PRIMARY KEY (`PermissionFS_Id`),
   KEY `aprenidz _idx` (`Apprentice_Id`),
   CONSTRAINT `aprenidz ` FOREIGN KEY (`Apprentice_Id`) REFERENCES `apprentice` (`id_apprentice`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `permissionfs`
+-- Dumping data for table `permissionFS`
 --
 
-LOCK TABLES `permissionfs` WRITE;
-/*!40000 ALTER TABLE `permissionfs` DISABLE KEYS */;
-INSERT INTO `permissionfs` VALUES (1,28241234,'Bogotá','2025-05-01 08:00:00','2025-05-03 18:00:00','Miercoles','Casa familiar','Si','Calle 123 #45-67'),(2,28241234,'Bogotá','2025-05-01 08:00:00','2025-05-03 18:00:00','Miercoles','Casa familiar','No','Calle 123 #45-67'),(4,28241234,'Bogotá','2025-05-01 08:00:00','2025-05-03 18:00:00','Domingo','Casa familiar','Si','Calle 123 #45-67');
-/*!40000 ALTER TABLE `permissionfs` ENABLE KEYS */;
+LOCK TABLES `permissionFS` WRITE;
+/*!40000 ALTER TABLE `permissionFS` DISABLE KEYS */;
+INSERT INTO `permissionFS` VALUES (6,1076200170,'Dolores','2025-05-21 14:01:32','2025-05-21 14:01:32','Miercoles','Casa familiar','No','Vereda','2025-05-21 00:00:00'),(7,1076200170,'Brasil','2025-05-21 16:35:38','2025-05-21 16:35:38','Domingo','Casa familiar','No','Tu corazon','2025-05-21 00:00:00'),(8,1076200170,'Cartagena','2025-05-21 17:35:08','2025-05-21 17:35:08','Miercoles','2-3','No','El cielo','2025-05-21 00:00:00'),(9,1076200170,'Cartagena','2025-05-15 00:00:00','2025-05-13 00:00:00','Miercoles','2-3','No','dolores','2025-05-21 00:00:00'),(10,1076200180,'Cartagena','2025-05-22 00:00:00','2025-05-23 00:00:00','Domingo','3-3','No','Ibague','2025-05-21 00:00:00'),(11,1076200180,'Pereira','2025-05-21 19:51:37','2025-05-21 19:51:37','Domingo','2-2','No','Nada','2025-05-21 00:00:00');
+/*!40000 ALTER TABLE `permissionFS` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `permissiongn`
+-- Table structure for table `permissionGN`
 --
 
-DROP TABLE IF EXISTS `permissiongn`;
+DROP TABLE IF EXISTS `permissionGN`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `permissiongn` (
+CREATE TABLE `permissionGN` (
   `PermissionId` int NOT NULL AUTO_INCREMENT,
   `DepartureDate` datetime NOT NULL,
   `EntryDate` datetime NOT NULL,
@@ -249,16 +279,17 @@ CREATE TABLE `permissiongn` (
   PRIMARY KEY (`PermissionId`),
   KEY `fk_permissionGN_1_idx` (`Id_apprentice`),
   CONSTRAINT `fk_permissionGN_1` FOREIGN KEY (`Id_apprentice`) REFERENCES `apprentice` (`id_apprentice`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `permissiongn`
+-- Dumping data for table `permissionGN`
 --
 
-LOCK TABLES `permissiongn` WRITE;
-/*!40000 ALTER TABLE `permissiongn` DISABLE KEYS */;
-/*!40000 ALTER TABLE `permissiongn` ENABLE KEYS */;
+LOCK TABLES `permissionGN` WRITE;
+/*!40000 ALTER TABLE `permissionGN` DISABLE KEYS */;
+INSERT INTO `permissionGN` VALUES (48,'2025-05-23 22:12:00','2025-05-24 22:12:00','2025-05-23 22:12:40','espinal','melon','me enferme del corazon ','coazon de melon','Aprobado',1076200170),(49,'2025-05-27 00:10:00','2025-06-02 18:00:00','2025-05-27 11:11:39','Dolores ','Verdad San José ','No formación ','Nada ','Rechazado',1076200170),(50,'2025-05-27 16:00:00','2025-05-31 18:00:00','2025-05-27 11:29:44','Vereda El Palmar ','Coyaima','Visita Familiar','Fin de semana','Rechazado',1105056493),(51,'2025-05-27 04:45:00','2025-05-28 05:45:00','2025-05-27 11:45:37','Dolores ','Verdad San José ','No formación ','Nada ','Aprobado',1076200170),(54,'2025-06-03 14:58:00','2025-06-04 14:59:00','2025-06-03 13:59:44','Ibague Tolima','cosita rika ','me enferme del corazon ','hola','Rechazado',1076200170),(55,'2025-06-04 15:41:00','2025-06-10 17:43:00','2025-06-03 14:40:54','espinal','melon','me enferme del corazon ','sddd','Rechazado',1076200170),(58,'2025-06-06 10:00:00','2025-06-07 08:57:00','2025-06-06 08:58:21','espinal','melon','cita medica','hola','Aprobado',1076200170),(59,'2025-06-06 10:12:00','2025-06-07 02:11:00','2025-06-06 09:12:12','espinal','ee','cita medica','ww','Pendiente',1076200170);
+/*!40000 ALTER TABLE `permissionGN` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -285,7 +316,7 @@ CREATE TABLE `program` (
 
 LOCK TABLES `program` WRITE;
 /*!40000 ALTER TABLE `program` DISABLE KEYS */;
-INSERT INTO `program` VALUES (1,'Análisis y desarrollo de software ',6,'Activo'),(2,'Gestion Agroenpresarial',6,'Activo'),(3,'Gestion de empresas pecuarias',2,'Activo'),(4,'Tecnologo de Gestion especies',2,'Activo'),(5,'tecnico en gestion ambiantal del peliculon',4,'Activo'),(6,'el de los tontos',5,'Activo');
+INSERT INTO `program` VALUES (1,'Análisis y desarrollo de software ',6,'Activo'),(2,'Gestion Agroenpresarial',6,'Activo'),(3,'Gestion de empresas pecuarias',2,'Activo'),(4,'Tecnologo de Gestion especies',2,'Activo'),(5,'tecnico en gestion ambiantal del peliculon',4,'Activo'),(6,'el de los tontos',5,'Activo'),(23432,'el de los tontos bien tontos',5,'Activo');
 /*!40000 ALTER TABLE `program` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -316,7 +347,7 @@ CREATE TABLE `responsible` (
 
 LOCK TABLES `responsible` WRITE;
 /*!40000 ALTER TABLE `responsible` DISABLE KEYS */;
-INSERT INTO `responsible` VALUES (1076200180,'Juan Valentina','Devia Hernandez',3133512529,2,'Activo','juanadevia2004@gmail.com');
+INSERT INTO `responsible` VALUES (231223,'Bienestar','Murcia',3137654342,3,'Activo','w@gmail.com'),(726253,'nestor','sarmiento primo',3245896760,4,'Activo','ww@gmail.com'),(987654,'Guio Bienestar','Meloajs',3245896760,3,'Activo','guio97445@gmail.com'),(8374652,'estefany','bicanegra',3245896760,3,'Activo','rata@gmial.com'),(12435421,'Fabian Rmirez','Gomez',3245896760,4,'Activo','mewwoin@gmail.com'),(13991739,'Rosalba','Pineda',3202171414,1,'Activo','rosalbapineda660@gmail.com'),(28948910,'Argeol22','Guio Pineda ',3245896760,2,'Activo','guiopinedaargeol59@gmail.com'),(34231211,'Argeol','Guio Pineda',3245896760,2,'Activo','yt@gmail.com'),(110625312,'Juan','Pérez',3001234567,1,'Activo','melon.perez@example.com'),(987624312,'Nestor','33Menor',3202171414,1,'Activo','nestor.sarbarrios@gmail.com'),(1076200180,'Juan Valentina','Devia Hernandez',3133512529,2,'Activo','juanadevia2004@gmail.com');
 /*!40000 ALTER TABLE `responsible` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -366,12 +397,13 @@ CREATE TABLE `user` (
   `ResetTokenExpiration` datetime DEFAULT NULL,
   `Id_Apprentice` int unsigned DEFAULT NULL,
   `Responsible_Id` int DEFAULT NULL,
+  `Status_User` enum('Activo','Inactivo') DEFAULT 'Activo',
   PRIMARY KEY (`User_Id`),
   KEY `fk_user_1_idx` (`Id_Apprentice`),
   KEY `fk_user_2_idx` (`Responsible_Id`),
   CONSTRAINT `fk_user_1` FOREIGN KEY (`Id_Apprentice`) REFERENCES `apprentice` (`id_apprentice`),
   CONSTRAINT `fk_user_2` FOREIGN KEY (`Responsible_Id`) REFERENCES `responsible` (`Responsible_Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -380,7 +412,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (27,'murcia21.gmz@gmail.com','/jajK3WnPx2Cr1NzkcWCxvKNKWOKlPJGeRNJBtbGLYs=','GqrmukDKJYb92h3tQ5OZZQ==',0,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im11cmNpYTIxLmdtekBnbWFpbC5jb20iLCJyb2xlIjoiQXByZW5kaXoiLCJhdWQiOiJCaWVuZXNvZnRDbGllbnQiLCJpc3MiOiJCaWVuZXNvZnRBUEkiLCJleHAiOjE3NDY0Njc3ODcsImlhdCI6MTc0NjQ2NTk4NywiSWRfQXBwcmVudGljZSI6IjEwNzYyMDAxNzAiLCJGdWxsTmFtZSI6IkZhYmlhbiBEYXJpbyAgR29tZXogTXVyY2lhICIsIm5iZiI6MTc0NjQ2NTk4N30.WCR3YGrtt7HIo6zsrIbnWL5uGgKzx1aRVv5UUXESDKE',_binary '\0','Aprendiz',_binary '',NULL,NULL,1076200170,NULL),(28,'juanadevia2004@gmail.com','nAjPdyb7qCVoWCeEmdmcYu4YrN75luR1sQYIyJKzd9E=','S448PuMJ5Oi7HRxKuRtwiA==',0,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imp1YW5hZGV2aWEyMDA0QGdtYWlsLmNvbSIsInJvbGUiOiJSZXNwb25zYWJsZSIsImF1ZCI6IkJpZW5lc29mdENsaWVudCIsImlzcyI6IkJpZW5lc29mdEFQSSIsImV4cCI6MTc0NjQ1NjY1OCwiaWF0IjoxNzQ2NDU0ODU4LCJSZXNwb25zaWJsZV9JZCI6IjEwNzYyMDAxODAiLCJGdWxsTmFtZSI6Ikp1YW4gVmFsZW50aW5hIERldmlhIEhlcm5hbmRleiIsIm5iZiI6MTc0NjQ1NDg1OH0.FztZRS3GxomqZycLSsg62DyBy8o-VVnhUAnejgtxuKE',_binary '\0','Responsable',_binary '',NULL,NULL,NULL,1076200180),(29,'zhayanaquin@gmail.com','9sxE9oFOZDbxEXdgkU+Jdu7O8cYPFy8I67wUz94ZYG0=','ZDcWPdgkhHDPlqkIzaIw7Q==',0,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InpoYXlhbmFxdWluQGdtYWlsLmNvbSIsInJvbGUiOiJBZG1pbmlzdHJhZG9yIiwiYXVkIjoiQmllbmVzb2Z0Q2xpZW50IiwiaXNzIjoiQmllbmVzb2Z0QVBJIiwiZXhwIjoxNzQ2NDU2NTc4LCJpYXQiOjE3NDY0NTQ3NzgsIm5iZiI6MTc0NjQ1NDc3OH0.pJ4XXdlQlJIAWqAfNJnx4fwZiZ9mQZbpdFAgZKqRBXI',_binary '\0','Administrador',_binary '',NULL,NULL,1076200180,NULL);
+INSERT INTO `user` VALUES (27,'murcia21.gmz@gmail.com','/jajK3WnPx2Cr1NzkcWCxvKNKWOKlPJGeRNJBtbGLYs=','GqrmukDKJYb92h3tQ5OZZQ==',0,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im11cmNpYTIxLmdtekBnbWFpbC5jb20iLCJyb2xlIjoiQXByZW5kaXoiLCJhdWQiOiJCaWVuZXNvZnRDbGllbnQiLCJpc3MiOiJCaWVuZXNvZnRBUEkiLCJleHAiOjE3NDk0MTg0NzcsImlhdCI6MTc0OTQxNjY3NywiSWRfQXBwcmVudGljZSI6IjEwNzYyMDAxNzAiLCJGdWxsTmFtZSI6IkZhYmlhbiBEYXJpbyAgR29tZXogTXVyY2lhICIsIm5iZiI6MTc0OTQxNjY3N30.WMznJaDqntqsb0qFRhcFnhsKA5BtgmzS3PDqCeJlT5A',_binary '\0','Aprendiz',_binary '','YzU0OTUyMWUtYzQ5ZS00NDY4LWEzN2UtNTVhNjQ2YjU0Nzk5','2025-05-26 16:27:02',1076200170,NULL,'Activo'),(28,'juanadevia2004@gmail.com','nAjPdyb7qCVoWCeEmdmcYu4YrN75luR1sQYIyJKzd9E=','S448PuMJ5Oi7HRxKuRtwiA==',0,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imp1YW5hZGV2aWEyMDA0QGdtYWlsLmNvbSIsInJvbGUiOiJSZXNwb25zYWJsZSIsImF1ZCI6IkJpZW5lc29mdENsaWVudCIsImlzcyI6IkJpZW5lc29mdEFQSSIsImV4cCI6MTc0NjQ1NjY1OCwiaWF0IjoxNzQ2NDU0ODU4LCJSZXNwb25zaWJsZV9JZCI6IjEwNzYyMDAxODAiLCJGdWxsTmFtZSI6Ikp1YW4gVmFsZW50aW5hIERldmlhIEhlcm5hbmRleiIsIm5iZiI6MTc0NjQ1NDg1OH0.FztZRS3GxomqZycLSsg62DyBy8o-VVnhUAnejgtxuKE',_binary '\0','Responsable',_binary '',NULL,NULL,NULL,1076200180,'Activo'),(29,'guio@gmail.com','9sxE9oFOZDbxEXdgkU+Jdu7O8cYPFy8I67wUz94ZYG0=','ZDcWPdgkhHDPlqkIzaIw7Q==',0,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InpoYXlhbmFxdWluQGdtYWlsLmNvbSIsInJvbGUiOiJBZG1pbmlzdHJhZG9yIiwiYXVkIjoiQmllbmVzb2Z0Q2xpZW50IiwiaXNzIjoiQmllbmVzb2Z0QVBJIiwiZXhwIjoxNzQ2NDU2NTc4LCJpYXQiOjE3NDY0NTQ3NzgsIm5iZiI6MTc0NjQ1NDc3OH0.pJ4XXdlQlJIAWqAfNJnx4fwZiZ9mQZbpdFAgZKqRBXI',_binary '\0','Administrador',_binary '',NULL,NULL,1076200180,NULL,'Activo'),(30,'guiopinedaargeol79@gmail.com','UMRSOPu1DqX0pBgm4MvQO/pHisMD+dSCSkuVx6dM5oE=','gEGkzC0+dkWVnY+ZBmPwmw==',0,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imd1aW9waW5lZGFhcmdlb2w3OUBnbWFpbC5jb20iLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImF1ZCI6IkJpZW5lc29mdENsaWVudCIsImlzcyI6IkJpZW5lc29mdEFQSSIsImV4cCI6MTc0OTQyMDQ0MCwiaWF0IjoxNzQ5NDE4NjQwLCJuYmYiOjE3NDk0MTg2NDB9.hy_NUBx9x9LOMfnXFGnulC71rynZY2iw0gHD-pnUcQA',_binary '\0','Administrador',_binary '','NzE5YjJmYmItMmZhOS00ZjZhLWE3NTQtMGRjYTdlYjI3ZGQx','2025-05-26 21:00:55',NULL,NULL,'Activo'),(31,'guiopinedaargeol59@gmail.com','UKH41tHPEtBTbnq7VtFLzy08j3nskfpJPo93TMil63A=','xncUCYkYHOqMyEBTua663g==',0,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imd1aW9waW5lZGFhcmdlb2w1OUBnbWFpbC5jb20iLCJyb2xlIjoiUmVzcG9uc2FibGUiLCJhdWQiOiJCaWVuZXNvZnRDbGllbnQiLCJpc3MiOiJCaWVuZXNvZnRBUEkiLCJleHAiOjE3NDkyMjA3NjIsImlhdCI6MTc0OTIxODk2MiwiUmVzcG9uc2libGVfSWQiOiIyODk0ODkxMCIsIkZ1bGxOYW1lIjoiQXJnZW9sMjIgR3VpbyBQaW5lZGEgIiwibmJmIjoxNzQ5MjE4OTYyfQ.OnQwKwMuU-DU30P_Ykb8oSEI9HAm5OSRILC4AYcjf-A',_binary '\0','Responsable',_binary '','OWNlMjdiYTUtM2UxOS00ODFmLThiMzItMTRkMjkxZjE3MDI4','2025-05-26 16:26:13',NULL,28948910,'Activo'),(32,'melon.perez@example.com','m/K0s19M9Bh3PirshXgqLOZsRizRkkFuxhh/Iwkl/Nk=','7Zlk4L0yhBouTo3jPB8arg==',0,NULL,_binary '\0','Responsable',_binary '',NULL,NULL,NULL,110625312,'Activo'),(33,'yt@gmail.com','FHiYXoFaEL771cAexOenSTDp15SmbWbpIpNqnZKLC+U=','wk7p0r4loWwLTYSco/Fvyw==',0,NULL,_binary '\0','Responsable',_binary '',NULL,NULL,NULL,34231211,'Activo'),(34,'rata@gmial.com','sx9qV66bJhVNdoj8b3OrSy5ZKJYsGuxGKg0DaXESKIY=','ocwzrs8epvfH2tDSbEP6/A==',0,NULL,_binary '\0','Responsable',_binary '',NULL,NULL,NULL,8374652,'Activo'),(35,'w@gmail.com','okRJkXGwUP1TG2M7MAsSdL4eaoXBrqUib4HQIdS61mU=','Oe5GNSRGsF40jvfvvHvfaA==',0,NULL,_binary '\0','Responsable',_binary '',NULL,NULL,NULL,231223,'Activo'),(36,'ww@gmail.com','K9mgSaMR/0igCXO5+NCmeImIGuhCyhGu2YkfpHZ9Ktw=','/ZaWQ1QjqmrGVx3b3TKzuQ==',0,NULL,_binary '\0','Responsable',_binary '',NULL,NULL,NULL,726253,'Activo'),(38,'rosalbapineda660@gmail.com','4MMW3L2lUR3CRytr1kRkZe3Q+kw6nQu7dG75DrKL600=','EB90WvkfjIWKA7of/6ZRAg==',0,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJvc2FsYmFwaW5lZGE2NjBAZ21haWwuY29tIiwicm9sZSI6IlJlc3BvbnNhYmxlIiwiYXVkIjoiQmllbmVzb2Z0Q2xpZW50IiwiaXNzIjoiQmllbmVzb2Z0QVBJIiwiZXhwIjoxNzQ5MjIwOTQ0LCJpYXQiOjE3NDkyMTkxNDQsIlJlc3BvbnNpYmxlX0lkIjoiMTM5OTE3MzkiLCJGdWxsTmFtZSI6IlJvc2FsYmEgUGluZWRhIiwibmJmIjoxNzQ5MjE5MTQ0fQ.7mb4oPsM8LP3SWUwxq9VoAndQQ9uL0A9TUNfouclP84',_binary '\0','Responsable',_binary '',NULL,NULL,NULL,13991739,'Activo'),(39,'nestor.sarbarrios@gmail.com','mCpNzOeGtw4vX+nFgkzXr0ERlW2yjdek+8cEwg5L1VI=','CvQk6aqYw3qSDmDrrfJLZw==',0,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im5lc3Rvci5zYXJiYXJyaW9zQGdtYWlsLmNvbSIsInJvbGUiOiJSZXNwb25zYWJsZSIsImF1ZCI6IkJpZW5lc29mdENsaWVudCIsImlzcyI6IkJpZW5lc29mdEFQSSIsImV4cCI6MTc0ODk4OTI3MSwiaWF0IjoxNzQ4OTc5NjcxLCJSZXNwb25zaWJsZV9JZCI6Ijk4NzYyNDMxMiIsIkZ1bGxOYW1lIjoiTmVzdG9yIDMzTWVub3IiLCJuYmYiOjE3NDg5Nzk2NzF9.6L9zCR8B9xaor9GgmTipEewzS0oiB_NDEdO3QQlxZCc',_binary '\0','Responsable',_binary '',NULL,NULL,NULL,987624312,'Activo'),(40,'guio97445@gmail.com','jlrvK+wnBVngfvwXdihdyF/MUAZx6EqJMv04jgCyYrg=','zKgpQCGqIpznHYEC0VWl5Q==',0,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imd1aW85NzQ0NUBnbWFpbC5jb20iLCJyb2xlIjoiUmVzcG9uc2FibGUiLCJhdWQiOiJCaWVuZXNvZnRDbGllbnQiLCJpc3MiOiJCaWVuZXNvZnRBUEkiLCJleHAiOjE3NDkyMjA3NTIsImlhdCI6MTc0OTIxODk1MiwiUmVzcG9uc2libGVfSWQiOiI5ODc2NTQiLCJGdWxsTmFtZSI6Ikd1aW8gQmllbmVzdGFyIE1lbG9hanMiLCJuYmYiOjE3NDkyMTg5NTJ9.tmJ0Pkn2vWM1kt77BJTQ2eMtP2g5qip0iXWEBRUKprg',_binary '\0','Responsable',_binary '',NULL,NULL,NULL,987654,'Activo'),(41,'mewwoin@gmail.com','zZOZZxBEGgtwt7YmOxfe+65+z5E8CCHbLx6GXPgH/PA=','BB71NR/pbVsyut/D++2ysQ==',0,NULL,_binary '\0','Responsable',_binary '',NULL,NULL,NULL,12435421,'Activo'),(42,'cmiloty1680@gmail.com','ogsFFPfqs6avoCt7y2UTTwdFEriNu6yAUHxVgnYQBP0=','mtVrPkI/Wk2b2qlgWnPkvQ==',0,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNtaWxvdHkxNjgwQGdtYWlsLmNvbSIsInJvbGUiOiJBcHJlbmRpeiIsImF1ZCI6IkJpZW5lc29mdENsaWVudCIsImlzcyI6IkJpZW5lc29mdEFQSSIsImV4cCI6MTc0ODM3Mjg2NSwiaWF0IjoxNzQ4MzYzMjY1LCJJZF9BcHByZW50aWNlIjoiMTEwNTA1NjQ5MyIsIkZ1bGxOYW1lIjoiQ3Jpc3RpYW4gQ2FtaWxvICBUaXF1ZSBUaXF1ZSIsIm5iZiI6MTc0ODM2MzI2NX0.DkkcoHcIBNM3f8YJR7MiKp1nqotrC5BQkJcIrRKqc2A',_binary '\0','Aprendiz',_binary '',NULL,NULL,1105056493,NULL,'Activo'),(43,'puentessantiago2003@gmail.com','PKyJXhy+YvC+iiwe8fXB34w7PU8hUHB8q7HtfYa4kjg=','MWchQFqFJrldHo3UVqGtKA==',0,NULL,_binary '\0','Administrador',_binary '',NULL,NULL,NULL,NULL,'Activo');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -393,4 +425,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-05 12:32:31
+-- Dump completed on 2025-06-09  8:25:03

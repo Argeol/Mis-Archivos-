@@ -5,6 +5,7 @@ using Bienesoft.utils;
 using Microsoft.EntityFrameworkCore;
 using bienesoft.models;
 using bienesoft.Funcions;
+using DocumentFormat.OpenXml.Bibliography;
 
 
 
@@ -27,7 +28,7 @@ namespace Bienesoft.Services
 
 
         public async Task<object> CreateApprenticeAsync(Apprentice apprentice, string email)
-{
+        {
             // Validar existencia de correo ANTES de abrir la transacción
             if (await _userService.UserByEmail(email))
                 throw new ArgumentException("El correo ya está registrado.");
@@ -90,6 +91,8 @@ namespace Bienesoft.Services
                 await transaction.RollbackAsync();
                 throw new Exception("No se pudo completar el registro. Detalles: " + ex.Message);
             }
+
+           
 }
 
 
@@ -239,6 +242,11 @@ namespace Bienesoft.Services
         public int CountApprentices()
         {
             return _context.apprentice.Count(a => a.Status_Apprentice == "Activo");
+        }
+        public bool ExisteApprentice(int id)
+        {
+            bool aprendizexiste = _context.apprentice.Any(a => a.Id_Apprentice == id);
+            return aprendizexiste;
         }
 
     }
