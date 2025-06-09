@@ -78,6 +78,16 @@ export default function RegisterFile() {
 
   return (
     <Card className="w-full max-w-2xl mx-auto shadow-lg border-blue-600/20 border-2">
+        {/* Encabezado institucional */}
+      <div className="text-center pb-4 space-y-1">
+        <img src="/assets/img/logoSena.png" alt="Logo SENA" className="mx-auto h-14" />
+        <h2 className="text-xl font-bold uppercase">Centro Agropecuario “La Granja” SENA Espinal</h2>
+        <p className="font-semibold text-sm">Registre nuevas fichas para los programas de formación del SENA. Complete todos los campos requeridos para
+              crear una nueva ficha.</p>
+        <p className="text-xs font-medium italic">
+          NOTA: Al momento que registres fichas el sistema va a buscar que ficha terminaron y asi mismo desactiva aprendices que ya no estan en el centro.
+        </p>
+      </div>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-6 pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

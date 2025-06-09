@@ -26,7 +26,8 @@ function ContecPage({
   updateEndpoint,
   queryKey,
   inf,
-  botonExtra, // Recibimos el botón aquí
+  ExportacionExcel, // Recibimos el botón aquí
+  ImportExcelBd,
 }) {
   return (
     <>
@@ -52,7 +53,8 @@ function ContecPage({
         updateEndpoint={updateEndpoint}
         queryKey={queryKey}
         inf={inf}
-        botonExtra={botonExtra} // Pasamos el botón a DataTable
+        ExportacionExcel={ExportacionExcel}// Pasamos el botón a DataTable
+        ImportExcelBd ={ImportExcelBd}
       />
     </>
   );

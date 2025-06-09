@@ -119,6 +119,31 @@ namespace bienesoft.Controllers
                 return StatusCode(500, new { error = "Error interno al actualizar el programa." });
             }
         }
+        [HttpGet("export")]
+        public async Task<IActionResult> ExportProgramsToExcel()
+        {
+            var fileContent = await _ProgramServices.ExportProgramsAsync();
+            return File(fileContent,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "Programas.xlsx");
+        }
+        [HttpPost("import")]
+        public async Task<IActionResult> ImportProgramsFromExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No se proporcionó ningún archivo.");
+
+            try
+            {
+                var result = await _ProgramServices.ImportProgramsAsync(file);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = "Error al importar", detalle = ex.Message });
+            }
+        }
+
 
     }
 }

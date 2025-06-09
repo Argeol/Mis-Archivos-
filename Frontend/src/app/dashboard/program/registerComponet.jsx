@@ -75,6 +75,16 @@ export default function RegisterProgram() {
 
   return (
     <Card className="w-full max-w-2xl mx-auto shadow-lg border-blue-600/20 border-2">
+      <div className="text-center pb-4 space-y-1">
+        <img src="/assets/img/logoSena.png" alt="Logo SENA" className="mx-auto h-14" />
+        <h2 className="text-xl font-bold uppercase">Centro Agropecuario “La Granja” SENA Espinal</h2>
+        <p className="font-semibold text-sm">Registre nuevos programas de formación del SENA. Complete todos los campos requeridos para
+          crear un nuevo programa.</p>
+        <p className="text-xs font-medium italic text-gray-600">
+          NOTA: Evite registrar programas duplicados. El sistema validará por nombre y área asociada.
+        </p>
+      </div>
+
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-6 pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

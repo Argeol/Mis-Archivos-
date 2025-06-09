@@ -8,6 +8,8 @@ import UpdateProgram from "./UpdateComponet";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import LoadingPage from "@/components/utils/LoadingPage";
+import ExportProgramExcelButton from "./ExportProgramExcelButton";
+import ImportProgramButton from "./ImportProgramButton";
 
 export default function Dashboard() {
   const queryClient = useQueryClient();
@@ -89,6 +91,8 @@ export default function Dashboard() {
           fieldName={"state"}
           updateEndpoint={"/api/Program/UpdateProgram"}
           queryKey={"programs"}
+          ExportacionExcel={<ExportProgramExcelButton/>}
+          ImportExcelBd = {<ImportProgramButton/>}
           // customActions={(row) => (
           //   <Button
           //     onClick={() => handleChangeState(row.program_Id, row.state)}

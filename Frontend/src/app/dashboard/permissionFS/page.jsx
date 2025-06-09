@@ -86,7 +86,7 @@ export default function PermissionFSDashboard() {
         translations={translations}
         ignorar={["permissionFS_Id"]}
         inf={"apprentice_Id"}
-        botonExtra={<ExportExcelButton/>}
+        ExportacionExcel={<ExportExcelButton/>}
       />
     </PrivateNav>
   );

@@ -57,7 +57,8 @@ export default function DataTable({
   updateEndpoint,
   queryKey,
   inf,
-  botonExtra,
+  ExportacionExcel,
+  ImportExcelBd
 }) {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -96,6 +97,7 @@ if (errorUser || loadingUser) return <LoadingPage />;
 
   return (
     <>
+    
     {tip === "Administrador" && (
         <Card className="w-full max-w-5xl mx-auto p-4 my-7">
           <CardHeader>
@@ -110,8 +112,11 @@ if (errorUser || loadingUser) return <LoadingPage />;
                 className="sm:max-w-xs"
               />
             </div>
-            {botonExtra && (
-              <div className="mb-4 flex justify-end">{botonExtra}</div>
+            {ExportacionExcel && (
+              <div className="mb-4 flex justify-end">{ExportacionExcel}</div>
+            )}
+            {ImportExcelBd && (
+              <div className="mb-4 flex justify-end">{ImportExcelBd}</div>
             )}
 
             {RegisterComponets && (

@@ -34,8 +34,8 @@ export default function ApprenticeDashboard() {
   // });
 
   if (isLoading) return <LoadingPage />;
-    if (error) return <p>Error: {error.message}</p>;
-  
+  if (error) return <p>Error: {error.message}</p>;
+
   const translations = {
     id_Apprentice: "Documento",
     doc_apprentice: "Documento de Aprendiz",
@@ -59,8 +59,8 @@ export default function ApprenticeDashboard() {
     areaName: "Área",
     stratum_Apprentice: "Estrato",
   };
-  
-  const fieldLabels = ["Documento","Nombre", "Apellido", "Teléfono", "Ficha"];
+
+  const fieldLabels = ["Documento", "Nombre", "Apellido", "Teléfono", "Ficha"];
   const TableCell = [
     "id_Apprentice",
     "first_Name_Apprentice",

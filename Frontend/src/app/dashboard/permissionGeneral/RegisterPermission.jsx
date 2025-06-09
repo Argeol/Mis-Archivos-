@@ -193,7 +193,7 @@ export default function RegisterPermission({ onSuccess }) {
 
       {/* Encabezado institucional */}
       <div className="text-center border-b border-black pb-4 space-y-1">
-        <img src="assets/img/logoSena.png" alt="Logo SENA" className="mx-auto h-14" />
+        <img src="/assets/img/logoSena.png" alt="Logo SENA" className="mx-auto h-14" />
         <h2 className="text-xl font-bold uppercase">Centro Agropecuario “La Granja” SENA Espinal</h2>
         <p className="font-semibold text-sm">Solicitud de Permiso para Aprendices</p>
         <p className="text-xs font-medium italic">
@@ -371,6 +371,11 @@ export default function RegisterPermission({ onSuccess }) {
       <p className="text-xs italic text-center border-t pt-2 text-gray-600">
         Las firmas se deben recolectar en orden: Instructor → Coordinador → Bienestar → Internado (si aplica).
       </p>
+      <div className="mt-0 border-t pt-4 text-center text-sm text-gray-500">
+        <p>© 2025 Centro Agropecuario “La Granja” - SENA Espinal</p>
+        <p className="italic">Desarrollado por aprendices SENA - ADS0</p>
+      </div>
     </form>
+    
   );
 }

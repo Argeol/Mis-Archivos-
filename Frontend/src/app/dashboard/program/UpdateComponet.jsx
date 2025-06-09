@@ -21,7 +21,7 @@ export default function UpdateProgram({ id }) {
   const queryClient = useQueryClient();
   const [programName, setProgramName] = useState("");
   const [areaId, setAreaId] = useState("");
-  
+
   // ✅ Obtener lista de áreas
   const { data: areas = [] } = useQuery({
     queryKey: ["areas"],
@@ -94,6 +94,15 @@ export default function UpdateProgram({ id }) {
 
   return (
     <Card className="w-full max-w-2xl mx-auto shadow-lg border-blue-600/20 border-2">
+      <div className="text-center pb-4 space-y-1">
+        <img src="/assets/img/logoSena.png" alt="Logo SENA" className="mx-auto h-14" />
+        <h2 className="text-xl font-bold uppercase">Centro Agropecuario “La Granja” SENA Espinal</h2>
+        <p className="font-semibold text-sm">Actualice la información de los programas de formación del SENA. Puede modificar el nombre, área.</p>
+        <p className="text-xs font-medium italic text-gray-600">
+          NOTA: Solo se permiten cambios en programas que aún no tengan fichas asociadas activas.
+        </p>
+      </div>
+
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-6 pt-6">
           {isLoadingProgram ? (
@@ -131,7 +140,7 @@ export default function UpdateProgram({ id }) {
                   required
                 >
                   <SelectTrigger className="border-blue-200 focus:ring-blue-500">
-                    <SelectValue placeholder={programData.area_Name|| "Sin programa seleccionado"} />
+                    <SelectValue placeholder={programData.area_Name || "Sin programa seleccionado"} />
                   </SelectTrigger>
                   <SelectContent>
                     {areas.map((area) => (
