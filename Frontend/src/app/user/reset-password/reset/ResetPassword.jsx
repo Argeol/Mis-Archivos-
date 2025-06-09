@@ -8,6 +8,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import AtIcon from "@mui/icons-material/AlternateEmail";
 import { motion } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 async function resetPasswordRequest(data) {
   const response = await axiosInstance.post("/api/User/ResetPassUser", data);
@@ -16,24 +17,23 @@ async function resetPasswordRequest(data) {
 
 function ResetPassword() {
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
 
   const mutation = useMutation({
     mutationFn: resetPasswordRequest,
     onSuccess: (res) => {
       if (res.status === 200) {
-        alert(res.data.message);
-        setMessage("");
+        toast.success(res.data.message || "Correo enviado correctamente.");
+        setEmail("");
       }
     },
     onError: (err) => {
-      setMessage(err.response?.data?.message || "Ocurrió un error");
+      const errMsg = err?.response?.data?.message || "Ocurrió un error";
+      toast.error(errMsg);
     },
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setMessage("");
     mutation.mutate({ email });
   };
 
@@ -49,11 +49,7 @@ function ResetPassword() {
             animate={{ y: [0, -5, 0], opacity: [1, 0.7, 1] }}
             transition={{ repeat: Infinity, duration: 1 }}
           >
-            <img
-              className="w-20"
-              alt="logo"
-              src="/assets/img/bienesoft.webp"
-            />
+            <img className="w-20" alt="logo" src="/assets/img/bienesoft.webp" />
           </motion.div>
         </div>
 
@@ -85,13 +81,37 @@ function ResetPassword() {
 
         <Button
           type="submit"
-          className="mt-4 bg-blue-500 text-white hover:bg-gray-400 transition-colors duration-200 rounded-md mx-auto block"
+          className="mt-4 bg-blue-500 text-white hover:bg-gray-400 transition-colors duration-200 rounded-md mx-auto flex items-center justify-center gap-2"
           disabled={mutation.isPending}
         >
-          {mutation.isPending ? "Enviando..." : "Restablecer contraseña"}
+          {mutation.isPending ? (
+            <>
+              <svg
+                className="animate-spin h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                ></path>
+              </svg>
+              Enviando...
+            </>
+          ) : (
+            "Restablecer contraseña"
+          )}
         </Button>
-
-        {message && <p className="mt-4 text-center text-red-500">{message}</p>}
 
         <div className="mt-4 text-center text-sm">
           <a className="text-blue-700 hover:underline" href="/user/login">

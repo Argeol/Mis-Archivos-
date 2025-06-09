@@ -10,16 +10,13 @@ import {
   Card,
   CardContent,
   CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
-import { UserCog } from "lucide-react";
 import { toast } from "sonner";
 
 export default function UpdateAdmin({ id }) {
   const queryClient = useQueryClient();
   const [email, setEmail] = useState("");
-  const [estado, setEstado] = useState(true); // true = Activo
+  const [showLoading, setShowLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
 
@@ -37,7 +34,6 @@ export default function UpdateAdmin({ id }) {
   useEffect(() => {
     if (adminData) {
       setEmail(adminData.email || "");
-      setEstado(adminData.asset); // asset es el campo booleano de activo/inactivo
     }
   }, [adminData]);
 
@@ -48,31 +44,36 @@ export default function UpdateAdmin({ id }) {
       return res.data; // Retornamos la respuesta para usar el mensaje
     },
     onSuccess: (data) => {
-      toast(data.message); // Mensaje del backend si la actualización fue exitosa
+      toast.success(data.message || "Administrador actualizado correctamente.");
       queryClient.invalidateQueries(["users"]);
-      setModalMessage(data.message);
-      setModalOpen(true);
+      setShowLoading(false);
     },
     onError: (error) => {
       const errMsg = error?.response?.data?.message || "Error desconocido al actualizar el admin.";
-      toast(errMsg); // Mensaje del backend en caso de error
-      setModalMessage(errMsg);
-      setModalOpen(true);
+      toast.error(errMsg);
+      setShowLoading(false);
     },
   });
 
-
-
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Validar email básico
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.warning("Por favor, ingresa un correo válido.");
+      return;
+    }
+
+    setShowLoading(true);
     updateMutation.mutate({ user_Id: id, email });
-  };
 
-
-  const toggleEstado = () => {
-    setEstado((prev) => !prev);
+    // Garantizar mínimo 3 segundos de spinner
+    setTimeout(() => {
+      if (!updateMutation.isLoading) {
+        setShowLoading(false);
+      }
+    }, 5000);
   };
-  console.log(adminData)
 
   return (
     <Card className="w-full max-w-2xl mx-auto shadow-lg border-blue-600/20 border-2">
@@ -89,11 +90,13 @@ export default function UpdateAdmin({ id }) {
                 <Input
                   id="email"
                   name="email"
+                  type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="correo@ejemplo.com"
                   className="border-blue-200 focus-visible:ring-blue-500"
                   required
+                  disabled={updateMutation.isLoading || showLoading}
                 />
               </div>
             </>
@@ -101,13 +104,43 @@ export default function UpdateAdmin({ id }) {
         </CardContent>
 
         <CardFooter className="dark:bg-green-900/20 border-blue-100 dark:border-blue-800 flex justify-end">
-          <Button type="submit" disabled={updateMutation.isLoading}>
-            {updateMutation.isLoading ? "Actualizando..." : "Actualizar Admin"}
+          <Button
+            type="submit"
+            disabled={updateMutation.isLoading || showLoading}
+            className="flex items-center justify-center gap-2"
+          >
+            {(updateMutation.isLoading || showLoading) ? (
+              <>
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
+                </svg>
+                Actualizando...
+              </>
+            ) : (
+              <>Actualizar Admin</>
+            )}
           </Button>
         </CardFooter>
       </form>
 
-      {/* ✅ Modal de confirmación */}
+      {/* Modal de confirmación */}
       {modalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-sm text-center space-y-4">

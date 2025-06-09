@@ -13,9 +13,9 @@ import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useAuthUser } from "@/app/user/login/useCurrentUser";
+import { toast } from "react-hot-toast"; // ✅ Importado toast
 
 async function Login(credentials) {
-  // Delay artificial de 2 segundos para ver el estado loading
   await new Promise((r) => setTimeout(r, 2000));
   const response = await axiosInstance.post("/api/User/Login", credentials);
   return response;
@@ -25,17 +25,14 @@ function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuthUser();
-
-  // Estado local para loading para probar y comparar
   const [localLoading, setLocalLoading] = useState(false);
 
   const loginMutation = useMutation({
     mutationFn: Login,
-    onMutate: () => setLocalLoading(true), // activar loading local
-    onSettled: () => setLocalLoading(false), // desactivar loading local
+    onMutate: () => setLocalLoading(true),
+    onSettled: () => setLocalLoading(false),
     onSuccess: (response) => {
       if (response.status === 200) {
         const { tip, user } = response.data;
@@ -45,13 +42,15 @@ function LoginPage() {
     },
     onError: (err) => {
       console.error(err);
-      setError(err.response ? err.response.data.message : "Error desconocido");
+      const message =
+        err.response?.data?.message || "Error desconocido. Intenta nuevamente.";
+      toast.error(message); // ✅ Mostrando toast
     },
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const credentials = { email, hashedPassword: password };
+    const credentials = { email, password }; // ✅ CAMBIO AQUI
     loginMutation.mutate(credentials);
   };
 
@@ -73,12 +72,6 @@ function LoginPage() {
         <h1 className="font-bold text-3xl text-center mb-4 mt-0">
           Iniciar Sesión
         </h1>
-
-        {error && (
-          <div className="mb-4 text-sm text-red-600 bg-red-100 p-2 rounded">
-            {error}
-          </div>
-        )}
 
         <div className="space-y-4">
           <TextField
@@ -159,14 +152,15 @@ function LoginPage() {
               Ingresando...
             </>
           ) : (
-            <>
-              Ingresar
-            </>
+            <>Ingresar</>
           )}
         </Button>
 
         <div className="flex flex-col items-center mt-5 text-sm space-y-2">
-          <a href="/user/reset-password/reset" className="text-blue-600 hover:underline">
+          <a
+            href="/user/reset-password/reset"
+            className="text-blue-600 hover:underline"
+          >
             ¿Olvidaste tu contraseña?
           </a>
         </div>
