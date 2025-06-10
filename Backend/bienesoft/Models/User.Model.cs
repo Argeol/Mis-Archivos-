@@ -64,6 +64,8 @@ namespace bienesoft.models
 
         [Required, StringLength(20)]
         public string Status_User { get; set; } = "Activo";
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
     }
 
 
@@ -84,7 +86,7 @@ namespace bienesoft.models
     {
         public int? User_Id { get; set; }
         public string? Email { get; set; }
-        
+
     }
 
     public class ResetPasswordModel
@@ -112,4 +114,5 @@ namespace bienesoft.models
         public Role? Role { get; set; }
         public string? State { get; set; }
     }
+
 }

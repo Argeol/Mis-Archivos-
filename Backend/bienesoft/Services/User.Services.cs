@@ -178,6 +178,17 @@ namespace bienesoft.Services
                 throw new Exception("No se pudo crear el usuario. Detalles: " + ex.Message);
             }
         }
+        public async Task<User?> GetByRefreshTokenAsync(string refreshToken)
+        {
+            return await _context.user
+                .Include(u => u.Apprentice)
+                .Include(u => u.Responsible)
+                .FirstOrDefaultAsync(u =>
+                    u.RefreshToken == refreshToken &&
+                    u.RefreshTokenExpiryTime > DateTime.UtcNow
+                );
+        }
+
 
 
 
@@ -254,6 +265,9 @@ namespace bienesoft.Services
             existingUser.Asset = user.Asset;
             existingUser.ResetToken = user.ResetToken;
             existingUser.ResetTokenExpiration = user.ResetTokenExpiration;
+            //PARA EL ACTUALIZAR EL TOKEN ADMINISTRADOR Y RESPONSABLE CADA SIERTO TIEMPO
+            existingUser.RefreshToken = user.RefreshToken;
+            existingUser.RefreshTokenExpiryTime = user.RefreshTokenExpiryTime;
 
             await _context.SaveChangesAsync();
         }

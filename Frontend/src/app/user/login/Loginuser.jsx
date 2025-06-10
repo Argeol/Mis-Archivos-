@@ -13,12 +13,13 @@ import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useAuthUser } from "@/app/user/login/useCurrentUser";
-import { toast } from "react-hot-toast"; // ✅ Importado toast
+import { toast } from "sonner"; // ✅ Importado toast
 
 async function Login(credentials) {
   await new Promise((r) => setTimeout(r, 2000));
   const response = await axiosInstance.post("/api/User/Login", credentials);
   return response;
+
 }
 
 function LoginPage() {
@@ -50,8 +51,12 @@ function LoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const credentials = { email, password }; // ✅ CAMBIO AQUI
+    const credentials = {
+      email: email.trim(),
+      hashedPassword: password.trim(), // Aquí haces el cambio
+    };
     loginMutation.mutate(credentials);
+
   };
 
   return (

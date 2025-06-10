@@ -87,11 +87,6 @@ namespace bienesoft.Services
             }
 
         }
-
-
-
-
-
         public async Task<List<object>> GetResponsiblesAsync()
         {
             var responsible = await _context.responsible
@@ -159,8 +154,8 @@ namespace bienesoft.Services
         public async Task<List<ResponsibleModel>> GetResponsiblesByRoleIdAsync(int roleId)
         {
             return await _context.responsible
-                                 .Where(r => r.RoleId == roleId)
-                                 .ToListAsync();
+                                .Where(r => r.RoleId == roleId)
+                                .ToListAsync();
         }
 
 

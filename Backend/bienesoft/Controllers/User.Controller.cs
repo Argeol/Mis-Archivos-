@@ -37,6 +37,7 @@ namespace bienesoft.Controllers
         public IActionResult Logout()
         {
             // Borrar la cookie con el nombre que usaste para guardar el token (por ejemplo: "jwt")
+            Response.Cookies.Delete("refreshToken");
             Response.Cookies.Delete("token");
             return Ok(new { message = "Sesión cerrada correctamente" });
 
@@ -48,10 +49,8 @@ namespace bienesoft.Controllers
             {
                 return Ok(new { isValid = true });
             }
-
-            return Unauthorized(new { isValid = false });
+            return Ok(new { isValid = false });
         }
-
 
         [HttpPost("Login")]
         public IActionResult Login(LoginUser login)
@@ -59,14 +58,19 @@ namespace bienesoft.Controllers
             try
             {
                 var user = _UserServices.GetByEmailAsync(login.Email).Result;
-                if (user == null || (user.Apprentice != null && user.Apprentice.Status_Apprentice == "Inactivo"))
+                if (user == null)
                 {
-                    return Unauthorized(new { message = "Acceso denegado. Tu estado es inactivo." });
+                    return Unauthorized(new { message = "Tu correo no esta registrado en el sistema, Verificalo" });
                 }
-                var hashedInput = PasswordHasher.HashPassword(login.HashedPassword, user.Salt);
+                var cleanPassword = login.HashedPassword?.Trim();
+                var hashedInput = PasswordHasher.HashPassword(cleanPassword, user.Salt);
                 if (hashedInput != user.HashedPassword)
                 {
-                    return Unauthorized(new { message = "Credenciales incorrectas." });
+                    return Unauthorized(new { message = "Credenciales incorrectas" });
+                }
+                if (user.Apprentice != null && user.Apprentice.Status_Apprentice == "Inactivo")
+                {
+                    return Unauthorized(new { message = "Acceso denegado. Tu estado es inactivo." });
                 }
 
                 var key = Encoding.UTF8.GetBytes(_jwtSettings.keysecret);
@@ -79,7 +83,6 @@ namespace bienesoft.Controllers
                     new Claim("exp", DateTimeOffset.UtcNow.AddMinutes(Convert.ToDouble(_jwtSettings.JWTExpireTime)).ToUnixTimeSeconds().ToString()),
                     new Claim("iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString())
                 };
-                Console.WriteLine($"user.UserType = '{user.UserType}'");
 
                 switch (user.UserType)
 
@@ -118,7 +121,21 @@ namespace bienesoft.Controllers
 
                 user.TokJwt = tokenString;
                 _UserServices.UpdateUserAsync(user).Wait();
+                if (user.UserType == "Administrador" || user.UserType == "Responsable")
+                {
+                    var refreshToken = Guid.NewGuid().ToString(); // Puedes usar un generador más seguro si deseas
+                    user.RefreshToken = refreshToken;
+                    user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Validez de 7 días
 
+                    _UserServices.UpdateUserAsync(user).Wait(); // Guardas el RefreshToken
+
+                    Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+                    {
+                        HttpOnly = true,
+                        SameSite = SameSiteMode.Strict,
+                        Expires = DateTimeOffset.UtcNow.AddDays(7)
+                    });
+                }
                 // return Ok(new { message = tokenString });
                 Response.Cookies.Append("token", tokenString, new CookieOptions
                 {
@@ -128,39 +145,6 @@ namespace bienesoft.Controllers
                     Expires = DateTimeOffset.UtcNow.AddMinutes(Convert.ToDouble(_jwtSettings.JWTExpireTime))
 
                 });
-
-                //object userDto = null;
-
-                //if (user.UserType == "Responsable" && user.Responsible != null)
-                //{
-                //    userDto= new UserLoginResponseDTO
-                //    {
-                //        Responsible_Id = user.Responsible.Responsible_Id,
-                //        Nom_Responsible = user.Responsible.Nom_Responsible,
-                //        Ape_Responsible = user.Responsible.Ape_Responsible,
-                //        Tel_Responsible = user.Responsible.Tel_Responsible,
-                //        Email_Responsible = user.Responsible.Email_Responsible,
-                //        State = user.Responsible.State
-                //    };
-
-                //    return Ok(new
-                //    {
-                //        message = "Login Exitoso",
-                //        tip = user.UserType,
-                //        user = userDto
-                //    });
-                //}
-                //else if (user.UserType == "Aprendiz " && user.Apprentice != null)
-                //{
-                //    return Ok(new
-                //    {
-                //        message = "Login Exitoso",
-                //        tip = user.UserType,
-                //        user = user.Apprentice
-                //    });
-                //}
-
-                //return Ok();
                 object UserObject = null;
 
                 if (user.UserType == "Responsable" && user.Responsible != null)
@@ -195,7 +179,7 @@ namespace bienesoft.Controllers
                 // Al final, se hace un solo return:
                 return Ok(new
                 {
-                    message = "Login Exitoso",
+                    message = "Inicio Sesion Exitoso",
                     tip = user.UserType,
                     user = UserObject
                 });
@@ -206,6 +190,56 @@ namespace bienesoft.Controllers
                 return StatusCode(500, "Ocurrió un error en el servidor.");
             }
         }
+        [HttpPost("RefreshToken")]
+        public async Task<IActionResult> RefreshToken()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+
+            if (string.IsNullOrEmpty(refreshToken))
+                return Unauthorized(new { message = "Token expirado. Inicia sesión de nuevo." });
+
+            var user = await _UserServices.GetByRefreshTokenAsync(refreshToken);
+
+            if (user == null || user.RefreshTokenExpiryTime < DateTime.UtcNow)
+                return Unauthorized(new { message = "Token inválido o expirado." });
+
+            if (user.UserType == "Aprendiz")
+                return Unauthorized(new { message = "Tu sesión ha expirado. Debes iniciar sesión." });
+
+            // Generar nuevo token JWT
+            var key = Encoding.UTF8.GetBytes(_jwtSettings.keysecret);
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Email, user.Email),
+        new Claim(ClaimTypes.Role, user.UserType),
+        new Claim("aud", "BienesoftClient"),
+        new Claim("iss", "BienesoftAPI"),
+        new Claim("exp", DateTimeOffset.UtcNow.AddMinutes(Convert.ToDouble(_jwtSettings.JWTExpireTime)).ToUnixTimeSeconds().ToString()),
+        new Claim("iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString())
+    };
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_jwtSettings.JWTExpireTime)),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                Audience = "BienesoftClient",
+                Issuer = "BienesoftAPI"
+            };
+
+            var token = new JwtSecurityTokenHandler().CreateToken(tokenDescriptor);
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            Response.Cookies.Append("token", tokenString, new CookieOptions
+            {
+                HttpOnly = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddMinutes(Convert.ToDouble(_jwtSettings.JWTExpireTime))
+            });
+
+            return Ok(new { message = "Token renovado correctamente" });
+        }
+
         [Authorize(Roles = "Administrador")]
         [HttpPost("createAdmi")]
         public async Task<IActionResult> CreateUser([FromBody] Administrador request)

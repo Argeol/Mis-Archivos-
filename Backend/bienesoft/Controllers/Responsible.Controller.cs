@@ -29,7 +29,6 @@ namespace bienesoft.Controllers
         {
             try
             {
-
                 if (string.IsNullOrWhiteSpace(responsible.Email_Responsible))
                     return BadRequest("El campo Email es obligatorio.");
 
@@ -38,17 +37,17 @@ namespace bienesoft.Controllers
                 return Ok(new
                 {
                     message = "Responsable resgistrado correctamente.",
-                    detalle = result.mensajeCorreo, 
+                    detalle = result.mensajeCorreo,
                     result.responsable
                 });
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new {error = ex.Message});
+                return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new {error = "Ocurrio un error inesperado.", detalle = ex.Message});
+                return StatusCode(500, new { error = "Ocurrio un error inesperado.", detalle = ex.Message });
             }
 
         }
@@ -70,7 +69,7 @@ namespace bienesoft.Controllers
                 //Sacamos el Responsable_Id del token
                 var idResponsibleClaim = User.Claims.FirstOrDefault(r => r.Type == "Responsible_Id")?.Value;
 
-                var idResponsible = int.Parse(idResponsibleClaim);  
+                var idResponsible = int.Parse(idResponsibleClaim);
 
                 var responsible = _ResponsibleServices.GetResponsibleById(idResponsible);
                 if (responsible == null)
@@ -78,7 +77,7 @@ namespace bienesoft.Controllers
 
                 return Ok(responsible);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 GeneralFunction.Addlog(ex.ToString());
                 return StatusCode(500, ex.ToString());
@@ -129,7 +128,6 @@ namespace bienesoft.Controllers
             {
                 return BadRequest(new { message = "El modelo de actualización es nulo" });
             }
-
             try
             {
                 // Obtener Responsible_Id desde el JWT
@@ -165,33 +163,33 @@ namespace bienesoft.Controllers
             }
 
         }
-            [HttpGet("GetResponsiblesByRole/roleid=1")]
-            public async Task<IActionResult> GetResponsiblesByRole1()
-            {
-                var result = await _ResponsibleServices.GetResponsiblesByRoleIdAsync(1);
-                return Ok(result);
-            }
+        [HttpGet("GetResponsiblesByRole/roleid=1")]
+        public async Task<IActionResult> GetResponsiblesByRole1()
+        {
+            var result = await _ResponsibleServices.GetResponsiblesByRoleIdAsync(1);
+            return Ok(result);
+        }
 
-            [HttpGet("GetResponsiblesByRole/roleid=2")]
-            public async Task<IActionResult> GetResponsiblesByRole2()
-            {
-                var result = await _ResponsibleServices.GetResponsiblesByRoleIdAsync(2);
-                return Ok(result);
-            }
+        [HttpGet("GetResponsiblesByRole/roleid=2")]
+        public async Task<IActionResult> GetResponsiblesByRole2()
+        {
+            var result = await _ResponsibleServices.GetResponsiblesByRoleIdAsync(2);
+            return Ok(result);
+        }
 
-            [HttpGet("GetResponsiblesByRole/roleid=3")]
-            public async Task<IActionResult> GetResponsiblesByRole3()
-            {
-                var result = await _ResponsibleServices.GetResponsiblesByRoleIdAsync(3);
-                return Ok(result);
-            }
+        [HttpGet("GetResponsiblesByRole/roleid=3")]
+        public async Task<IActionResult> GetResponsiblesByRole3()
+        {
+            var result = await _ResponsibleServices.GetResponsiblesByRoleIdAsync(3);
+            return Ok(result);
+        }
 
-            [HttpGet("GetResponsiblesByRole/roleid=4")]
-            public async Task<IActionResult> GetResponsiblesByRole4()
-            {
-                var result = await _ResponsibleServices.GetResponsiblesByRoleIdAsync(4);
-                return Ok(result);
-            }
+        [HttpGet("GetResponsiblesByRole/roleid=4")]
+        public async Task<IActionResult> GetResponsiblesByRole4()
+        {
+            var result = await _ResponsibleServices.GetResponsiblesByRoleIdAsync(4);
+            return Ok(result);
+        }
 
     }
 }
