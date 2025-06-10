@@ -72,8 +72,7 @@ const [isTokenValid, setIsTokenValid] = useState(null); // null: cargando, true/
       : `Gestionar ${titlespage}`;
   if (isTokenValid === null) return <p>Validando sesión...</p>;
 
-  if (!isTokenValid) {
-    return (
+  if (!isTokenValid) {    return (
       <div className="flex items-center justify-center h-screen bg-gray-100">
         <div className="p-6 bg-white rounded shadow text-center">
           <h2 className="text-lg font-semibold text-gray-800">

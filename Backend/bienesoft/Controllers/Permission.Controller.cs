@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using bienesoft.Models;
 using Microsoft.AspNetCore.Authorization;
+using DocumentFormat.OpenXml.Drawing.Charts;
 
 
 
@@ -56,6 +57,22 @@ namespace bienesoft.Controllers
             {
                 var idApprenticeClaim = User.Claims.FirstOrDefault(c => c.Type == "Id_Apprentice")?.Value;
                 var idApprentice = Convert.ToInt32(idApprenticeClaim);
+
+                var result = await _permissionService.CreatePermissionAsync(Request.Permission, idApprentice, Request.ResponsablesSeleccionados);
+
+                return Ok(new { success = true, message = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+        [Authorize(Roles = "Administrador")]
+        [HttpPost("CrearPermisoAdmi")]
+        public async Task<IActionResult> CreatePermissionAdmi(CreatePermissionRequest Request, [FromQuery] int idApprentice)
+        {
+            try
+            {
 
                 var result = await _permissionService.CreatePermissionAsync(Request.Permission, idApprentice, Request.ResponsablesSeleccionados);
 
