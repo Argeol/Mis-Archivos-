@@ -402,14 +402,64 @@ namespace bienesoft.Funcions
         }
         private string GenerateApprovalBody(string nombreRol, string nombreAprendiz)
         {
+            string imageUrl = "https://i.imgur.com/BChB7mV.png";
             return $@"
-        <h2>Notificación de Permiso Pendiente</h2>
-        <p>Estimado/a {nombreRol},</p>
-        <p>El aprendiz <strong>{nombreAprendiz}</strong> ha solicitado un permiso que requiere su aprobación.</p>
-        <p>Por favor, ingrese al sistema para autorizar o rechazar la solicitud.</p>
-        <br/>
-        <p><em>Este es un mensaje automático del sistema Bienesoft.</em></p>
-    ";
+<!DOCTYPE html>
+<html lang=""es"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>Notificación de Permiso</title>
+    <!--[if mso]>
+    <style type=""text/css"">
+        table, td, div, h1, p {{font-family: Arial, sans-serif !important;}}
+    </style>
+    <![endif]-->
+</head>
+<body style=""margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f4f8; color: #333333;"">
+    <table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" align=""center"" width=""100%"" style=""max-width: 650px; margin: 20px auto;"">
+        <tr>
+            <td style=""background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); padding: 30px 0; text-align: center; border-radius: 12px 12px 0 0;"">
+                <h1 style=""color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.2);"">Notificación de Permiso</h1>
+            </td>
+        </tr>
+        <tr>
+            <td style=""background-color: #ffffff; padding: 0; border-left: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0;"">
+                <table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" width=""100%"">
+                    <tr>
+                        <td style=""padding: 40px 40px 20px; text-align: center;"">
+                            <img src=""{imageUrl}"" alt=""Logo de Bienesoft"" style=""max-width: 200px; height: auto; margin-bottom: 25px;"" />
+                            <h2 style=""color: #2c3e50; margin: 0 0 15px; font-size: 22px; font-weight: 600;"">Notificación de Permiso Pendiente</h2>
+                            <p style=""color: #5d6778; font-size: 16px; line-height: 1.6; margin: 0 0 20px;"">Estimado/a <strong>{nombreRol}</strong>,</p>
+                            <p style=""color: #5d6778; font-size: 16px; line-height: 1.6; margin: 0 0 20px;"">El aprendiz <strong>{nombreAprendiz}</strong> ha solicitado un permiso que requiere su aprobación.</p>
+                            <p style=""color: #5d6778; font-size: 16px; line-height: 1.6; margin: 0 0 20px;"">Por favor, ingrese al sistema para autorizar o rechazar la solicitud.</p>
+                            <p style=""color: #999; font-size: 14px; line-height: 1.6; font-style: italic;"">Este es un mensaje automático del sistema Bienesoft.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style=""background-color: #f8f9fa; padding: 30px 40px; border-left: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0;"">
+                <table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" width=""100%"">
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style=""background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%); padding: 25px 40px; text-align: center; border-radius: 0 0 12px 12px;"">
+                <p style=""color: rgba(255, 255, 255, 0.9); font-size: 14px; margin: 0 0 10px;"">
+                    &copy; {DateTime.Now.Year} Bienesoft. Todos los derechos reservados.
+                </p>
+                <p style=""color: rgba(255, 255, 255, 0.8); font-size: 13px; margin: 0;"">
+                    Espinal - Tolima
+                </p>
+                <p style=""font-size:12px; color:#999;"">Este mensaje fue enviado automáticamente por Bienesoft. Si recibiste este correo por error, ignóralo.</p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>";
+
         }
 
         public async Task<ResponseSend> NotifyAprendizAsync(
@@ -444,40 +494,73 @@ namespace bienesoft.Funcions
 
                         // Construir la lista de aprobaciones en HTML
                         string aprobacionesHtml = string.Join("", aprobaciones.Select(a => $"<li>{a}</li>"));
-
+                        string imageUrl = "https://i.imgur.com/BChB7mV.png";
                         // Cuerpo del correo
                         message.Body = $@"
-                        <html>
-                            <body style='font-family: Arial, sans-serif;'>
-                                <p>Hola <strong>{nombreAprendiz}</strong>,</p>
-                                <p>Nos complace informarte que tu permiso ha sido <strong>aprobado</strong> por todos los responsables asignados.</p>
-                                
-                                <h3>📋 Detalles del permiso:</h3>
-                                <ul>
-                                    <li><strong>Tipo de aprendiz:</strong> {tipoAprendiz}</li>
-                                    <li><strong>Acudiente:</strong> {acudiente}</li>
-                                    <li><strong>Tel. Acudiente:</strong> {acudienteTel}</li>
-                                    <li><strong>Fecha de salida:</strong> {fechaSalida}</li>
-                                    <li><strong>Fecha de entrada:</strong> {fechaEntrada}</li>
-                                    <li><strong>Dirección destino:</strong> {direccion}</li>
-                                    <li><strong>Motivo:</strong> {motivo}</li>
-                                    <li><strong>Observaciones:</strong> {observacion}</li>
-                                </ul>
+<!DOCTYPE html>
+<html lang=""es"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>Permiso Aprobado</title>
+</head>
+<body style=""margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f4f8; color: #333333;"">
+    <table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" align=""center"" width=""100%"" style=""max-width: 650px; margin: 20px auto;"">
+        <tr>
+            <td style=""background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); padding: 30px 0; text-align: center; border-radius: 12px 12px 0 0;"">
+                <h1 style=""color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;"">Permiso Aprobado</h1>
+            </td>
+        </tr>
+        <tr>
+            <td style=""background-color: #ffffff; padding: 40px; border-left: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0;"">
+                <img src=""{imageUrl}"" alt=""Logo Bienesoft"" style=""max-width: 200px; height: auto; display: block; margin: 0 auto 30px;"" />
+                <p style=""font-size: 16px; color: #2c3e50;"">Hola <strong>{nombreAprendiz}</strong>,</p>
+                <p style=""font-size: 16px; color: #2c3e50;"">Nos complace informarte que tu permiso ha sido <strong style='color: green;'>aprobado</strong> por todos los responsables asignados.</p>
+                
+                <h3 style=""color: #4a6cf7; font-size: 18px;"">📋 Detalles del permiso:</h3>
+                <ul style=""color: #5d6778; font-size: 15px; line-height: 1.6;"">
+                    <li><strong>Tipo de aprendiz:</strong> {tipoAprendiz}</li>
+                    <li><strong>Acudiente:</strong> {acudiente}</li>
+                    <li><strong>Tel. Acudiente:</strong> {acudienteTel}</li>
+                    <li><strong>Fecha de salida:</strong> {fechaSalida}</li>
+                    <li><strong>Fecha de entrada:</strong> {fechaEntrada}</li>
+                    <li><strong>Dirección destino:</strong> {direccion}</li>
+                    <li><strong>Motivo:</strong> {motivo}</li>
+                    <li><strong>Observaciones:</strong> {observacion}</li>
+                </ul>
 
-                                <h3>✅ Responsables que aprobaron:</h3>
-                                <ul>
-                                    {aprobacionesHtml}
-                                </ul>
+                <h3 style=""color: #4a6cf7; font-size: 18px;"">✅ Responsables que aprobaron:</h3>
+                <ul style=""color: #5d6778; font-size: 15px; line-height: 1.6;"">
+                    {aprobacionesHtml}
+                </ul>
 
-                                <hr style='margin: 20px 0;' />
-                                <p>Tu acudiente {acudiente} fue informado de tu salida del Centro Agropecuario la granja</p>
+                <hr style=""border: none; border-top: 1px solid #ccc; margin: 30px 0;"" />
 
-                                <p><strong>🔒 Nota para portería:</strong> Este correo sirve como constancia de aprobación. Por favor, verifique identidad, fecha de salida y entrada del aprendiz.</p>
+                <p style=""font-size: 15px; color: #2c3e50;"">Tu acudiente <strong>{acudiente}</strong> fue informado de tu salida del Centro Agropecuario La Granja.</p>
+                
+                <div style=""background-color: #fff8f0; border-left: 4px solid #ff9800; padding: 15px; border-radius: 4px; margin-top: 20px;"">
+                    <p style=""color: #e67e22; font-size: 14px;"">
+                        <strong>🔒 Nota para portería:</strong> Este correo sirve como constancia de aprobación. Por favor, verifique identidad, fecha de salida y entrada del aprendiz.
+                    </p>
+                </div>
 
-                                <p>Atentamente,<br><strong>Equipo de Bienesoft</strong></p>
-                            </body>
-                        </html>";
-
+                <p style=""margin-top: 30px; font-size: 15px;"">Atentamente,<br><strong>Equipo de Bienesoft</strong></p>
+            </td>
+        </tr>
+        <tr>
+            <td style=""background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%); padding: 25px 40px; text-align: center; border-radius: 0 0 12px 12px;"">
+                <p style=""color: rgba(255, 255, 255, 0.9); font-size: 14px; margin: 0 0 10px;"">
+                    &copy; {DateTime.Now.Year} Bienesoft. Todos los derechos reservados.
+                </p>
+                <p style=""color: rgba(255, 255, 255, 0.8); font-size: 13px; margin: 0;"">
+                    Espinal - Tolima
+                </p>
+                <p style=""font-size:12px; color:#999;"">Este mensaje fue enviado automáticamente. Si lo recibiste por error, puedes ignorarlo.</p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>";
 
                         message.BodyEncoding = Encoding.UTF8;
 
@@ -522,26 +605,60 @@ namespace bienesoft.Funcions
                     {
                         message.IsBodyHtml = true;
                         message.Subject = $"Se ha aprobado un permiso para {nombreAprendiz}";
+                        string imageUrl = "https://i.imgur.com/BChB7mV.png";
 
                         message.Body = $@"
-                <html>
-                    <body style='font-family: Arial, sans-serif;'>
-                        <p>Estimado(a) <strong>{nombreAcudiente}</strong>,</p>
-                        <p>Le informamos que el aprendiz <strong>{nombreAprendiz}</strong> ha recibido autorización para salir, y usted ha sido notificado como acudiente.</p>
-                        <p><strong>Detalles del permiso:</strong></p>
-                        <ul>
-                            <li><strong>Fecha de salida:</strong> {fechaSalida}</li>
-                            <li><strong>Fecha de entrada:</strong> {fechaEntrada}</li>
-                            <li><strong>Dirección destino:</strong> {direccion}</li>
-                            <li><strong>Motivo:</strong> {motivo}</li>
-                            <li><strong>Observaciones:</strong> {observacion}</li>
-                        </ul>
-                        <p>Por favor, esté atento(a) a cualquier novedad.</p>
-                        <p>Gracias por su atención.</p>
-                        <p><strong>Bienesoft</strong></p>
-                    </body>
-                </html>";
+<!DOCTYPE html>
+<html lang=""es"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>Notificación para Acudiente</title>
+</head>
+<body style=""margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f4f8; color: #333333;"">
+    <table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" align=""center"" width=""100%"" style=""max-width: 650px; margin: 20px auto;"">
+        <tr>
+            <td style=""background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); padding: 30px 0; text-align: center; border-radius: 12px 12px 0 0;"">
+                <h1 style=""color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;"">Notificación para Acudiente</h1>
+            </td>
+        </tr>
+        <tr>
+            <td style=""background-color: #ffffff; padding: 40px; border-left: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0;"">
+                <img src=""{imageUrl}"" alt=""Logo Bienesoft"" style=""max-width: 200px; height: auto; display: block; margin: 0 auto 30px;"" />
+                <p style=""font-size: 16px; color: #2c3e50;"">Estimado(a) <strong>{nombreAcudiente}</strong>,</p>
+                <p style=""font-size: 16px; color: #2c3e50;"">
+                    Le informamos que el aprendiz <strong>{nombreAprendiz}</strong> ha recibido autorización para salir, y usted ha sido notificado como acudiente.
+                </p>
 
+                <h3 style=""color: #4a6cf7; font-size: 18px;"">📋 Detalles del permiso:</h3>
+                <ul style=""color: #5d6778; font-size: 15px; line-height: 1.6;"">
+                    <li><strong>Fecha de salida:</strong> {fechaSalida}</li>
+                    <li><strong>Fecha de entrada:</strong> {fechaEntrada}</li>
+                    <li><strong>Dirección destino:</strong> {direccion}</li>
+                    <li><strong>Motivo:</strong> {motivo}</li>
+                    <li><strong>Observaciones:</strong> {observacion}</li>
+                </ul>
+
+                <p style=""font-size: 16px; color: #2c3e50;"">Por favor, esté atento(a) a cualquier novedad.</p>
+                <p style=""font-size: 16px; color: #2c3e50;"">Gracias por su atención.</p>
+
+                <p style=""margin-top: 30px; font-size: 16px;""><strong>Bienesoft</strong></p>
+            </td>
+        </tr>
+        <tr>
+            <td style=""background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%); padding: 25px 40px; text-align: center; border-radius: 0 0 12px 12px;"">
+                <p style=""color: rgba(255, 255, 255, 0.9); font-size: 14px; margin: 0 0 10px;"">
+                    &copy; {DateTime.Now.Year} Bienesoft. Todos los derechos reservados.
+                </p>
+                <p style=""color: rgba(255, 255, 255, 0.8); font-size: 13px; margin: 0;"">
+                    Espinal - Tolima
+                </p>
+                <p style=""font-size:12px; color:#999;"">Este mensaje fue enviado automáticamente. Si lo recibió por error, puede ignorarlo.</p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>";
                         message.BodyEncoding = Encoding.UTF8;
 
                         await smtpClient.SendMailAsync(message);
