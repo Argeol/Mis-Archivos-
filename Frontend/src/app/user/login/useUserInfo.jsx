@@ -120,16 +120,6 @@ export function UserInfoModal({ Tip, open, onClose, Data }) {
   };
 
   const getIconForKey = (key) => {
-    const keyLower = key.toLowerCase();
-    // if (keyLower.includes("name") || keyLower.includes("nombre")) return <UserIcon className="h-5 w-5 text-rose-500" />
-    if (keyLower.includes("correo") || keyLower.includes("email"))
-      return <Mail className="h-5 w-5 text-amber-500" />;
-    if (
-      keyLower.includes("fecha") ||
-      keyLower.includes("birth") ||
-      keyLower.includes("date")
-    )
-      return <Calendar className="h-5 w-5 text-emerald-500" />;
     return <ChevronRight className="h-5 w-5 text-slate-400" />;
   };
 

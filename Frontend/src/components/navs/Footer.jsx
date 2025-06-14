@@ -18,7 +18,7 @@ export default function Footer() {
             />
           </div>
           <h3 className="text-2xl font-bold tracking-tight -ml-4 bg-gradient-to-r from-sky-600 to-indigo-600 text-transparent bg-clip-text">
-            BIENESOFT
+            IENESOFT
           </h3>
         </div>
 

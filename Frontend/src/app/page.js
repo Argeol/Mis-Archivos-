@@ -28,9 +28,9 @@ export default function Home() {
                 <Button size="lg" className="animate-gradient text-white bg-blue-500">
                   <a href="/user/login">Iniciar</a>
                 </Button>
-                <Button size="lg" variant="outline">
+                {/* <Button size="lg" variant="outline">
                   <a href="/user/register">Registrarse</a>
-                </Button>
+                </Button> */}
               </div>
             </div>
           </div>

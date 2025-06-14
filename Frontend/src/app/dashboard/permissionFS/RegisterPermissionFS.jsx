@@ -1,22 +1,15 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axiosInstance from "@/lib/axiosInstance";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useState } from "react"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import axiosInstance from "@/lib/axiosInstance"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function RegisterPermissionFS() {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   const [formData, setFormData] = useState({
     destino: "",
     fec_Salida: "",
@@ -25,185 +18,243 @@ export default function RegisterPermissionFS() {
     alojamiento: "",
     sen_Empresa: "",
     direccion: "",
-  });
-
-  // const { data: apprentices = [] } = useQuery({
-  //   queryKey: ["apprentices"],
-  //   queryFn: async () => {
-  //     const res = await axiosInstance.get("/api/Apprentice/all");
-  //     return res.data;
-  //   },
-  // });
+  })
 
   const mutation = useMutation({
     mutationFn: async () => {
       const res = await axiosInstance.post("/api/PermissionFS/Create", {
-        permission: formData, // 👈 importante
-      });
-      return res.data;
+        permission: formData,
+      })
+      return res.data
     },
     onSuccess: () => {
-      alert("Permiso FS registrado exitosamente");
-      queryClient.invalidateQueries(["permissionsfs"]);
+      alert("Permiso FS registrado exitosamente")
+      setFormData({
+        destino: "",
+        fec_Salida: "",
+        fec_Entrada: "",
+        dia_Salida: "",
+        alojamiento: "",
+        sen_Empresa: "",
+        direccion: "",
+      })
+      queryClient.invalidateQueries(["permissionsfs"])
     },
     onError: (error) => {
-      const errorMessage =
-        error.response?.data?.message || "Error al registrar el permiso FS.";
-      alert(errorMessage);
+      const errorMessage = error.response?.data?.message || "Error al registrar el permiso FS."
+      alert(errorMessage)
     },
-  });
+  })
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }));
-  };
-
-  const handleSelectApprentice = (value) => {
-    setFormData((prev) => ({
-      ...prev,
-      apprentice_Id: parseInt(value),
-    }));
-  };
+    }))
+  }
 
   const handleSelectDiaSalida = (value) => {
     setFormData((prev) => ({
       ...prev,
       dia_Salida: value,
-    }));
-  };
+    }))
+  }
 
   const handleSelectSenEmpresa = (value) => {
     setFormData((prev) => ({
       ...prev,
       sen_Empresa: value,
-    }));
-  };
+    }))
+  }
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    mutation.mutate();
-  };
+    e.preventDefault()
+
+    if (!formData.fec_Salida || !formData.fec_Entrada) {
+      alert("Las fechas de salida y entrada son obligatorias.")
+      return
+    }
+
+    const fechaSalida = new Date(formData.fec_Salida)
+    const fechaEntrada = new Date(formData.fec_Entrada)
+    const ahora = new Date()
+
+    if (fechaSalida < ahora) {
+      alert("La fecha de salida no puede ser anterior al momento actual.")
+      return
+    }
+
+    if (fechaEntrada <= fechaSalida) {
+      alert("La fecha de entrada debe ser posterior a la de salida.")
+      return
+    }
+
+    mutation.mutate()
+  }
+
+  const diasSalida = ["Miércoles", "Domingo", "Fin de semana"]
+  const opcionesSenaEmpresa = [
+    { value: "Si", label: "Sí" },
+    { value: "No", label: "No" },
+  ]
 
   return (
-    <form onSubmit={handleSubmit} className="w-full p-2 bg-white space-y-4">
-      {/* Fecha salida */}
-      <div className="space-y-1 px-2">
-        <Label htmlFor="fec_Salida">Fecha de salida</Label>
-        <Input
-          id="fec_Salida"
-          name="fec_Salida"
-          type="date"
-          onChange={handleChange}
-          required
-        />
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-4xl mx-auto p-6 space-y-6 bg-white border border-black rounded-2xl shadow"
+    >
+      {/* Encabezado institucional */}
+      <div className="text-center border-b border-black pb-4 space-y-1">
+        <img src="/assets/img/logoSena.png" alt="Logo SENA" className="mx-auto h-14" />
+        <h2 className="text-xl font-bold uppercase">Centro Agropecuario "La Granja" SENA Espinal</h2>
+        <p className="font-semibold text-sm">Solicitud de Permiso de Formación SENA (INTERNOS)</p>
       </div>
 
-      {/* Fecha entrada */}
-      <div className="space-y-1 px-2">
-        <Label htmlFor="fec_Entrada">Fecha de entrada</Label>
-        <Input
-          id="fec_Entrada"
-          name="fec_Entrada"
-          type="date"
-          onChange={handleChange}
-          required
-        />
+
+      {/* Fechas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="fec_Salida" className="font-semibold">
+            Fecha de salida *
+          </Label>
+          <Input
+            id="fec_Salida"
+            name="fec_Salida"
+            type="date"
+            value={formData.fec_Salida}
+            onChange={handleChange}
+            className="border-[#218EED]/40 focus:border-[#218EED]"
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="fec_Entrada" className="font-semibold">
+            Fecha de entrada *
+          </Label>
+          <Input
+            id="fec_Entrada"
+            name="fec_Entrada"
+            type="date"
+            value={formData.fec_Entrada}
+            onChange={handleChange}
+            className="border-[#218EED]/40 focus:border-[#218EED]"
+            required
+          />
+        </div>
       </div>
 
-      {/* Destino */}
-      <div className="space-y-1 px-2">
-        <Label htmlFor="destino">Destino</Label>
-        <Input
-          id="destino"
-          name="destino"
-          placeholder="Destino"
-          onChange={handleChange}
-          required
-        />
+      {/* Información del destino */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="destino" className="font-semibold">
+            Destino *
+          </Label>
+          <Input
+            id="destino"
+            name="destino"
+            placeholder="Ingrese el destino"
+            value={formData.destino}
+            onChange={handleChange}
+            className="border-[#218EED]/40 focus:border-[#218EED]"
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="direccion" className="font-semibold">
+            Dirección
+          </Label>
+          <Input
+            id="direccion"
+            name="direccion"
+            placeholder="Dirección del destino"
+            value={formData.direccion}
+            onChange={handleChange}
+            className="border-[#218EED]/40 focus:border-[#218EED]"
+          />
+        </div>
       </div>
 
       {/* Alojamiento */}
-      <div className="space-y-1 px-2">
-        <Label htmlFor="alojamiento">Alojamiento</Label>
+      <div className="space-y-2">
+        <Label htmlFor="alojamiento" className="font-semibold">
+          Alojamiento o Cabaña
+        </Label>
         <Input
           id="alojamiento"
           name="alojamiento"
-          placeholder="Alojamiento"
+          placeholder="Espeficique su Alojamiento o Cabaña"
+          value={formData.alojamiento}
           onChange={handleChange}
+          className="border-[#218EED]/40 focus:border-[#218EED]"
         />
       </div>
 
-      {/* Dirección */}
-      <div className="space-y-1 px-2">
-        <Label htmlFor="direccion">Dirección</Label>
-        <Input
-          id="direccion"
-          name="direccion"
-          placeholder="Dirección"
-          onChange={handleChange}
-        />
+      {/* Configuraciones específicas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label className="font-semibold">Día de salida *</Label>
+          <Select onValueChange={handleSelectDiaSalida} value={formData.dia_Salida}>
+            <SelectTrigger className="border-[#218EED]/40 focus:border-[#218EED]">
+              <SelectValue placeholder="Seleccionar día" />
+            </SelectTrigger>
+            <SelectContent>
+              {diasSalida.map((dia) => (
+                <SelectItem key={dia} value={dia}>
+                  {dia}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label className="font-semibold">¿Pertenece a  SenaEmpresa? *</Label>
+          <Select onValueChange={handleSelectSenEmpresa} value={formData.sen_Empresa}>
+            <SelectTrigger className="border-[#218EED]/40 focus:border-[#218EED]">
+              <SelectValue placeholder="Seleccionar opción" />
+            </SelectTrigger>
+            <SelectContent>
+              {opcionesSenaEmpresa.map((opcion) => (
+                <SelectItem key={opcion.value} value={opcion.value}>
+                  {opcion.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      {/* Día de salida */}
-      <div className="space-y-1 px-2">
-        <Label>Día de salida</Label>
-        <Select
-          onValueChange={handleSelectDiaSalida}
-          defaultValue="Seleccione dia"
+      {/* Botón de envío */}
+      <div className="pt-4">
+        <Button
+          type="submit"
+          disabled={mutation.isLoading}
+          className="mt-4 bg-[#218EED] text-white hover:bg-[#1A7BD6] transition-colors duration-200 rounded-md mx-auto w-full flex items-center justify-center gap-2"
         >
-          <SelectTrigger>
-            <SelectValue placeholder="Seleccionar día" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Miercoles">Miércoles</SelectItem>
-            <SelectItem value="Domingo">Domingo</SelectItem>
-            <SelectItem value="Findesemana">Fin de semana</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* ¿Sale para empresa o SENA? */}
-      <div className="space-y-1 px-2">
-        <Label>SENA o Empresa</Label>
-        <Select onValueChange={handleSelectSenEmpresa} defaultValue="No">
-          <SelectTrigger>
-            <SelectValue placeholder="¿Sale para empresa?" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Si">Sí</SelectItem>
-            <SelectItem value="No">No</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Aprendiz */}
-      {/* <div className="space-y-1 px-2">
-        <Label>Aprendiz</Label>
-        <Select onValueChange={handleSelectApprentice}>
-          <SelectTrigger>
-            <SelectValue placeholder="Seleccionar Aprendiz" />
-          </SelectTrigger>
-          <SelectContent>
-            {apprentices.map((a) => (
-              <SelectItem
-                key={a.id_Apprentice}
-                value={a.id_Apprentice.toString()}
+          {mutation.isLoading ? (
+            <>
+              <svg
+                className="animate-spin h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
               >
-                {a.first_Name_Apprentice} {a.last_Name_Apprentice}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div> */}
-
-      <div className="px-2">
-        <Button type="submit" disabled={mutation.isLoading} className="w-full">
-          {mutation.isLoading ? "Registrando..." : "Registrar Permiso FS"}
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+              </svg>
+              Registrando...
+            </>
+          ) : (
+            <>Registrar Permiso FS</>
+          )}
         </Button>
       </div>
+
+      {/* Footer institucional */}
+      <div className="mt-0 border-t pt-4 text-center text-sm text-gray-500">
+        <p>© 2025 Centro Agropecuario "La Granja" - SENA Espinal</p>
+        <p className="italic">Desarrollado por aprendices SENA - ADS0</p>
+      </div>
     </form>
-  );
+  )
 }

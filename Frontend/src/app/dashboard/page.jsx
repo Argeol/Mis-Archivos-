@@ -28,7 +28,7 @@ import RegisterPermissionFS from "./permissionFS/RegisterPermissionFS";
 import axiosInstance from "@/lib/axiosInstance";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Footer } from "react-day-picker";
+import Footer from "@/components/navs/Footer";
 
 export default function DashboardPage() {
   // Todos los hooks deben llamarse siempre en el mismo orden
@@ -190,8 +190,9 @@ export default function DashboardPage() {
     <PrivateNav titlespage="Contenido Principal">
       <div className="min-h-screen">
         <main
-          className={`flex-1 overflow-y-auto p-4 sm:p-6 bg-white/80 backdrop-blur-md rounded-t-2xl shadow-inner ${isMobile ? "mx-auto" : "ml-[60px]"
-            }`}
+          className={`flex-1 overflow-y-auto p-4 sm:p-6 bg-white/80 backdrop-blur-md rounded-t-2xl shadow-inner ${
+            isMobile ? "mx-auto" : "ml-[60px]"
+          }`}
         >
           {/* Encabezado del Dashboard */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
@@ -210,47 +211,43 @@ export default function DashboardPage() {
             </div>
 
             {(tip === "Administrador" || tip === "Aprendiz") && (
-              <ModalDialog
-                TitlePage="Permiso"
-                RegisterComponets={RegisterPermission}
-              />
+              <>
+                <div className="flex flex-col gap-3 p-4 bg-white w-full max-w-sm">
+                  {/* Botón para Permiso General */}
+                  <div className="w-full text-center">
+                    <ModalDialog
+                      TitlePage="Permiso General"
+                      RegisterComponets={RegisterPermission}
+                    />
+                  </div>
+
+                  {/* Botón para Permiso Interno */}
+                  <div className="w-full text-center">
+                    <ModalDialog
+                      TitlePage="Permiso Interno"
+                      RegisterComponets={RegisterPermissionFS}
+                    />
+                  </div>
+                </div>
+              </>
             )}
           </div>
-            {tip === "Responsable" && (
-              <>
-                <h2 className="text-lg font-semibold mb-4">
-                  Permisos Pendientes
-                </h2>
-                <PendingPermissionsList />
-              </>
-            )}
-            {tip === "Aprendiz" && (
-              <>
-                <h2 className="text-lg font-semibold mb-4">
-                  Permisos Pendientes
-                </h2>
-                <ApprenticePermissionList />
-              </>
-            )}
-          {/* Sección para Responsables */}
-          {/* {tip === "Responsable" && (
-            <div className="p-6">
+          {tip === "Responsable" && (
+            <>
               <h2 className="text-lg font-semibold mb-4">
                 Permisos Pendientes
               </h2>
               <PendingPermissionsList />
-            </div>
-          )} */}
-
-          {/* Sección para Aprendices */}
-          {/* {tip === "Aprendiz" && (
-            <div className="p-6">
+            </>
+          )}
+          {tip === "Aprendiz" && (
+            <>
               <h2 className="text-lg font-semibold mb-4">
                 Permisos Pendientes
               </h2>
               <ApprenticePermissionList />
-            </div>
-          )} */}
+            </>
+          )}
           {/* Sección para Administradores */}
           {tip === "Administrador" && (
             <>
@@ -347,7 +344,7 @@ export default function DashboardPage() {
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="mb-6 w-full">
+                <Card className="overflow-hidden">
                   <CardContent className="p-4 sm:p-6">
                     <CardTitle className="text-base sm:text-lg mb-3 sm:mb-4">
                       Control de Permisos Internos
@@ -422,7 +419,7 @@ export default function DashboardPage() {
                 </Card>
               </div>
 
-              {/* Tabs de resumen */}  
+              {/* Tabs de resumen */}
               <Tabs
                 defaultValue="overview"
                 value={activeTab}
@@ -471,6 +468,7 @@ export default function DashboardPage() {
             </>
           )}
         </main>
+        {/* <Footer/> */}
       </div>
     </PrivateNav>
   );
