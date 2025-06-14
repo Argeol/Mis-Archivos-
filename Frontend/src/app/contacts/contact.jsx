@@ -7,7 +7,7 @@ import { FaMapMarkerAlt, FaWhatsapp } from 'react-icons/fa'
 const ContactPage = () => {
   return (
     <div className="min-h-screen bg-white text-black p-8">
-      <h1 className="text-4xl md:text-6xl font-serif text-center mb-8">
+      <h1 className="text-4xl md:text-6xl py-10 font-serif text-center mb-8">
         Contáctanos
       </h1>
 

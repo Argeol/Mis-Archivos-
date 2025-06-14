@@ -78,7 +78,7 @@ export default function PermissionFSDashboard() {
     <PrivateNav titlespage="Permisos Fin de Semana">
       <ContecPage
         registerComponets={RegisterPermissionFS}
-        titlesPage="Permisos FS"
+        titlesPage="Permisos Internos"
         titlesData={fieldLabels}
         Data={dataPermissionFS}
         idKey="permissionFS_Id"

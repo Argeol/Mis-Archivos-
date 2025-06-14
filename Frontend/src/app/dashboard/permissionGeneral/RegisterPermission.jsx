@@ -59,7 +59,7 @@ export default function RegisterPermission({ onSuccess }) {
   })()
 
   const tips = ["Interno", "Externo"]
-  const motivos = ["Médico", "Personal", "Académico", "Familiar"]
+  const motivos = ["Actualizacion de Datos", "Cita Medica", "Firma de Contrato de Aprendizaje", "Calamidad Familiar", "Diligencias Personales", "No Tiene Formacion"]
 
   const fetchResponsables = async () => {
     const roles = Object.keys(getConsult)

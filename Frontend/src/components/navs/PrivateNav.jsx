@@ -102,19 +102,19 @@ const [isTokenValid, setIsTokenValid] = useState(null); // null: cargando, true/
         <nav className="bg-white px-3  flex justify-between items-center border-b border-slate-200 shadow-sm  ">
           {tip === "Administrador" && (
         <div className="">
-          <Sidebar className="h-full shadow-md bg-white/80 backdrop-blur-md " />
+          <Sidebar className="shadow-md bg-white/80 backdrop-blur-md  " />
         </div>
       )}
           {tip === "Aprendiz" && (
             <div className="flex justify-center items-center mt-5">
               <img
-                src="assets/img/bienesoft.webp"
+                src="/assets/img/bienesoft.webp"
                 title="BIENESOFT"
                 className="w-16 h-16 object-contain animate-bounce"
               />
             </div>
           )}
-          <h1 className="text-xl font-extrabold text-gray-800 ms-16 ">
+          <h1 className="text-xl font-extrabold text-gray-800 ms-10 py-4 ">
             {pageTitle}
           </h1>
 

@@ -132,7 +132,7 @@ function LoginPage() {
         <Button
           type="submit"
           disabled={localLoading}
-          className="mt-4 bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200 rounded-md mx-auto block w-full flex items-center justify-center gap-2"
+          className="mt-4 bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200 rounded-md mx-auto w-full flex items-center justify-center gap-2"
         >
           {localLoading ? (
             <>

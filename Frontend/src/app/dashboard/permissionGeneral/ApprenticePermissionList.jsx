@@ -9,9 +9,12 @@ import { ApprovalStatusModal } from "./ApprovalStatusModal";
 import DeletePermissionButton from "./DeletePermission";
 
 async function fetchMyPermissions() {
-  const response = await axiosInstance.get("/api/permission/GetPermissionsByApprentice", {
-    withCredentials: true,
-  });
+  const response = await axiosInstance.get(
+    "/api/permission/GetPermissionsByApprentice",
+    {
+      withCredentials: true,
+    }
+  );
   return response.data;
 }
 
@@ -53,51 +56,59 @@ export default function ApprenticePermissionList() {
 
   return (
     <div className="grid gap-4">
-      {data.map((permiso) => (
-        <Card key={permiso.permissionId}>
-          <CardContent className="p-4 space-y-1">
-            <p className="text-sm font-semibold text-gray-800">
-              Estado:{" "}
-              <span
-                className={`${permiso.status === "Aprobado"
-                    ? "text-green-600"
-                    : permiso.status === "Rechazado"
+      {[...data]
+        .sort(
+          (a, b) => new Date(b.applicationDate) - new Date(a.applicationDate)
+        )
+        .map((permiso) => (
+          <Card key={permiso.permissionId}>
+            <CardContent className="p-4 space-y-1">
+              <p className="text-sm font-semibold text-gray-800">
+                Estado:{" "}
+                <span
+                  className={`${
+                    permiso.status === "Aprobado"
+                      ? "text-green-600"
+                      : permiso.status === "Rechazado"
                       ? "text-red-600"
                       : "text-yellow-600"
                   }`}
+                >
+                  {permiso.status}
+                </span>
+              </p>
+              <p className="text-sm text-gray-700">
+                Fecha de salida: {formatDateTime(permiso.departureDate)}
+              </p>
+              <p className="text-sm text-gray-700">
+                Fecha de entrada: {formatDateTime(permiso.entryDate)}
+              </p>
+              <p className="text-sm text-gray-700">
+                Dirección: {permiso.adress}
+              </p>
+              <p className="text-sm text-gray-700">Motivo: {permiso.motive}</p>
+              <p className="text-sm text-gray-700">
+                Observación: {permiso.observation}
+              </p>
+              <p className="text-xs text-gray-500">
+                Fecha de solicitud: {formatDateTime(permiso.applicationDate)}
+              </p>
+
+              <Button
+                variant="outline"
+                className="mt-2"
+                onClick={() => handleViewStatus(permiso.permissionId)}
               >
-                {permiso.status}
-              </span>
-            </p>
-            <p className="text-sm text-gray-700">
-              Fecha de salida: {formatDateTime(permiso.departureDate)}
-            </p>
-            <p className="text-sm text-gray-700">
-              Fecha de entrada: {formatDateTime(permiso.entryDate)}
-            </p>
-            <p className="text-sm text-gray-700">Dirección: {permiso.adress}</p>
-            <p className="text-sm text-gray-700">Motivo: {permiso.motive}</p>
-            <p className="text-sm text-gray-700">
-              Observación: {permiso.observation}
-            </p>
-            <p className="text-xs text-gray-500">
-              Fecha de solicitud: {formatDateTime(permiso.applicationDate)}
-            </p>
-
-            <Button
-              variant="outline"
-              className="mt-2"
-              onClick={() => handleViewStatus(permiso.permissionId)}
-            >
-              Ver estado de aprobación
-            </Button>
-            {permiso.status === "Pendiente" && (
-              <DeletePermissionButton idPermiso={permiso.permissionId} />
-            )}
-
-          </CardContent>
-        </Card>
-      ))}
+                Ver estado de aprobación
+              </Button>
+              {permiso.status === "Pendiente" && (
+                <div className="">
+                    <DeletePermissionButton idPermiso={permiso.permissionId} />
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
 
       {selectedPermissionId && (
         <ApprovalStatusModal
