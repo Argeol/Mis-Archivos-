@@ -162,6 +162,32 @@ namespace bienesoft.Controllers
                 return StatusCode(500, new { error = "Error al importar", detalle = ex.Message });
             }
         }
+        [Authorize(Roles = "Administrador")]
+        [HttpGet("ExportByFile/{fileId}")]
+        public async Task<IActionResult> ExportByFile(int fileId)
+        {
+            try
+            {
+                var fileContent = await _apprenticeService.ExportApprenticesByFileIdAsync(fileId);
+
+                var fileName = $"Aprendices_Ficha_{fileId}.xlsx";
+
+                return File(fileContent,
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            fileName);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                // Excepción lanzada si no existe la ficha
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Cualquier otro error inesperado
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+            }
+        }
+
 
         // [Authorize(Roles = "Aprendiz")]
         // [HttpGet("apprendiz-only")]

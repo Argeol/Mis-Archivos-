@@ -7,6 +7,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import RegisterFile from "./registerComponet";
 import LoadingPage from "@/components/utils/LoadingPage"; // ya debe estar importado
 import UpdateFile from "./UpdateComponet";
+import ExportApprenticesModal from "./ExportApprenticesModal";
 
 export default function FileDashboard() {
   // 🔹 Obtener lista de fichas con React Query
@@ -39,6 +40,7 @@ export default function FileDashboard() {
   return (
     <PrivateNav titlespage="Fichas">
       <ContecPage
+        ExportApprenticebyFile={<ExportApprenticesModal />}          //Exportar estudiantes por ficha
         registerComponets={RegisterFile}
         titlesPage={"Fichas"}
         titlesData={fieldLabels}

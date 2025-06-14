@@ -257,6 +257,80 @@ namespace Bienesoft.Services
             return new { success = true, message = "Permiso actualizado correctamente." };
         }
 
+        // // para traer permisos por id de ficha 
+        // public async Task<List<object>> GetPermissionsByFileIdAsync(int fileId)
+        // {
+        //     var permissions = await _context.permissionGN
+        //         .Where(p => p.Apprentice.File_Id == fileId)
+        //         .Select(p => new
+        //         {
+        //             p.PermissionId,
+        //             p.Id_Apprentice,
+        //             ApprenticeFullName = p.Apprentice.First_Name_Apprentice + " " + p.Apprentice.Last_Name_Apprentice,
+        //             p.DepartureDate,
+        //             p.EntryDate,
+        //             p.ApplicationDate,
+        //             p.Motive,
+        //             p.Observation,
+        //             p.Status
+        //         })
+        //         .ToListAsync();
+        //     return permissions.Cast<object>().ToList();
+        // }
+        // exportacion por id de ficha 
+        public async Task<byte[]> ExportPermissionsByFileIdAsync(int fileId)
+        {
+            var permissions = await _context.permissionGN
+                .Where(p => p.Apprentice.File_Id == fileId)
+                .Select(p => new
+                {
+                    p.PermissionId,
+                    p.Id_Apprentice,
+                    ApprenticeFullName = p.Apprentice.First_Name_Apprentice + " " + p.Apprentice.Last_Name_Apprentice,
+                    p.DepartureDate,
+                    p.EntryDate,
+                    p.ApplicationDate,
+                    p.Motive,
+                    p.Observation,
+                    p.Status
+                })
+                .ToListAsync();
+
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Permisos");
+
+            // Cabeceras
+            // worksheet.Cell(1, 1).Value = "ID Permiso";
+            worksheet.Cell(1, 2).Value = "Documento Aprendiz";
+            worksheet.Cell(1, 3).Value = "Nombre Completo";
+            worksheet.Cell(1, 4).Value = "Fecha de Salida";
+            worksheet.Cell(1, 5).Value = "Fecha de Entrada";
+            worksheet.Cell(1, 6).Value = "Fecha de Solicitud";
+            worksheet.Cell(1, 7).Value = "Motivo";
+            worksheet.Cell(1, 8).Value = "Observación";
+            worksheet.Cell(1, 9).Value = "Estado";
+
+            // Cuerpo
+            int row = 2;
+            foreach (var p in permissions)
+            {
+                // worksheet.Cell(row, 1).Value = p.PermissionId;
+                worksheet.Cell(row, 2).Value = p.Id_Apprentice;
+                worksheet.Cell(row, 3).Value = p.ApprenticeFullName;
+                worksheet.Cell(row, 4).Value = p.DepartureDate.ToString("yyyy-MM-dd");
+                worksheet.Cell(row, 5).Value = p.EntryDate.ToString("yyyy-MM-dd"); // si es nullable
+                worksheet.Cell(row, 6).Value = p.ApplicationDate.ToString("yyyy-MM-dd");
+                worksheet.Cell(row, 7).Value = p.Motive.ToString();
+                worksheet.Cell(row, 8).Value = p.Observation.ToString();
+                worksheet.Cell(row, 9).Value = p.Status.ToString();
+                row++;
+            }
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
+        }
+
 
         public async Task<IEnumerable<object>> GetPermissionsByApprenticeId(int apprenticeId)
         {

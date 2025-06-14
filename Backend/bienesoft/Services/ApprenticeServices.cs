@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using bienesoft.models;
 using bienesoft.Funcions;
 using DocumentFormat.OpenXml.Bibliography;
+using ClosedXML.Excel;
 
 
 
@@ -92,46 +93,46 @@ namespace Bienesoft.Services
                 throw new Exception("No se pudo completar el registro. Detalles: " + ex.Message);
             }
 
-           
-}
+
+        }
 
 
         public object GetApprenticeById(int id)
         {
-           var apprentice =  _context.apprentice
-                .Include(a => a.Municipality)
-                    .ThenInclude(m => m.Department)
-                .Include(a => a.File)
-                    .ThenInclude(f => f.program)
-                        .ThenInclude(p => p.Area)
-                .Where(a => a.Id_Apprentice == id)
-                .Select(a => new
-                {
-                    a.Id_Apprentice,
-                    a.First_Name_Apprentice,
-                    a.Last_Name_Apprentice,
-                    a.Address_Type_Apprentice,
-                    a.Address_Apprentice,
-                    a.Email_Apprentice,
-                    Birth_Date_Apprentice_Formatted = a.birth_date_apprentice.ToString("yyyy-MM-dd"),
-                    a.Phone_Apprentice,
-                    a.Stratum_Apprentice,
-                    a.Gender_Apprentice,
-                    a.Tip_Apprentice,
-                    a.tip_document,
-                    a.nom_responsible,
-                    a.ape_responsible,
-                    a.email_responsible,
-                    a.tel_responsible,
-                    a.Municipality.Id_municipality,
-                    MunicipalityName = a.Municipality.municipality,
-                    DepartmentName = a.Municipality.Department.Name_department,
-                    a.File.File_Id,
-                    ProgramName = a.File.program.Program_Name,
-                    AreaName = a.File.program.Area.Area_Name,
-                    a.Status_Apprentice
-                })
-                .FirstOrDefault();
+            var apprentice = _context.apprentice
+                 .Include(a => a.Municipality)
+                     .ThenInclude(m => m.Department)
+                 .Include(a => a.File)
+                     .ThenInclude(f => f.program)
+                         .ThenInclude(p => p.Area)
+                 .Where(a => a.Id_Apprentice == id)
+                 .Select(a => new
+                 {
+                     a.Id_Apprentice,
+                     a.First_Name_Apprentice,
+                     a.Last_Name_Apprentice,
+                     a.Address_Type_Apprentice,
+                     a.Address_Apprentice,
+                     a.Email_Apprentice,
+                     Birth_Date_Apprentice_Formatted = a.birth_date_apprentice.ToString("yyyy-MM-dd"),
+                     a.Phone_Apprentice,
+                     a.Stratum_Apprentice,
+                     a.Gender_Apprentice,
+                     a.Tip_Apprentice,
+                     a.tip_document,
+                     a.nom_responsible,
+                     a.ape_responsible,
+                     a.email_responsible,
+                     a.tel_responsible,
+                     a.Municipality.Id_municipality,
+                     MunicipalityName = a.Municipality.municipality,
+                     DepartmentName = a.Municipality.Department.Name_department,
+                     a.File.File_Id,
+                     ProgramName = a.File.program.Program_Name,
+                     AreaName = a.File.program.Area.Area_Name,
+                     a.Status_Apprentice
+                 })
+                 .FirstOrDefault();
 
             return apprentice;
         }
@@ -248,16 +249,89 @@ namespace Bienesoft.Services
             bool aprendizexiste = _context.apprentice.Any(a => a.Id_Apprentice == id);
             return aprendizexiste;
         }
+        public async Task<byte[]> ExportApprenticesByFileIdAsync(int fileId)
+        {
+            bool fileExists = await _context.file.AnyAsync(f => f.File_Id == fileId);
+            if (!fileExists)
+            {
+                throw new KeyNotFoundException("No existe una ficha con ese ID. Verifícala.");
+            }
+            var apprentices = await _context.apprentice
+                .Where(a => a.File_Id == fileId)
+                .Select(a => new
+                {
+                    a.Id_Apprentice,
+                    FullName = a.First_Name_Apprentice + " " + a.Last_Name_Apprentice,
+                    a.birth_date_apprentice,
+                    a.Gender_Apprentice,
+                    a.Email_Apprentice,
+                    a.Address_Apprentice,
+                    a.Address_Type_Apprentice,
+                    a.Phone_Apprentice,
+                    a.Stratum_Apprentice,
+                    a.Status_Apprentice,
+                    a.Tip_Apprentice,
+                    a.tip_document,
+                    ResponsibleFullName = a.nom_responsible + " " + a.ape_responsible,
+                    a.tel_responsible,
+                    a.email_responsible
+                })
+                .ToListAsync();
 
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Aprendices");
+
+            // Encabezados
+            worksheet.Cell(1, 1).Value = "Documento";
+            worksheet.Cell(1, 2).Value = "Nombre completo";
+            worksheet.Cell(1, 3).Value = "Fecha de nacimiento";
+            worksheet.Cell(1, 4).Value = "Género";
+            worksheet.Cell(1, 5).Value = "Correo";
+            worksheet.Cell(1, 6).Value = "Dirección";
+            worksheet.Cell(1, 7).Value = "Tipo de dirección";
+            worksheet.Cell(1, 8).Value = "Teléfono";
+            worksheet.Cell(1, 9).Value = "Estrato";
+            worksheet.Cell(1, 10).Value = "Estado";
+            worksheet.Cell(1, 11).Value = "Tipo de aprendiz";
+            worksheet.Cell(1, 12).Value = "Tipo de documento";
+            worksheet.Cell(1, 13).Value = "Nombre del responsable";
+            worksheet.Cell(1, 14).Value = "Tel. responsable";
+            worksheet.Cell(1, 15).Value = "Email responsable";
+            // Cuerpo
+            int row = 2;
+            foreach (var a in apprentices)
+            {
+                worksheet.Cell(row, 1).Value = a.Id_Apprentice;
+                worksheet.Cell(row, 2).Value = a.FullName;
+                worksheet.Cell(row, 3).Value = a.birth_date_apprentice.ToShortDateString();
+                worksheet.Cell(row, 4).Value = a.Gender_Apprentice;
+                worksheet.Cell(row, 5).Value = a.Email_Apprentice;
+                worksheet.Cell(row, 6).Value = a.Address_Apprentice;
+                worksheet.Cell(row, 7).Value = a.Address_Type_Apprentice;
+                worksheet.Cell(row, 8).Value = a.Phone_Apprentice;
+                worksheet.Cell(row, 9).Value = a.Stratum_Apprentice;
+                worksheet.Cell(row, 10).Value = a.Status_Apprentice;
+                worksheet.Cell(row, 11).Value = a.Tip_Apprentice;
+                worksheet.Cell(row, 12).Value = a.tip_document;
+                worksheet.Cell(row, 13).Value = a.ResponsibleFullName;
+                worksheet.Cell(row, 14).Value = a.tel_responsible;
+                worksheet.Cell(row, 15).Value = a.email_responsible;
+                row++;
+            }
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
+        }
     }
-    // public async Task<bool> DeleteApprenticeAsync(int id)
-    // {
-    //     var apprentice = await _context.apprentice.FindAsync(id);
-    //     if (apprentice == null)
-    //         return false;
-
-    //     _context.apprentice.Remove(apprentice);
-    //     await _context.SaveChangesAsync();
-    //     return true;
-    // }
 }
+// public async Task<bool> DeleteApprenticeAsync(int id)
+// {
+//     var apprentice = await _context.apprentice.FindAsync(id);
+//     if (apprentice == null)
+//         return false;
+
+//     _context.apprentice.Remove(apprentice);
+//     await _context.SaveChangesAsync();
+//     return true;
+// }

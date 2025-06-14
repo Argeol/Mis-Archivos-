@@ -73,7 +73,6 @@ export default function ApprenticeDashboard() {
     <>
       <PrivateNav titlespage="Aprendices">
         <ContecPage
-          //para registrar
           registerComponets={RegisterApprentice}
           //como se llama la tabla
           titlesPage={"Aprendices"}

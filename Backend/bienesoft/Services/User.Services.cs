@@ -220,23 +220,23 @@ namespace bienesoft.Services
         }
 
 
-        public async Task DeleteByEmailAsync(string email)
-        {
-            var user = await _context.user.FirstOrDefaultAsync(u => u.Email == email);
+        // public async Task DeleteByEmailAsync(string email)
+        // {
+        //     var user = await _context.user.FirstOrDefaultAsync(u => u.Email == email);
 
-            if (user == null)
-                throw new KeyNotFoundException("No se encontró ningún usuario con el correo: " + email);
+        //     if (user == null)
+        //         throw new KeyNotFoundException("No se encontró ningún usuario con el correo: " + email);
 
-            try
-            {
-                _context.user.Remove(user);
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("No se pudo eliminar el usuario: " + ex.Message);
-            }
-        }
+        //     try
+        //     {
+        //         _context.user.Remove(user);
+        //         await _context.SaveChangesAsync();
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         throw new Exception("No se pudo eliminar el usuario: " + ex.Message);
+        //     }
+        // }
 
 
         public async Task UpdateUserAsync(User user)

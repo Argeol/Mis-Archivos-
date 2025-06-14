@@ -72,7 +72,7 @@ export default function PermissionDashboard() {
         // fieldName="status"
         // inf del aprendiz
         inf={"id_Apprentice"}
-        updateComponets={UpdatePermission}
+        // updateComponets={UpdatePermission}
       />
     </PrivateNav>
   );

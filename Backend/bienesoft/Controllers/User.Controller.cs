@@ -151,7 +151,6 @@ namespace bienesoft.Controllers
                 {
                     UserObject = new UserLoginResponseDTO
                     {
-
                         Responsible_Id = user.Responsible.Responsible_Id,
                         Nom_Responsible = user.Responsible.Nom_Responsible,
                         Ape_Responsible = user.Responsible.Ape_Responsible,
@@ -359,23 +358,23 @@ namespace bienesoft.Controllers
 
 
 
-        [HttpDelete("{email}")]
-        public async Task<IActionResult> DeleteUser(string email)
-        {
-            try
-            {
-                await _UserServices.DeleteByEmailAsync(email);
-                return Ok(new { message = "Usuario eliminado correctamente." });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error al eliminar el usuario.", details = ex.Message });
-            }
-        }
+        // [HttpDelete("{email}")]
+        // public async Task<IActionResult> DeleteUser(string email)
+        // {
+        //     try
+        //     {
+        //         await _UserServices.DeleteByEmailAsync(email);
+        //         return Ok(new { message = "Usuario eliminado correctamente." });
+        //     }
+        //     catch (KeyNotFoundException ex)
+        //     {
+        //         return NotFound(new { message = ex.Message });
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return StatusCode(500, new { message = "Error al eliminar el usuario.", details = ex.Message });
+        //     }
+        // }
 
         [HttpPost("ResetPasswordConfirm")]
 

@@ -28,9 +28,16 @@ function ContecPage({
   inf,
   ExportacionExcel, // Recibimos el botón aquí
   ImportExcelBd,
+  ExportApprenticebyFile
 }) {
   return (
     <>
+      {ExportApprenticebyFile && (
+        <div className="flex justify-center w-full mb-4">
+          {ExportApprenticebyFile}
+        </div>
+      )}
+
       <DataTable
         Data={Data}
         idKey={idKey}
@@ -53,10 +60,11 @@ function ContecPage({
         updateEndpoint={updateEndpoint}
         queryKey={queryKey}
         inf={inf}
-        ExportacionExcel={ExportacionExcel}// Pasamos el botón a DataTable
-        ImportExcelBd ={ImportExcelBd}
+        ExportacionExcel={ExportacionExcel}
+        ImportExcelBd={ImportExcelBd}
       />
     </>
+
   );
 }
 
