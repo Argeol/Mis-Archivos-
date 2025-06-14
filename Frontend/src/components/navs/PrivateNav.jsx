@@ -19,7 +19,7 @@ import { useEffect } from "react";
 
 function PrivateNav({ children, titlespage }) {
 
-const [isTokenValid, setIsTokenValid] = useState(null); // null: cargando, true/false: resultado
+  const [isTokenValid, setIsTokenValid] = useState(null); // null: cargando, true/false: resultado
   // const pathname = usePathname();
   const { user, tip, isLoading: loadingUser, error: errorUser } = useAuthUser();
   const [theme, setTheme] = useState("light"); // Estado local para el tema
@@ -42,24 +42,22 @@ const [isTokenValid, setIsTokenValid] = useState(null); // null: cargando, true/
   useEffect(() => {
     const validateToken = async () => {
       try {
-        const response = await axiosInstance.get("/api/User/ValidateToken", {
-          withCredentials: true,
-        });
+        const response = await axiosInstance.get("/api/User/ValidateToken");
 
+        // Como siempre responde 200, solo usamos la propiedad isValid
         if (response.data.isValid === true) {
           setIsTokenValid(true);
         } else {
           setIsTokenValid(false);
         }
       } catch (error) {
-        console.error("Error al validar token:", error);
-        setIsTokenValid(false);
+        console.error("Error inesperado al validar token:", error);
+        setIsTokenValid(false); // Por si falla por otros motivos (red, etc.)
       }
     };
 
     validateToken();
   }, []);
-
 
   // Manejo de la carga y error antes de renderizar el componente
 
@@ -72,7 +70,8 @@ const [isTokenValid, setIsTokenValid] = useState(null); // null: cargando, true/
       : `Gestionar ${titlespage}`;
   if (isTokenValid === null) return <p>Validando sesión...</p>;
 
-  if (!isTokenValid) {    return (
+  if (!isTokenValid) {
+    return (
       <div className="flex items-center justify-center h-screen bg-gray-100">
         <div className="p-6 bg-white rounded shadow text-center">
           <h2 className="text-lg font-semibold text-gray-800">
@@ -95,7 +94,7 @@ const [isTokenValid, setIsTokenValid] = useState(null); // null: cargando, true/
     >
 
       {/* Sidebar solo visible para administradores */}
-      
+
       {/* Contenedor principal */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Navbar superior */}

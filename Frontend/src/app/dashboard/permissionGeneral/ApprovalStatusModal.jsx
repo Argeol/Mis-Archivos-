@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -34,20 +34,21 @@ function getStatusBadge(status) {
 }
 
 export function ApprovalStatusModal({ permisoId, open, onClose }) {
-  const [data, setData] = useState(null);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["estadoPermiso", permisoId],
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/api/PermissionApproval/estado?idPermiso=${permisoId}`
+      );
+      return res.data;
+    },
+    enabled: open && !!permisoId, // solo ejecuta si el modal está abierto y hay id
+  });
 
-  useEffect(() => {
-    if (open && permisoId) {
-      axiosInstance
-        .get(`/api/PermissionApproval/estado?idPermiso=${permisoId}`)
-        .then((res) => setData(res.data))
-        .catch((err) =>
-          console.error("Error cargando estado del permiso:", err)
-        );
-    }
-  }, [permisoId, open]);
-
-  if (!data) return null;
+  if (!open) return null;
+  if (isLoading) return <div className="p-4">Cargando estado...</div>;
+  if (isError || !data)
+    return <div className="p-4 text-red-500">Error al cargar el estado</div>;
 
   return (
     <Dialog open={open} onOpenChange={onClose}>

@@ -121,6 +121,7 @@ namespace bienesoft.Controllers
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         fileName);
         }
+        [Authorize(Roles = "Aprendiz")]
         [HttpPut("UpdatePermission/{id}")]
         public async Task<IActionResult> UpdatePermission(int id, [FromBody] UpdatePermiso permiso)
         {

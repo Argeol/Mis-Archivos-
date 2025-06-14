@@ -11,15 +11,21 @@ namespace bienesoft.Models
         }
         [Key]
         public int PermissionId { get; set; }
+        //Fecha de salida
         public DateTime DepartureDate { get; set; }
+        // Fecha de entrada
         public DateTime EntryDate { get; set; }
+        // fecha de deligenciamiento
         public DateTime ApplicationDate { get; set; } = DateTime.Now;
+        // a donde se dirige 
         public string Adress { get; set; }
+        // destino
         public string Destination { get; set; }
-
+        //motivo 
         public string Motive { get; set; }
+        // observacion 
         public string Observation { get; set; }
-
+        //estado pendiente
         public Status Status { get; set; } = Status.Pendiente;
         public int Id_Apprentice { get; set; }
 

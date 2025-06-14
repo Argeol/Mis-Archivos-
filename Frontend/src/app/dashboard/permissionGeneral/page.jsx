@@ -46,15 +46,20 @@ export default function PermissionDashboard() {
     status: "Estado",
     fechadesolicitud: "Fecha Solicitud",
   };
-
-
-  const fieldLabels = ["Fecha","Aprendiz", "Fecha Salida", "Fecha Llegada", "Estado"];
-  const tableCell = ["fechadesolicitud","nombreAprendiz", "fechalsalida", "fechallegada","porcentaje"]  
+  if (error) {
+    return (
+      <div className="p-4 text-red-500">
+         Error al cargar los permisos: {error.message}
+      </div>
+    );
+  }
+  const fieldLabels = ["Fecha", "Aprendiz", "Fecha Salida", "Fecha Llegada", "Estado"];
+  const tableCell = ["fechadesolicitud", "nombreAprendiz", "fechalsalida", "fechallegada", "porcentaje"]
   return (
     <PrivateNav titlespage="Permisos">
       <ContecPage
         registerComponets={RegisterPermission} // Puedes poner null si no lo tienes
-        titlesPage="Permisos" 
+        titlesPage="Permisos"
         titlesData={fieldLabels}
         Data={dataPermissions}
         idKey="permissionId"
@@ -67,7 +72,7 @@ export default function PermissionDashboard() {
         // fieldName="status"
         // inf del aprendiz
         inf={"id_Apprentice"}
-        updateComponets={UpdatePermission}
+        // updateComponets={UpdatePermission}
       />
     </PrivateNav>
   );

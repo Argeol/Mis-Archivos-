@@ -178,6 +178,17 @@ namespace bienesoft.Services
                 throw new Exception("No se pudo crear el usuario. Detalles: " + ex.Message);
             }
         }
+        public async Task<User?> GetByRefreshTokenAsync(string refreshToken)
+        {
+            return await _context.user
+                .Include(u => u.Apprentice)
+                .Include(u => u.Responsible)
+                .FirstOrDefaultAsync(u =>
+                    u.RefreshToken == refreshToken &&
+                    u.RefreshTokenExpiryTime > DateTime.UtcNow
+                );
+        }
+
 
 
 
@@ -209,23 +220,23 @@ namespace bienesoft.Services
         }
 
 
-        public async Task DeleteByEmailAsync(string email)
-        {
-            var user = await _context.user.FirstOrDefaultAsync(u => u.Email == email);
+        // public async Task DeleteByEmailAsync(string email)
+        // {
+        //     var user = await _context.user.FirstOrDefaultAsync(u => u.Email == email);
 
-            if (user == null)
-                throw new KeyNotFoundException("No se encontró ningún usuario con el correo: " + email);
+        //     if (user == null)
+        //         throw new KeyNotFoundException("No se encontró ningún usuario con el correo: " + email);
 
-            try
-            {
-                _context.user.Remove(user);
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("No se pudo eliminar el usuario: " + ex.Message);
-            }
-        }
+        //     try
+        //     {
+        //         _context.user.Remove(user);
+        //         await _context.SaveChangesAsync();
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         throw new Exception("No se pudo eliminar el usuario: " + ex.Message);
+        //     }
+        // }
 
 
         public async Task UpdateUserAsync(User user)
@@ -254,6 +265,9 @@ namespace bienesoft.Services
             existingUser.Asset = user.Asset;
             existingUser.ResetToken = user.ResetToken;
             existingUser.ResetTokenExpiration = user.ResetTokenExpiration;
+            //PARA EL ACTUALIZAR EL TOKEN ADMINISTRADOR Y RESPONSABLE CADA SIERTO TIEMPO
+            existingUser.RefreshToken = user.RefreshToken;
+            existingUser.RefreshTokenExpiryTime = user.RefreshTokenExpiryTime;
 
             await _context.SaveChangesAsync();
         }

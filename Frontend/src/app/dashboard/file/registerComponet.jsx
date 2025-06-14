@@ -42,12 +42,28 @@ export default function RegisterFile() {
       return res.data;
     },
     onSuccess: (data) => {
-      toast(data.message);
+      toast(data.message, {
+        duration: 5000,
+        style: {
+          maxWidth: "90vw",
+          wordWrap: "break-word",
+          whiteSpace: "pre-line",
+          fontSize: "14px",
+        },
+      });
       queryClient.invalidateQueries(["files"]);
     },
     onError: (error) => {
       const errorMessage = error.response?.data?.message || error.message || "Error desconocido.";
-      toast.error(errorMessage);
+      toast.error(errorMessage, {
+        duration: 5000,
+        style: {
+          maxWidth: "90vw",
+          wordWrap: "break-word",
+          whiteSpace: "pre-line",
+          fontSize: "14px",
+        },
+      });
     },
   });
 
@@ -59,18 +75,15 @@ export default function RegisterFile() {
     },
   });
 
-  // Manejo de Cambios en el Formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Manejo selección programa
   const handleSelectProgram = (value) => {
     setFormData((prev) => ({ ...prev, program_Id: Number.parseInt(value) }));
   };
 
-  // Enviar Formulario
   const handleSubmit = (e) => {
     e.preventDefault();
     mutation.mutate();
@@ -78,16 +91,15 @@ export default function RegisterFile() {
 
   return (
     <Card className="w-full max-w-2xl mx-auto shadow-lg border-blue-600/20 border-2">
-        {/* Encabezado institucional */}
       <div className="text-center pb-4 space-y-1">
         <img src="/assets/img/logoSena.png" alt="Logo SENA" className="mx-auto h-14" />
         <h2 className="text-xl font-bold uppercase">Centro Agropecuario “La Granja” SENA Espinal</h2>
-        <p className="font-semibold text-sm">Registre nuevas fichas para los programas de formación del SENA. Complete todos los campos requeridos para
-              crear una nueva ficha.</p>
+        <p className="font-semibold text-sm">Registre nuevas fichas para los programas de formación del SENA. Complete todos los campos requeridos para crear una nueva ficha.</p>
         <p className="text-xs font-medium italic">
           NOTA: Al momento que registres fichas el sistema va a buscar que ficha terminaron y asi mismo desactiva aprendices que ya no estan en el centro.
         </p>
       </div>
+
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-6 pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

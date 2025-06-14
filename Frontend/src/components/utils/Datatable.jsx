@@ -92,13 +92,13 @@ export default function DataTable({
   };
   //este es para ver estado de aprobacion
   const [open, setOpen] = useState(false);
-  const {tip, isLoading: loadingUser, error: errorUser } = useAuthUser();
-if (errorUser || loadingUser) return <LoadingPage />;
+  const { tip, isLoading: loadingUser, error: errorUser } = useAuthUser();
+  if (errorUser || loadingUser) return <LoadingPage />;
 
   return (
     <>
-    
-    {tip === "Administrador" && (
+
+      {tip === "Administrador" && (
         <Card className="w-full max-w-5xl mx-auto p-4 my-7">
           <CardHeader>
             <CardTitle className="text-center text-xl font-semibold">
@@ -196,14 +196,16 @@ if (errorUser || loadingUser) return <LoadingPage />;
                                 </DropdownMenuItem>
                               )}
                               {/* Otros elementos del menú */}
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setSelectedUpdateId(row[idKey]);
-                                  setIsOpenUpdateModal(true);
-                                }}
-                              >
-                                <Edit className="mr-2 h-4 w-4" /> Editar
-                              </DropdownMenuItem>
+                              {updateComponets && (
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedUpdateId(row[idKey]);
+                                    setIsOpenUpdateModal(true);
+                                  }}
+                                >
+                                  <Edit className="mr-2 h-4 w-4" /> Editar
+                                </DropdownMenuItem>
+                              )}
 
                               {inf && (
                                 <DropdownMenuItem
@@ -223,17 +225,17 @@ if (errorUser || loadingUser) return <LoadingPage />;
                                     setIsOpenInfoModal(true);
                                   }}
                                 >
-                                  <Info className="mr-2 h-4 w-4" /> Información
+                                  <Info className="mr-2 h-4 w-4" /> Mas Información
                                 </DropdownMenuItem>
                               )}
-                              {idKey === "permissionId" &&(
-                              <DropdownMenuItem
-                                variant="outline"
-                                className="mt-2"
-                                onClick={() => handleViewStatus(row[idKey])}
-                              >
-                                Ver estado de aprobación
-                              </DropdownMenuItem>
+                              {idKey === "permissionId" && (
+                                <DropdownMenuItem
+                                  variant="outline"
+                                  className="mt-2"
+                                  onClick={() => handleViewStatus(row[idKey])}
+                                >
+                                  Ver estado de aprobación
+                                </DropdownMenuItem>
                               )}
                               {fieldName && updateEndpoint && currentStatus && (
                                 <DropdownMenuItem asChild>
@@ -307,7 +309,7 @@ if (errorUser || loadingUser) return <LoadingPage />;
               />
             )
           }
-          {/* { // infomacion completa el modal  */} 
+          {/* { // infomacion completa el modal  */}
           {
             translations && selectedRowInfo && (
               <RowInfoModal
@@ -324,7 +326,7 @@ if (errorUser || loadingUser) return <LoadingPage />;
             )
           }
           {
-            isOpenUpdateModal && selectedUpdateId && (
+            updateComponets && isOpenUpdateModal && selectedUpdateId && (
               <ModalDialogUpdate
                 TitlePage={TitlePage}
                 UpdateComponent={updateComponets}
@@ -352,7 +354,7 @@ if (errorUser || loadingUser) return <LoadingPage />;
             />
           )}
         </Card >
-    )}
+      )}
     </>
   );
 }
