@@ -34,7 +34,7 @@ export default function PermissionDashboard() {
   //       return response.data;
   //     },
   //   });
-  console.log(dataPermissions);
+  // console.log(dataPermissions);
 
   if (isLoading) return <LoadingPage />;
   const translations = {

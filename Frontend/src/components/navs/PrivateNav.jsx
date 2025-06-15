@@ -33,17 +33,16 @@ function PrivateNav({ children, titlespage }) {
         {},
         { withCredentials: true }
       );
-      toast(response.data.message)
+      toast.info(response.data.message)
       router.push("/user/login");
     } catch (error) {
-      console.error("Error al cerrar sesión:", error);
+      toast.error("Error al cerrar sesión:", error);
     }
   };
   useEffect(() => {
     const validateToken = async () => {
       try {
         const response = await axiosInstance.get("/api/User/ValidateToken");
-
         // Como siempre responde 200, solo usamos la propiedad isValid
         if (response.data.isValid === true) {
           setIsTokenValid(true);
@@ -51,7 +50,7 @@ function PrivateNav({ children, titlespage }) {
           setIsTokenValid(false);
         }
       } catch (error) {
-        console.error("Error inesperado al validar token:", error);
+        // console.error("Error inesperado al validar token:", error);
         setIsTokenValid(false); // Por si falla por otros motivos (red, etc.)
       }
     };

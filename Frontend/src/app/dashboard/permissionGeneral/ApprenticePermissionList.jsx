@@ -27,7 +27,7 @@ export default function ApprenticePermissionList() {
   const [selectedPermissionId, setSelectedPermissionId] = useState(null);
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["my-permissions"],
+    queryKey: ["permissions"],
     queryFn: fetchMyPermissions,
   });
 

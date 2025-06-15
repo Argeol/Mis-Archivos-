@@ -31,7 +31,7 @@ export default function ImportProgramButton() {
       toast.success(response.data.message || "Importación exitosa.");
       setFile(null);
     } catch (error) {
-      console.error("Error al importar:", error);
+      // console.error("Error al importar:", error);
       toast.error(
         error.response?.data?.message || "Ocurrió un error al importar."
       );

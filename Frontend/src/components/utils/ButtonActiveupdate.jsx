@@ -12,7 +12,7 @@ export default function StatusToggleButton({
   queryKey,          // ← clave para invalidar la query
   onSuccess,
 }) {
-  console.log(currentStatus)
+  // console.log(currentStatus)
   const [status, setStatus] = useState(currentStatus === "Activo");
   const queryClient = useQueryClient();
 

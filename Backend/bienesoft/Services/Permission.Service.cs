@@ -48,22 +48,23 @@ namespace Bienesoft.Services
             _context.permissionApproval.AddRange(aprobaciones);
             await _context.SaveChangesAsync();
 
-            // Notificar al primer responsable
-            var primerResponsableId = responsablesOrdenados.First();
-            var primerResponsable = await _context.responsible
-                .Include(r => r.Role)
-                .FirstOrDefaultAsync(r => r.RoleId == primerResponsableId);
+            // // Notificar al primer responsable
+            // var primerResponsableId = responsablesOrdenados.First();
+            // var primerResponsable = await _context.responsible
+            //     .Include(r => r.Role)
+            //     .FirstOrDefaultAsync(r => r.Responsible_Id == primerResponsableId);
 
-            var aprendiz = await _context.apprentice.FindAsync(idApprentice);
+            // var aprendiz = await _context.apprentice.FindAsync(idApprentice);
 
-            if (primerResponsable != null && aprendiz != null)
-            {
-                var email = primerResponsable.Email_Responsible;
-                var nombreRol = primerResponsable.Role.Name_role;
-                var nombreAprendiz = $"{aprendiz.First_Name_Apprentice} {aprendiz.Last_Name_Apprentice}";
+            // if (primerResponsable != null && aprendiz != null)
+            // {
+            //     var email = primerResponsable.Email_Responsible;
+            //     var nombreRol = primerResponsable.Role.Name_role;
+            //     var nombreAprendiz = $"{aprendiz.First_Name_Apprentice} {aprendiz.Last_Name_Apprentice}";
 
-                await generalFunction.NotifyResponsibleAsync(email, nombreRol, nombreAprendiz);
-            }
+            //     await generalFunction.NotifyResponsibleAsync(email, nombreRol, nombreAprendiz);
+            //     Console.WriteLine($"Enviando correo a: {email} - Rol: {nombreRol}");
+            // }
 
             return "Permiso creado con responsables asignados.";
         }

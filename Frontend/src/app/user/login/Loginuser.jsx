@@ -42,7 +42,7 @@ function LoginPage() {
       }
     },
     onError: (err) => {
-      console.error(err);
+      // console.error(err);
       const message =
         err.response?.data?.message || "Error desconocido. Intenta nuevamente.";
       toast.error(message); // ✅ Mostrando toast

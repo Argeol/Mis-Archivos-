@@ -17,9 +17,10 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import UpdateResponsible from "@/app/dashboard/responsible/updateResponsible";
+import { toast } from "sonner";
 
 export function UserInfoModal({ Tip, open, onClose, Data }) {
-  console.log(Data.nom_Responsible)
+  // console.log(Data.nom_Responsible)
   const modalRef = useRef(null);
   const [data, setData] = useState(null);
   const [translations, setTranslations] = useState({});
@@ -107,7 +108,7 @@ export function UserInfoModal({ Tip, open, onClose, Data }) {
       const response = await axiosInstance.get(url);
       setData(response.data);
     } catch (err) {
-      console.error("Error al obtener los datos:", err);
+      toast.error("Error al obtener los datos:");
     } finally {
       setLoading(false);
     }

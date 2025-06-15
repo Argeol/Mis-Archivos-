@@ -40,7 +40,6 @@ export default function ExportApprenticesModal() {
             console.error("Error al exportar:", error);
         }
     };
-
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>

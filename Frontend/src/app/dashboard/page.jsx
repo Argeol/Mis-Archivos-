@@ -29,6 +29,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import Footer from "@/components/navs/Footer";
+import { toast } from "sonner";
 
 export default function DashboardPage() {
   // Todos los hooks deben llamarse siempre en el mismo orden
@@ -60,10 +61,12 @@ export default function DashboardPage() {
         const res = await axiosInstance.get(
           "/api/PermissionFS/consulta-estado-permisoFS"
         );
-        console.log("Respuesta del GET:", res.data);
+        //eliminar("Respuesta del GET:", res.data);
         setActivo(res.data?.activo ?? false);
       } catch (error) {
-        console.error("Error al obtener el estado del permiso FS", error);
+        toast.error("Error al obtener el estado del permiso FS")
+  
+        // console.error("Error al obtener el estado del permiso FS", error);
         setActivo(false);
       }
     };
@@ -82,8 +85,8 @@ export default function DashboardPage() {
       const nuevoEstado = !activo;
       const payload3 = nuevoEstado.toString(); // solo el stringn
 
-      console.log("Estado actual:", activo);
-      console.log("Nuevo estado:", nuevoEstado);
+      //console.log("Estado actual:", activo);
+      //console.log("Nuevo estado:", nuevoEstado);
 
       let response;
       try {
@@ -97,15 +100,15 @@ export default function DashboardPage() {
             },
           }
         );
-        console.log("✅ Éxito con payload3 (solo string)");
+        //console.log("✅ Éxito con payload3 (solo string)");
       } catch (error3) {
-        console.log(
-          "❌ Falló payload3, intentando payload4 (solo boolean):",
-          payload4
-        );
+        // console.log(
+        //   "❌ Falló payload3, intentando payload4 (solo boolean):",
+        //   payload4
+        // );
       }
 
-      console.log("Respuesta del POST:", response.data);
+      // ("Respuesta del POST:", response.data);
 
       // Actualizar el estado local
       setActivo(nuevoEstado);
@@ -113,13 +116,15 @@ export default function DashboardPage() {
         `Permiso FS ${nuevoEstado ? "activado" : "desactivado"} correctamente.`
       );
     } catch (error) {
-      console.error("Error al cambiar el estado del permiso FS:", error);
+      toast.error("Error al cambiar el estado del permiso FS:")
+
+      // console.error(, error);
 
       // Mostrar más detalles del error
       if (error.response) {
-        console.error("Error response data:", error.response.data);
-        console.error("Error response status:", error.response.status);
-        console.error("Error response headers:", error.response.headers);
+        // console.error("Error response data:", error.response.data);
+        // console.error("Error response status:", error.response.status);
+        // console.error("Error response headers:", error.response.headers);
 
         // Mostrar el mensaje de error específico si está disponible
         const errorMessage = error.response.data?.errors
@@ -138,7 +143,8 @@ export default function DashboardPage() {
         );
         setActivo(res.data?.activo ?? false);
       } catch (getError) {
-        console.error("Error al recargar el estado:", getError);
+        toast.error("Error al recargar el estado:")
+        // console.error(, getError);
       }
     } finally {
       setCargando(false);
@@ -190,9 +196,8 @@ export default function DashboardPage() {
     <PrivateNav titlespage="Contenido Principal">
       <div className="min-h-screen">
         <main
-          className={`flex-1 overflow-y-auto p-4 sm:p-6 bg-white/80 backdrop-blur-md rounded-t-2xl shadow-inner ${
-            isMobile ? "mx-auto" : "ml-[60px]"
-          }`}
+          className={`flex-1 overflow-y-auto p-4 sm:p-6 bg-white/80 backdrop-blur-md rounded-t-2xl shadow-inner ${isMobile ? "mx-auto" : "ml-[60px]"
+            }`}
         >
           {/* Encabezado del Dashboard */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
@@ -365,30 +370,29 @@ export default function DashboardPage() {
                               activo === null
                                 ? "outline"
                                 : activo
-                                ? "default"
-                                : "destructive"
+                                  ? "default"
+                                  : "destructive"
                             }
-                            className={`text-xs sm:text-sm w-fit ${
-                              activo === null
-                                ? "bg-gray-100 text-gray-600"
-                                : activo
+                            className={`text-xs sm:text-sm w-fit ${activo === null
+                              ? "bg-gray-100 text-gray-600"
+                              : activo
                                 ? "bg-green-100 text-green-700 border-green-300"
                                 : "bg-red-100 text-red-700 border-red-300"
-                            }`}
+                              }`}
                           >
                             {activo === null
                               ? "Cargando..."
                               : activo
-                              ? "Activado"
-                              : "Desactivado"}
+                                ? "Activado"
+                                : "Desactivado"}
                           </Badge>
                         </div>
                         <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                           {activo === null
                             ? "Verificando estado..."
                             : activo
-                            ? "Permiso habilitado globalmente"
-                            : "El permiso está deshabilitado"}
+                              ? "Permiso habilitado globalmente"
+                              : "El permiso está deshabilitado"}
                         </p>
                       </div>
 
@@ -406,11 +410,10 @@ export default function DashboardPage() {
 
                     {mensaje && (
                       <div
-                        className={`mt-3 sm:mt-4 p-3 rounded-lg text-xs sm:text-sm transition-all ${
-                          mensaje.includes("Error") || mensaje.includes("error")
-                            ? "bg-red-50 text-red-700 border border-red-200"
-                            : "bg-green-50 text-green-700 border border-green-200"
-                        }`}
+                        className={`mt-3 sm:mt-4 p-3 rounded-lg text-xs sm:text-sm transition-all ${mensaje.includes("Error") || mensaje.includes("error")
+                          ? "bg-red-50 text-red-700 border border-red-200"
+                          : "bg-green-50 text-green-700 border border-green-200"
+                          }`}
                       >
                         {mensaje}
                       </div>

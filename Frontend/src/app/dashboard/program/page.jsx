@@ -24,7 +24,7 @@ export default function Dashboard() {
     queryFn: async () => {
       const response = await axiosInstance.get("/api/Program/GetProgram");
 
-      console.log("Datos recibidos:", response.data); // 🔍 Depuración
+      // console.log("Datos recibidos:", response.data); // 🔍 Depuración
 
       return Array.isArray(response.data)
         ? response.data.map((program) => ({

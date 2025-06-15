@@ -39,13 +39,13 @@ export default function UpdatePermission({ id }) {
   // ✅ Actualizar el estado cuando `permissionData` cambie
   useEffect(() => {
     if (permissionData) {
-      console.log("✅ Actualizando estado con datos:", permissionData);
+      // console.log("✅ Actualizando estado con datos:", permissionData);
       setDepartureDate(permissionData.departureDate || "");
       setEntryDate(permissionData.entryDate || "");
       setMotive(permissionData.motive || "");
       setObservation(permissionData.observation || "");
       // setStatus(permissionData.status || "");
-      console.log("🔄 Estado actualizado:", permissionData);
+      // console.log("🔄 Estado actualizado:", permissionData);
     }
   }, [permissionData]);
 
@@ -56,7 +56,7 @@ export default function UpdatePermission({ id }) {
         `api/permission/UpdatePermission/${id}`,
         newData
       );
-      console.log("📤 Respuesta de actualización:", res.data);
+      // console.log("📤 Respuesta de actualización:", res.data);
       return res.data; // Esto será lo que llega al onSuccess
     },
     onSuccess: (data) => {
@@ -71,13 +71,13 @@ export default function UpdatePermission({ id }) {
   // ✅ Enviar formulario
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("📤 Enviando datos:", {
-      departureDate,
-      entryDate,
-      motive,
-      observation,
-      // status,
-    });
+    // console.log("📤 Enviando datos:", {
+    //   departureDate,
+    //   entryDate,
+    //   motive,
+    //   observation,
+    //   // status,
+    // });
     updatePermissionMutation.mutate({
       departureDate,
       entryDate,

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FileDown, Loader2 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
+import { toast } from "sonner";
 
 export default function ExportProgramExcelButton() {
     const [isExporting, setIsExporting] = useState(false);
@@ -37,7 +38,8 @@ export default function ExportProgramExcelButton() {
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
         } catch (error) {
-            console.error("Error al exportar programas:", error);
+            toast.error("Error al exportar programas:")
+            // console.error("Error al exportar programas:", error);
         } finally {
             setIsExporting(false);
         }

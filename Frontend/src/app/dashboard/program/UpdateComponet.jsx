@@ -27,7 +27,7 @@ export default function UpdateProgram({ id }) {
     queryKey: ["areas"],
     queryFn: async () => {
       const response = await axiosInstance.get("/api/Area/AllAreas");
-      console.log("📌 Lista de áreas recibida:", response.data);
+      // console.log("📌 Lista de áreas recibida:", response.data);
       return response.data;
     },
   });
@@ -39,7 +39,7 @@ export default function UpdateProgram({ id }) {
       const response = await axiosInstance.get(
         `/api/Program/ProgramGetId${id}`
       );
-      console.log("📌 Datos recibidos del programa:", response.data);
+      // console.log("📌 Datos recibidos del programa:", response.data);
       return response.data;
     },
     enabled: !!id, // Solo ejecutar si hay un ID válido
@@ -48,7 +48,7 @@ export default function UpdateProgram({ id }) {
   // ✅ Actualizar el estado cuando `programData` cambie
   useEffect(() => {
     if (programData) {
-      console.log("✅ Actualizando estado con datos:", programData);
+      // console.log("✅ Actualizando estado con datos:", programData);
 
       // Buscar el área correspondiente
       const matchingArea = areas.find(
@@ -58,10 +58,10 @@ export default function UpdateProgram({ id }) {
       setProgramName(programData.program_Name || "");
       setAreaId(matchingArea ? matchingArea.area_Id.toString() : "");
 
-      console.log("🔄 Estado actualizado:", {
-        programName: programData.program_Name || "",
-        areaId: matchingArea ? matchingArea.area_Id : "",
-      });
+      // console.log("🔄 Estado actualizado:", {
+      //   programName: programData.program_Name || "",
+      //   areaId: matchingArea ? matchingArea.area_Id : "",
+      // });
     }
   }, [programData, areas]);
 
@@ -82,10 +82,10 @@ export default function UpdateProgram({ id }) {
   // ✅ Enviar formulario
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("📤 Enviando datos:", {
-      program_Name: programName,
-      area_Id: Number(areaId),
-    });
+    // console.log("📤 Enviando datos:", {
+    //   program_Name: programName,
+    //   area_Id: Number(areaId),
+    // });
     updateMutation.mutate({
       program_Name: programName,
       area_Id: Number(areaId),
