@@ -80,7 +80,7 @@ export default function DataTable({
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
   const [selectedUpdateId, setSelectedUpdateId] = useState(null);
-  const [isOpenAuthorizationModal, setIsOpenAuthorizationModal] =
+  // const [isOpenAuthorizationModal, setIsOpenAuthorizationModal] =
     useState(false); // Estado para el modal de autorización
   const [responsibleId, setResponsibleId] = useState(null); // 👈 Agrega esta línea
   const [selectedPermissionId, setSelectedPermissionId] = useState(null);
@@ -183,7 +183,7 @@ export default function DataTable({
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-44">
-                              {idKey === "responsible_Id" && row[idKey] != null && (
+                              {/* {idKey === "responsible_Id" && row[idKey] != null && (
                                 <DropdownMenuItem
                                   onClick={() => {
                                     setResponsibleId(row[idKey]);
@@ -194,7 +194,7 @@ export default function DataTable({
                                   <CheckCircle className="mr-2 h-4 w-4" />
                                   Autorizar
                                 </DropdownMenuItem>
-                              )}
+                              )} */}
                               {/* Otros elementos del menú */}
                               {updateComponets && (
                                 <DropdownMenuItem
@@ -339,13 +339,13 @@ export default function DataTable({
               />
             )
           }
-
+{/* 
           <AuthorizePermissionModal
             isOpen={isOpenAuthorizationModal}
             onClose={() => setIsOpenAuthorizationModal(false)}
             responsibleId={responsibleId}
             responsibleName={responsibleName} // 👈 Agrega esta línea
-          />
+          /> */}
           {selectedPermissionId && (
             <ApprovalStatusModal
               permisoId={selectedPermissionId}
