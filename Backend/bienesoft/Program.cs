@@ -164,12 +164,10 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
-// Middleware
-if (app.Environment.IsDevelopment())
-{
+
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+
 
 //app.UseRouting(); // No es obligatorio aquí si usas MapControllers()
 

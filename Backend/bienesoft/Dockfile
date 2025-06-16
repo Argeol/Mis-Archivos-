@@ -1,21 +1,24 @@
 # Etapa de construcción
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
-WORKDIR /app
+WORKDIR /bienesoft
 
-COPY *.csproj ./
+EXPOSE 80
+EXPOSE 5000
+
+
+COPY ./*.csproj ./
 RUN dotnet restore
 
 COPY . ./
 RUN dotnet publish -c Release -o out
 
 # Etapa de runtime
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 
-WORKDIR /app
+WORKDIR /bienesoft
 
-COPY --from=build /app/out .
+COPY --from=build /Bienesoft/out . 
 
-EXPOSE 80
 
-ENTRYPOINT ["dotnet", "Bienesoft.d11.dll"]
+ENTRYPOINT ["dotnet", "bienesoft.dll"]
