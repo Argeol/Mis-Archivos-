@@ -66,20 +66,8 @@ public class PermissionApprovalService
         var rechazos = permiso.Approvals
             .Any(pa => pa.ApprovalStatus == ApprovalStatus.Rechazado && rolesRequeridos.Contains(pa.Responsible.RoleId));
 
-        string estado;
-
-        if (rechazos)
-        {
-            estado = Status.Rechazado.ToString();
-        }
-        else if (rolesRequeridos.All(r => aprobaciones.Contains(r)))
-        {
-            estado = Status.Aprobado.ToString();
-        }
-        else
-        {
-            estado = Status.Pendiente.ToString();
-        }
+        var estado = permiso.Status.ToString();
+        estado = Status.Pendiente.ToString();
 
         return new
         {
@@ -206,7 +194,7 @@ public class PermissionApprovalService
                 observacion,         // 9
                 motivo,              // 10
                 direccion);// 11
-             // Solo notificar al acudiente si el correo no está vacío
+                           // Solo notificar al acudiente si el correo no está vacío
             if (!string.IsNullOrWhiteSpace(emailAcudiente))
             {
                 var resultadoAcudiente = await GeneralFunction.NotifyAcudienteAsync(
