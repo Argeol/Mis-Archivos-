@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:5000/',
+  baseURL: 'http://10.6.96.50:5000/',
   withCredentials: true,
   headers: {
     Accept: '*/*',

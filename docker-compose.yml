@@ -2,26 +2,37 @@ version: '3.8'
 
 services:
   backend:
+    container_name: bienesoft_backend
     build:
       context: ./Backend/bienesoft
-      dockerfile: Dockerfile
     ports:
-      - "5000:80"
-    networks:
-      - app-network
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://0.0.0.0:5000
+    restart: always
 
   frontend:
+    container_name: bienesoft_front
     build:
       context: ./Frontend
-      dockerfile: Dockerfile
     ports:
-      - "3001:80"
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
     depends_on:
       - backend
-    networks:
-      - app-network
 
-networks:
-  app-network:
-    driver: bridge
-
+  db:
+    image: mysql:8.0
+    container_name: bienesoft_db
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bienesoft
+      MYSQL_USER: bienesoft_user
+      MYSQL_PASSWORD: bienesoft_pass
+    volumes:
+      - ./DataBase/bienesoft.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
