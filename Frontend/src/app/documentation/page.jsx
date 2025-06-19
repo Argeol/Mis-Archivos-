@@ -1,45 +1,87 @@
-import React from "react";
-import PublicNav from "@/components/navs/PublicNav";
+"use client";
+
+import {
+  FileText,
+  Download,
+  Maximize2,
+  Calendar,
+  Users,
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import Footer from "@/components/navs/Footer";
+import PublicNav from "@/components/navs/PublicNav";
 
 const Documento = () => {
-    return (
-        <>
-            <PublicNav />    
-            <br>
-            </br>        
-            <br>
-            </br>
-            <div className="flex flex-col min-h-screen">
-                {/* Título y enunciado */}
-                <div className="text-center p-4">
-                    <h1 className="text-xl font-serif tracking-tighter sm:text-2xl md:text-3xl lg:text-4xl">
-                        Manual Técnico
-                    </h1>
-                    <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400 ">
-                        Este es nuestro manual técnico, donde redacta cómo se está llevando a 
-                        cabo la elaboración de nuestro proyecto Bienesoft
-                    </p>
-                </div>
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = "/assets/docs/ManualT.pdf";
+    link.download = "Manual_Tecnico_Bienesoft.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
-                {/* Contenedor del documento */}
-                <div className="bg-gray-300 p-1 rounded-md shadow-md max-w-2xl mx-auto mt-4 mb-10">
-                    <div className="overflow-hidden shadow-lg rounded-md">
-                        <iframe
-                            src="assets/docs/ManualT.pdf"
-                            title="Documentación"
-                            className=" h-[600px] w-[600px] border-none"
-                        />
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="min-h-screen flex flex-col bg-white">
+      <PublicNav />
 
-            {/* Footer separado */}
-            <div className="mt-auto">
-                <Footer />
-            </div>
-        </>
-    );
+      {/* Título principal centrado con ícono y resumen */}
+      <section className="container pt-32 pb-20 px-4 max-w-5xl mx-auto text-center space-y-6">
+        <div className="flex items-center justify-center gap-3">
+          <div className="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center shadow">
+            <FileText className="h-6 w-6 text-white" />
+          </div>
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl text-blue-700">
+            Manual Técnico Bienesoft
+          </h1>
+        </div>
+
+        <p className="text-slate-600 text-lg max-w-3xl mx-auto leading-relaxed">
+          Este manual técnico presenta una visión integral del desarrollo y funcionamiento de Bienesoft, abordando su arquitectura, tecnologías utilizadas y pautas de mantenimiento. Está dirigido a desarrolladores, administradores y personal técnico que requiera comprender el sistema en profundidad.
+        </p>
+
+        {/* Metadatos de actualización */}
+        <div className="flex flex-wrap justify-center gap-4 text-sm text-slate-600">
+          <div className="flex items-center gap-2 bg-blue-100 rounded-full px-4 py-2 shadow-sm">
+            <Calendar className="w-4 h-4 text-blue-600" />
+            <span>
+              Actualizado el{" "}
+              {new Date().toLocaleDateString("es-ES", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 bg-blue-100 rounded-full px-4 py-2 shadow-sm">
+            <Users className="w-4 h-4 text-blue-600" />
+            <span>Equipo de Desarrollo Bienesoft</span>
+          </div>
+        </div>
+
+        {/* Botones de acción */}
+        <div className="flex flex-col sm:flex-row justify-center gap-4 pt-6">
+          <a href="/assets/docs/ManualT.pdf" target="_blank" rel="noopener noreferrer">
+            <Button className="w-60 bg-blue-600 hover:bg-blue-700 text-white h-11">
+              <Maximize2 className="w-4 h-4 mr-2" />
+              Ver PDF
+            </Button>
+          </a>
+          <Button
+            onClick={handleDownload}
+            variant="outline"
+            className="w-60 border-blue-300 text-blue-700 hover:bg-blue-50 h-11"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Descargar
+          </Button>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
 };
 
 export default Documento;

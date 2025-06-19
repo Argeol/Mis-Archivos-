@@ -13,14 +13,19 @@ export default function Home() {
       <PublicNav />
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="pt-20 py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-b from-white to-gray-100 flex items-center justify-center">
-          <div className="container px-4 md:px-6 ">
+        <section className="min-h-screen pt-24 sm:pt-28 md:pt-20 lg:pt-16 xl:pt-12 bg-gradient-to-b from-white to-gray-100 flex items-center justify-center">
+          <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center space-y-4 text-center">
+              <img
+                src="/assets/img/bienesoft.webp"
+                alt="Bienesoft Logo"
+                className="w-32 sm:w-40 md:w-44 lg:w-48 xl:w-52"
+              />
               <div className="space-y-2">
                 <h1 className="text-3xl font-serif tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl">
                   Gestión de Permisos de Aprendices
                 </h1>
-                <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400 ">
+                <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
                   Simplifica, agiliza el proceso de solicitud y aprobación de permisos en el centro Agropecuario la "La Granja".
                 </p>
               </div>
