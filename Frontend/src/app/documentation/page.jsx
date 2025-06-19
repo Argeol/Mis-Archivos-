@@ -32,7 +32,7 @@ const Documento = () => {
           <div className="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center shadow">
             <FileText className="h-6 w-6 text-white" />
           </div>
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl text-blue-700">
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl text-black">
             Manual Técnico Bienesoft
           </h1>
         </div>

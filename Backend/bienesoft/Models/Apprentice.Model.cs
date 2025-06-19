@@ -39,8 +39,9 @@ namespace bienesoft.Models
         [Required, Phone, StringLength(20)]
         public string Phone_Apprentice { get; set; } = string.Empty;
 
-        [Required]
-        public string Stratum_Apprentice { get; set; } = string.Empty;
+        
+        public string? Stratum_Apprentice { get; set; } = null;
+
 
         [Required, StringLength(20)]
         public string Status_Apprentice { get; set; } = "Activo";
@@ -60,11 +61,11 @@ namespace bienesoft.Models
         [Required, StringLength(45)]
         public string ape_responsible { get; set; } = string.Empty;
 
-        [Required, Phone, StringLength(12)]
+        [Required,Phone, StringLength(12)]
         public string tel_responsible { get; set; } = string.Empty;
 
         [EmailAddress]
-        public string email_responsible { get; set; } = string.Empty;
+        public string? email_responsible { get; set; } 
 
         [Required]
         public int File_Id { get; set; }

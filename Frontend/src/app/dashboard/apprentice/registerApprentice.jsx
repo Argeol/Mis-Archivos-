@@ -141,7 +141,6 @@ export default function RegisterApprentice({ onSuccess }) {
         !formData.birth_Date_Apprentice ||
         !formData.email_Apprentice.trim() ||
         !formData.phone_Apprentice.trim() ||
-        !formData.stratum_Apprentice ||
         !formData.gender_Apprentice
       ) {
         setErrorMessage("Por favor completa todos los campos obligatorios del paso 1 correctamente.");
@@ -168,7 +167,6 @@ export default function RegisterApprentice({ onSuccess }) {
     }
     if (currentStep === 4) {
       if (
-        !formData.email_responsible.trim() ||
         !formData.nom_responsible.trim() ||
         !formData.ape_responsible.trim() ||
         !formData.tel_responsible.trim()
@@ -190,10 +188,24 @@ export default function RegisterApprentice({ onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Limpiar campos que pueden ir nulos
+    if (formData.email_responsible?.trim() === "") {
+      formData.email_responsible = null;
+    }
+
+    if (
+      typeof formData.stratum_Apprentice !== "string" ||
+      formData.stratum_Apprentice.trim() === ""
+    ) {
+      formData.stratum_Apprentice = null;
+    }
+
     if (validateStep(step)) {
       mutation.mutate();
     }
   };
+
 
   return (
     <>
@@ -313,15 +325,16 @@ export default function RegisterApprentice({ onSuccess }) {
                   placeholder="Correo"
                   onChange={(e) => {
                     const value = e.target.value;
-                    // Permitir escribir siempre
                     setFormData({ ...formData, email_Apprentice: value });
                   }}
                   required
                 />
-                {/* Validación en tiempo real (opcional): */}
-                {!/^[^\s@]+@[^\s@]+\.com$/.test(formData.email_Apprentice || "") &&
+                {/* Validación en tiempo real */}
+                {!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email_Apprentice || "") &&
                   formData.email_Apprentice && (
-                    <p style={{ color: "red" }}>Correo inválido: debe contener @ y terminar en .com</p>
+                    <p style={{ color: "red" }}>
+                      Correo inválido: debe tener el formato usuario@dominio.extensión
+                    </p>
                   )}
               </div>
 
@@ -359,9 +372,12 @@ export default function RegisterApprentice({ onSuccess }) {
               <div>
                 <Label>Grupo SISBÉN</Label>
                 <Select
-                  value={formData.stratum_Apprentice}
+                  value={formData.stratum_Apprentice ?? ""}
                   onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, stratum_Apprentice: value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      stratum_Apprentice: value,
+                    }))
                   }
                 >
                   <SelectTrigger className="w-full">
@@ -574,16 +590,19 @@ export default function RegisterApprentice({ onSuccess }) {
                       file_Id: parseInt(value),
                     }))
                   }
+                  disabled={!formData.program_Id} // Evita seleccionar ficha si aún no se eligió programa
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecciona una ficha" />
                   </SelectTrigger>
                   <SelectContent>
-                    {files.map((file) => (
-                      <SelectItem key={file.file_Id} value={file.file_Id.toString()}>
-                        {file.file_Id}
-                      </SelectItem>
-                    ))}
+                    {files
+                      .filter((file) => file.program_Id === formData.program_Id)
+                      .map((file) => (
+                        <SelectItem key={file.file_Id} value={file.file_Id.toString()}>
+                          {file.file_Id}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -650,15 +669,15 @@ export default function RegisterApprentice({ onSuccess }) {
                   value={formData.email_responsible || ""}
                   onChange={(e) => {
                     const value = e.target.value;
-                    // Permitir escribir siempre
-                    setFormData({ ...formData, email_responsible: value });
+                    setFormData({ ...formData, email_responsible: value === "" ? null : value });
                   }}
-                  required
                 />
-                {/* Validación en tiempo real (opcional): */}
-                {!/^[^\s@]+@[^\s@]+\.com$/.test(formData.email_responsible || "") &&
-                  formData.email_responsible && (
-                    <p style={{ color: "red" }}>Correo inválido: debe contener @ y terminar en .com</p>
+                {formData.email_responsible?.trim() !== "" &&
+                  typeof formData.email_responsible === "string" &&
+                  !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email_responsible) && (
+                    <p style={{ color: "red" }}>
+                      Correo inválido: debe tener el formato usuario@dominio.extensión
+                    </p>
                   )}
               </div>
             </div>
