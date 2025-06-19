@@ -159,8 +159,8 @@ export default function UpdateProgram({ id }) {
         </CardContent>
 
         <CardFooter className="dark:bg-green-900/20 border-blue-100 dark:border-blue-800 flex justify-end ">
-          <Button type="submit" disabled={updateMutation.isLoading}>
-            {updateMutation.isLoading
+          <Button type="submit" disabled={updateMutation.isPending}>
+            {updateMutation.isPending
               ? "Actualizando..."
               : "Actualizar Programa"}
           </Button>

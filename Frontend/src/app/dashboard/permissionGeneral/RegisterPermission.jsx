@@ -463,10 +463,10 @@ export default function RegisterPermission({ onSuccess }) {
       <div className="pt-4">
         <Button
           type="submit"
-          disabled={mutation.isLoading}
+          disabled={mutation.isPending}
           className="mt-4 bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200 rounded-md mx-auto w-full flex items-center justify-center gap-2"
         >
-          {mutation.isLoading ? (
+          {mutation.isPending ? (
             <>
               <svg
                 className="animate-spin h-5 w-5 text-white"

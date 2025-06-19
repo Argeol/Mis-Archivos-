@@ -165,8 +165,8 @@ export default function RegisterProgram() {
         </CardContent>
 
         <CardFooter className="dark:bg-green-900/20 border-blue-100 dark:border-blue-800 flex justify-end ">
-          <Button type="submit" disabled={mutation.isLoading}>
-            {mutation.isLoading ? "Registrando..." : "Registrar Programa"}
+          <Button type="submit" disabled={mutation.isPending}>
+            {mutation.isPending ? "Registrando..." : "Registrar Programa"}
           </Button>
         </CardFooter>
       </form>

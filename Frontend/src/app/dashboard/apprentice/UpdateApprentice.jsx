@@ -16,14 +16,13 @@ import {
 import { Label } from "@/components/ui/label";
 import { Value } from "@radix-ui/react-select";
 import { Files } from "lucide-react";
+import { toast } from "sonner";
 
 const genders = ["Masculino", "Femenino", "Otro"];
 const addressTypes = ["Barrio", "Vereda", "Corregimiento", "Comuna"];
 const apprenticeTypes = ["Interno", "Externo"];
 const statusOptions = ["Active", "Inactive"];
 const documentstypes = ["TI", "CC"];
-
-
 
 export default function UpdateApprentice({ id }) {
   const queryClient = useQueryClient();
@@ -53,7 +52,9 @@ export default function UpdateApprentice({ id }) {
   const { data, isLoading } = useQuery({
     queryKey: ["apprentice", id],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/api/Apprentice/GetApprenticeByIdAdmi/${id}`);
+      const res = await axiosInstance.get(
+        `/api/Apprentice/GetApprenticeByIdAdmi/${id}`
+      );
       return res.data || {};
     },
     enabled: !!id,
@@ -84,42 +85,22 @@ export default function UpdateApprentice({ id }) {
   }, [data]);
 
   const mutation = useMutation({
-    mutationFn: async () => {
-      // Muestra mensaje informativo mientras se actualiza
-      setAlert({
-        type: "info",
-        message: "Actualizando aprendiz, por favor espera...",
-        open: true,
-      });
+  mutationFn: async () => {
+    if (!formData.first_name_apprentice || !formData.email_apprentice) {
+      toast.error("Por favor completa todos los campos obligatorios.")
+      return; // <- Importante para no continuar si faltan campos
+    }
 
-      // Validación: ejemplo con advertencia
-      if (!formData.first_name_apprentice || !formData.email_apprentice) {
-        setAlert({
-          type: "warning",
-          message: "Por favor completa todos los campos obligatorios.",
-          open: true,
-        });
-        throw new Error("Faltan campos obligatorios"); // Detiene la mutación
-      }
-
-      await axiosInstance.put(`/api/Apprentice/UpdateApprentice/${id}`, formData);
-    },
-    onSuccess: () => {
-      setAlert({
-        type: "success",
-        message: "Aprendiz actualizado correctamente.",
-        open: true,
-      });
-      queryClient.invalidateQueries(["apprentice", id]);
-    },
-    onError: (error) => {
-      setAlert({
-        type: "error",
-        message: error.response?.data?.message || "Error al actualizar aprendiz.",
-        open: true,
-      });
-    },
-  });
+    await axiosInstance.put(`/api/Apprentice/UpdateApprentice/${id}`, formData);
+  },
+  onSuccess: () => {
+    toast.info("Aprendiz actualizado correctamente.");
+    queryClient.invalidateQueries(["apprentice", id]);
+  },
+  onError: () => {
+    toast.error("Error al actualizar aprendiz.");
+  },
+});
 
   const { data: departments = [] } = useQuery({
     queryKey: ["departments"],
@@ -137,7 +118,7 @@ export default function UpdateApprentice({ id }) {
       const res = await axiosInstance.get("/Api/File/GetFiles");
       return res.data;
     },
-  })
+  });
 
   const { data: municipalities = [] } = useQuery({
     queryKey: ["municipalities", id_department],
@@ -150,8 +131,6 @@ export default function UpdateApprentice({ id }) {
     },
     enabled: !!id_department,
   });
-
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -217,14 +196,15 @@ export default function UpdateApprentice({ id }) {
             // Permitir escribir siempre
             setFormData({ ...formData, email_apprentice: value });
           }}
-          required
+          // required
         />
         {/* Validación en tiempo real (opcional): */}
         {!/^[^\s@]+@[^\s@]+\.com$/.test(formData.email_apprentice || "") &&
           formData.email_apprentice && (
-            <p style={{ color: "red" }}>Correo inválido: debe contener @ y terminar en .com</p>
+            <p style={{ color: "red" }}>
+              Correo inválido: debe contener @ y terminar en .com
+            </p>
           )}
-
 
         <Label>Fecha de nacimiento</Label>
         <Input
@@ -237,7 +217,7 @@ export default function UpdateApprentice({ id }) {
               birth_date_apprentice: new Date(e.target.value).toISOString(),
             }))
           }
-          required
+          // required
         />
 
         <Select
@@ -247,7 +227,9 @@ export default function UpdateApprentice({ id }) {
           }
         >
           <SelectTrigger>
-            <SelectValue placeholder={data?.gender_Apprentice || "Selecciona género"} />
+            <SelectValue
+              placeholder={data?.gender_Apprentice || "Selecciona género"}
+            />
           </SelectTrigger>
           <SelectContent>
             {genders.map((gender) => (
@@ -257,7 +239,6 @@ export default function UpdateApprentice({ id }) {
             ))}
           </SelectContent>
         </Select>
-
 
         <Label>Dirección</Label>
         <Input
@@ -296,7 +277,7 @@ export default function UpdateApprentice({ id }) {
               setFormData({ ...formData, phone_Apprentice: value });
             }
           }}
-          required
+          // required
         />
         {/* Validación del largo del teléfono */}
         {formData.phone_Apprentice.length > 0 &&
@@ -311,10 +292,11 @@ export default function UpdateApprentice({ id }) {
           </p>
         )}
 
-
         <Label>Grupo SISBÉN</Label>
         <Select
-          onValueChange={(value) => setFormData((prev) => ({ ...prev, stratum_Apprentice: value }))}
+          onValueChange={(value) =>
+            setFormData((prev) => ({ ...prev, stratum_Apprentice: value }))
+          }
           value={formData.stratum_Apprentice}
         >
           <SelectTrigger className="w-full">
@@ -350,7 +332,6 @@ export default function UpdateApprentice({ id }) {
             ))}
           </SelectContent>
         </Select>
-
 
         <Label>Tipo de Aprendiz</Label>
         <Select
@@ -396,7 +377,7 @@ export default function UpdateApprentice({ id }) {
               setFormData({ ...formData, tel_responsible: value });
             }
           }}
-          required
+          // required
         />
         {/* Validación del largo del teléfono */}
         {formData.tel_responsible && formData.tel_responsible.length < 10 && (
@@ -419,12 +400,14 @@ export default function UpdateApprentice({ id }) {
             // Permitir escribir siempre
             setFormData({ ...formData, email_responsible: value });
           }}
-          required
+          // required
         />
         {/* Validación en tiempo real (opcional): */}
         {!/^[^\s@]+@[^\s@]+\.com$/.test(formData.email_responsible || "") &&
           formData.email_responsible && (
-            <p style={{ color: "red" }}>Correo inválido: debe contener @ y terminar en .com</p>
+            <p style={{ color: "red" }}>
+              Correo inválido: debe contener @ y terminar en .com
+            </p>
           )}
 
         <Label>Departamento</Label>
@@ -450,7 +433,8 @@ export default function UpdateApprentice({ id }) {
         </Select>
 
         <p className="text-yellow-600 text-sm mt-1">
-          Para poder editar el municipio, debe editar el departamento, incluso si es el mismo.
+          Para poder editar el municipio, debe editar el departamento, incluso
+          si es el mismo.
         </p>
 
         <Label>Municipio</Label>
@@ -458,7 +442,9 @@ export default function UpdateApprentice({ id }) {
           onValueChange={(value) =>
             setFormData((prev) => ({ ...prev, id_municipality: Number(value) }))
           }
-          value={formData.id_municipality ? formData.id_municipality.toString() : ""}
+          value={
+            formData.id_municipality ? formData.id_municipality.toString() : ""
+          }
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder={data.municipalityName} />
@@ -497,10 +483,35 @@ export default function UpdateApprentice({ id }) {
           </SelectContent>
         </Select>
 
-
-        <Button type="submit" disabled={mutation.isLoading}>
-          {mutation.isLoading ? "Actualizando..." : "Actualizar"}
-        </Button>
+        <Button onClick={() => mutation.mutate()} disabled={mutation.isPending}>
+         {mutation.isPending ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    ></path>
+                  </svg>
+                  Registrando...
+                </>
+              ) : (
+                <>Registrar</>
+              )}
+            </Button>
       </form>
     </div>
   );
