@@ -145,7 +145,7 @@ namespace bienesoft.Controllers
                 return StatusCode(500, new { Message = "Error al contar los aprendices.", Details = ex.Message });
             }
         }
-        [Authorize(Roles = "Administrador")]
+        // [Authorize(Roles = "Administrador")]
         [HttpPost("import")]
         public async Task<IActionResult> ImportApprentices(IFormFile file)
         {

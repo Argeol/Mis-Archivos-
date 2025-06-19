@@ -14,7 +14,7 @@ namespace bienesoft.Controllers
     [ApiController]
     [Route("Api/[controller]")]
 
-    [Authorize(Roles = "Administrador")]
+    // [Authorize(Roles = "Administrador")]
     public class FileController : Controller
     {
         public IConfiguration _Configuration { get; set; }
@@ -147,6 +147,34 @@ namespace bienesoft.Controllers
                 GeneralFunction.Addlog(ex.Message);
                 return StatusCode(500, new { error = ex.Message });
             }
+        }
+        [HttpPost("import")]
+        public async Task<IActionResult> ImportProgramsFromExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No se proporcionó ningún archivo.");
+
+            try
+            {
+                var result = await _FileServices.ImportFilesAsync(file);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = "Error al importar", detalle = ex.Message });
+            }
+        }
+        [HttpPost("NormalizeNames")]
+        public async Task<IActionResult> NormalizeMunicipalitiesAndDepartments()
+        {
+            var countMun = await _FileServices.UppercaseMunicipalitiesAsync();
+            var countDep = await _FileServices.UppercaseDepartmentsAsync();
+
+            return Ok(new
+            {
+                MunicipiosModificados = countMun,
+                DepartamentosModificados = countDep
+            });
         }
 
     }

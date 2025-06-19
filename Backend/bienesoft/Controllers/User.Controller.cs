@@ -60,17 +60,17 @@ namespace bienesoft.Controllers
                 var user = _UserServices.GetByEmailAsync(login.Email).Result;
                 if (user == null)
                 {
-                    return Unauthorized(new { message = "Tu correo no esta registrado en el sistema, Verificalo" });
+                    return BadRequest(new { message = "Tu correo no esta registrado en el sistema, Verificalo" });
                 }
                 var cleanPassword = login.HashedPassword?.Trim();
                 var hashedInput = PasswordHasher.HashPassword(cleanPassword, user.Salt);
                 if (hashedInput != user.HashedPassword)
                 {
-                    return Unauthorized(new { message = "Credenciales incorrectas" });
+                    return BadRequest(new { message = "Credenciales incorrectas" });
                 }
                 if (user.Apprentice != null && user.Apprentice.Status_Apprentice == "Inactivo")
                 {
-                    return Unauthorized(new { message = "Acceso denegado. Tu estado es inactivo." });
+                    return BadRequest(new { message = "Acceso denegado. Tu estado es inactivo." });
                 }
 
                 var key = Encoding.UTF8.GetBytes(_jwtSettings.keysecret);
@@ -140,7 +140,7 @@ namespace bienesoft.Controllers
                 Response.Cookies.Append("token", tokenString, new CookieOptions
                 {
                     HttpOnly = true,
-                    // Secure = true, // Solo si usas HTTPS
+                    // Secure = false, // Solo si usas HTTPS
                     SameSite = SameSiteMode.Strict,
                     Expires = DateTimeOffset.UtcNow.AddMinutes(Convert.ToDouble(_jwtSettings.JWTExpireTime))
 
@@ -239,7 +239,7 @@ namespace bienesoft.Controllers
             return Ok(new { message = "Token renovado correctamente" });
         }
 
-        [Authorize(Roles = "Administrador")]
+        // [Authorize(Roles = "Administrador")]
         [HttpPost("createAdmi")]
         public async Task<IActionResult> CreateUser([FromBody] Administrador request)
         {

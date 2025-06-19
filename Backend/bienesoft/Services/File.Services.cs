@@ -154,6 +154,94 @@ namespace bienesoft.Services
         //     stream.Position = 0;
         //     return stream;
         // }
+        public async Task<object> ImportFilesAsync(IFormFile file)
+        {
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+
+            using var workbook = new XLWorkbook(stream);
+            var worksheet = workbook.Worksheet(1); // o usa el nombre de la hoja si lo sabes
+
+            var rows = worksheet.RangeUsed().RowsUsed().Skip(1); // Omitimos la cabecera
+
+            var added = new List<FileModel>();
+            var notFoundPrograms = new List<string>();
+
+            foreach (var row in rows)
+            {
+                var fichaId = row.Cell(1).GetValue<int>();
+                var programName = row.Cell(2).GetString().Trim();
+                var cantidad = row.Cell(3).GetValue<int>();
+
+                // Buscar el programa por nombre
+                var program = await _context.program
+                    .FirstOrDefaultAsync(p => p.Program_Name.Trim().ToUpper() == programName.ToUpper());
+
+                if (program == null)
+                {
+                    notFoundPrograms.Add(programName);
+                    continue;
+                }
+
+                // Evitar fichas duplicadas
+                if (_context.file.Any(f => f.File_Id == fichaId)) continue;
+
+                var ficha = new FileModel
+                {
+                    File_Id = fichaId,
+                    Program_Id = program.Program_Id,
+                    Apprentice_count = cantidad
+                };
+
+                _context.file.Add(ficha);
+                added.Add(ficha);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return new
+            {
+                message = $"Se importaron {added.Count} fichas exitosamente.",
+                programasNoEncontrados = notFoundPrograms.Distinct().ToList()
+            };
+        }
+        public static string NormalizarTexto(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return "";
+
+            var normalized = input.Normalize(System.Text.NormalizationForm.FormD);
+            var sinTildes = new string(normalized
+                .Where(c => System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c) != System.Globalization.UnicodeCategory.NonSpacingMark)
+                .ToArray());
+
+            return sinTildes.ToUpper().Trim();
+        }
+
+        public async Task<int> UppercaseMunicipalitiesAsync()
+        {
+            var municipios = await _context.municipality.ToListAsync();
+
+            foreach (var m in municipios)
+            {
+                m.municipality = NormalizarTexto(m.municipality);
+            }
+
+            return await _context.SaveChangesAsync(); // Devuelve la cantidad de registros modificados
+        }
+
+
+        public async Task<int> UppercaseDepartmentsAsync()
+        {
+            var departamentos = await _context.department.ToListAsync();
+
+            foreach (var d in departamentos)
+            {
+                d.Name_department = d.Name_department?.Trim().ToUpper();
+            }
+
+            return await _context.SaveChangesAsync();
+        }
     }
 }
 

@@ -18,7 +18,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigin", builder =>
      {
          builder
-         .WithOrigins("http://10.6.96.50:3001") // Asegúrate de poner el origen correcto de tu frontend (puede ser otro puerto si es necesario)
+        //  .WithOrigins("http://10.6.96.50:3001") // Asegúrate de poner el origen correcto de tu frontend (puede ser otro puerto si es necesario)
+         .WithOrigins("http://localhost:3000") // Asegúrate de poner el origen correcto de tu frontend (puede ser otro puerto si es necesario)
          .AllowAnyMethod()
          .AllowAnyHeader()
          .AllowCredentials(); // Permite el uso de credenciales como cookies

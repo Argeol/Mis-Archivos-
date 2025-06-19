@@ -21,8 +21,8 @@ namespace bienesoft.Models
         [Required, StringLength(100)]
         public string Last_Name_Apprentice { get; set; } = string.Empty;
 
-        [Required, DataType(DataType.Date)]
-        public DateTime birth_date_apprentice { get; set; }
+        [DataType(DataType.Date)]
+        public DateTime? birth_date_apprentice { get; set; }
 
         [Required, StringLength(20)]
         public string Gender_Apprentice { get; set; } = string.Empty;
@@ -33,7 +33,7 @@ namespace bienesoft.Models
         [Required, StringLength(200)]
         public string Address_Apprentice { get; set; } = string.Empty;
 
-        [Required, StringLength(50)]
+        // [Required, StringLength(50)]
         public string Address_Type_Apprentice { get; set; } = string.Empty;
 
         [Required, Phone, StringLength(20)]
@@ -45,7 +45,8 @@ namespace bienesoft.Models
         [Required, StringLength(20)]
         public string Status_Apprentice { get; set; } = "Activo";
 
-        public int Permission_Count_Apprentice { get; set; }
+        [Required]
+        public int Permission_Count_Apprentice { get; set; } = 0;
 
         [Required, StringLength(20)]
         public string Tip_Apprentice { get; set; } = "interno";
@@ -69,12 +70,12 @@ namespace bienesoft.Models
         public int File_Id { get; set; }
 
         // [Required]
-        public int id_municipality { get; set; }
+        public int? id_municipality { get; set; }
 
+        // Relaciones
         public Municipality? Municipality { get; set; }
         public FileModel? File { get; set; }
         public ICollection<PermissionGN>? PermissionGN { get; set; }
-        // public ICollection<User>? User { get; set; }
     }
 
     public class UpdateApprentice
@@ -83,14 +84,14 @@ namespace bienesoft.Models
         public string? last_name_apprentice { get; set; }
         public DateTime? birth_date_apprentice { get; set; }
         public string? gender_apprentice { get; set; }
-        public string? 	email_apprentice	{ get; set; }
+        public string? email_apprentice { get; set; }
         public string? address_apprentice { get; set; }
-        public string? 	address_type_apprentice { get; set; }
+        public string? address_type_apprentice { get; set; }
         public string? phone_Apprentice { get; set; }
         public string? Stratum_apprentice { get; set; }
         public string? status_Apprentice { get; set; } = "Activo";
-        public string? Tip_Apprentice {get; set;}
-        public string? tip_document {  get; set;}
+        public string? Tip_Apprentice { get; set; }
+        public string? tip_document { get; set; }
         public string? nom_responsible { get; set; }
         public string? ape_responsible { get; set; }
         public string? tel_responsible { get; set; }

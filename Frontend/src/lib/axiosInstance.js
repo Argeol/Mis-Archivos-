@@ -3,10 +3,12 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://10.6.96.50:5000/',
+  // baseURL: 'http://10.6.96.50:5000/',
+  baseURL: "http://localhost:5000/" ,
   withCredentials: true,
-  headers: {
+  headers: {  
     Accept: '*/*',
+    // 'Content-Type': 'application/json', // ✅ Este header es clave
   },
 });
 

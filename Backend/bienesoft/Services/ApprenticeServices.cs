@@ -96,46 +96,93 @@ namespace Bienesoft.Services
 
         }
 
-
         public object GetApprenticeById(int id)
         {
+            // Paso 1: Obtener aprendiz sin usar Include
             var apprentice = _context.apprentice
-                 .Include(a => a.Municipality)
-                     .ThenInclude(m => m.Department)
-                 .Include(a => a.File)
-                     .ThenInclude(f => f.program)
-                         .ThenInclude(p => p.Area)
-                 .Where(a => a.Id_Apprentice == id)
-                 .Select(a => new
-                 {
-                     a.Id_Apprentice,
-                     a.First_Name_Apprentice,
-                     a.Last_Name_Apprentice,
-                     a.Address_Type_Apprentice,
-                     a.Address_Apprentice,
-                     a.Email_Apprentice,
-                     Birth_Date_Apprentice_Formatted = a.birth_date_apprentice.ToString("yyyy-MM-dd"),
-                     a.Phone_Apprentice,
-                     a.Stratum_Apprentice,
-                     a.Gender_Apprentice,
-                     a.Tip_Apprentice,
-                     a.tip_document,
-                     a.nom_responsible,
-                     a.ape_responsible,
-                     a.email_responsible,
-                     a.tel_responsible,
-                     a.Municipality.Id_municipality,
-                     MunicipalityName = a.Municipality.municipality,
-                     DepartmentName = a.Municipality.Department.Name_department,
-                     a.File.File_Id,
-                     ProgramName = a.File.program.Program_Name,
-                     AreaName = a.File.program.Area.Area_Name,
-                     a.Status_Apprentice
-                 })
-                 .FirstOrDefault();
+                .Where(a => a.Id_Apprentice == id)
+                .Select(a => new
+                {
+                    a.Id_Apprentice,
+                    a.First_Name_Apprentice,
+                    a.Last_Name_Apprentice,
+                    a.Address_Type_Apprentice,
+                    a.Address_Apprentice,
+                    a.Email_Apprentice,
+                    a.birth_date_apprentice,
+                    a.Phone_Apprentice,
+                    a.Stratum_Apprentice,
+                    a.Gender_Apprentice,
+                    a.Tip_Apprentice,
+                    a.tip_document,
+                    a.nom_responsible,
+                    a.ape_responsible,
+                    a.email_responsible,
+                    a.tel_responsible,
+                    a.id_municipality,
+                    a.File_Id,
+                    a.Status_Apprentice
+                })
+                .FirstOrDefault();
 
-            return apprentice;
+            if (apprentice == null)
+            {
+                return new { Message = "Aprendiz no encontrado." };
+            }
+
+            // Paso 2: Consultar municipio y departamento solo si id_municipality es válido
+            string municipalityName = "Sin municipio";
+            string departmentName = "Sin departamento";
+
+            if (apprentice.id_municipality != null && apprentice.id_municipality != 0)
+            {
+                var municipality = _context.municipality
+                    .Where(m => m.Id_municipality == apprentice.id_municipality)
+                    .Select(m => new
+                    {
+                        m.municipality,
+                        DepartmentName = m.Department != null ? m.Department.Name_department : "Sin departamento"
+                    })
+                    .FirstOrDefault();
+
+                if (municipality != null)
+                {
+                    municipalityName = municipality.municipality;
+                    departmentName = municipality.DepartmentName;
+                }
+            }
+
+            // Resultado combinado
+            var response = new
+            {
+                apprentice.Id_Apprentice,
+                apprentice.First_Name_Apprentice,
+                apprentice.Last_Name_Apprentice,
+                apprentice.Address_Type_Apprentice,
+                apprentice.Address_Apprentice,
+                apprentice.Email_Apprentice,
+                Birth_Date_Apprentice_Formatted = apprentice.birth_date_apprentice?.ToString("yyyy-MM-dd") ?? "Fecha no disponible",
+                apprentice.Phone_Apprentice,
+                apprentice.Stratum_Apprentice,
+                apprentice.Gender_Apprentice,
+                apprentice.Tip_Apprentice,
+                apprentice.tip_document,
+                apprentice.nom_responsible,
+                apprentice.ape_responsible,
+                apprentice.email_responsible,
+                apprentice.tel_responsible,
+
+                apprentice.id_municipality,
+                MunicipalityName = municipalityName,
+                DepartmentName = departmentName,
+
+                apprentice.File_Id,
+                apprentice.Status_Apprentice
+            };
+
+            return response;
         }
+
 
         public IEnumerable<object> GetApprentices()
         {
@@ -153,7 +200,7 @@ namespace Bienesoft.Services
                     a.Address_Type_Apprentice,
                     a.Address_Apprentice,
                     a.Email_Apprentice,
-                    Birth_Date_Apprentice_Formatted = a.birth_date_apprentice.ToString("yyyy-MM-dd"),
+                    // Birth_Date_Apprentice_Formatted = a.birth_date_apprentice?.ToString("yyyy-MM-dd") ?? "Fecha no disponible",
                     a.Phone_Apprentice,
                     a.Stratum_Apprentice,
                     a.Gender_Apprentice,
@@ -303,7 +350,7 @@ namespace Bienesoft.Services
             {
                 worksheet.Cell(row, 1).Value = a.Id_Apprentice;
                 worksheet.Cell(row, 2).Value = a.FullName;
-                worksheet.Cell(row, 3).Value = a.birth_date_apprentice.ToShortDateString();
+                // worksheet.Cell(row, 3).Value = a.birth_date_apprentice.ToShortDateString();
                 worksheet.Cell(row, 4).Value = a.Gender_Apprentice;
                 worksheet.Cell(row, 5).Value = a.Email_Apprentice;
                 worksheet.Cell(row, 6).Value = a.Address_Apprentice;

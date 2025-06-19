@@ -255,6 +255,7 @@ export default function DashboardPage() {
           )}
           {/* Sección para Administradores */}
           {tip === "Administrador" && (
+            
             <>
               {/* Control de Permisos FS */}
 

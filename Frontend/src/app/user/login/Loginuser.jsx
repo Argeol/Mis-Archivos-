@@ -17,7 +17,8 @@ import { toast } from "sonner"; // ✅ Importado toast
 
 async function Login(credentials) {
   await new Promise((r) => setTimeout(r, 2000));
-  const response = await axiosInstance.post("/api/User/Login", credentials);
+  const response = await axiosInstance.post("api/User/Login", credentials);
+  console.log(response)
   return response;
 
 }
