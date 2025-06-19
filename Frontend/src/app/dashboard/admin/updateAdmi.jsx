@@ -69,7 +69,7 @@ export default function UpdateAdmin({ id }) {
 
     // Garantizar mínimo 3 segundos de spinner
     setTimeout(() => {
-      if (!updateMutation.isLoading) {
+      if (!updateMutation.isPending) {
         setShowLoading(false);
       }
     }, 5000);
@@ -96,7 +96,7 @@ export default function UpdateAdmin({ id }) {
                   placeholder="correo@ejemplo.com"
                   className="border-blue-200 focus-visible:ring-blue-500"
                   required
-                  disabled={updateMutation.isLoading || showLoading}
+                  disabled={updateMutation.isPending || showLoading}
                 />
               </div>
             </>
@@ -106,10 +106,10 @@ export default function UpdateAdmin({ id }) {
         <CardFooter className="dark:bg-green-900/20 border-blue-100 dark:border-blue-800 flex justify-end">
           <Button
             type="submit"
-            disabled={updateMutation.isLoading || showLoading}
+            disabled={updateMutation.isPending || showLoading}
             className="flex items-center justify-center gap-2"
           >
-            {(updateMutation.isLoading || showLoading) ? (
+            {(updateMutation.isPending || showLoading) ? (
               <>
                 <svg
                   className="animate-spin h-5 w-5 text-white"

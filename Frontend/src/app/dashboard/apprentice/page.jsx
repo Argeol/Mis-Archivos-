@@ -58,6 +58,7 @@ export default function ApprenticeDashboard() {
     programName: "Programa",
     areaName: "Área",
     stratum_Apprentice: "Estrato",
+    tip_document: "Tipo de Codumento",
   };
 
   const fieldLabels = ["Documento", "Nombre", "Apellido", "Teléfono", "Ficha"];

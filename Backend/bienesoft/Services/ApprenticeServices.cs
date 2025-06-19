@@ -121,6 +121,8 @@ namespace Bienesoft.Services
                     a.tel_responsible,
                     a.id_municipality,
                     a.File_Id,
+                    ProgramName = a.File.program.Program_Name,
+                    AreaName = a.File.program.Area.Area_Name,
                     a.Status_Apprentice
                 })
                 .FirstOrDefault();
@@ -177,6 +179,8 @@ namespace Bienesoft.Services
                 DepartmentName = departmentName,
 
                 apprentice.File_Id,
+                apprentice.ProgramName,
+                apprentice.AreaName,
                 apprentice.Status_Apprentice
             };
 

@@ -55,7 +55,7 @@ export default function StatusToggleButton({
           : "bg-red-500 hover:bg-red-600 text-white"
       }
       onClick={toggleStatus}
-      disabled={mutation.isLoading}
+      disabled={mutation.isPending}
     >
       {status ? "Activo" : "Inactivo"}
     </Button>

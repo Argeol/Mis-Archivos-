@@ -707,11 +707,11 @@ export default function RegisterApprentice({ onSuccess }) {
           {step === 4 && (
             <Button
               type="submit"
-              disabled={mutation.isLoading}
+              disabled={mutation.isPending}
               className="mt-[-1px] bg-blue-500 text-white text-sm px-4 py-1 hover:bg-blue-600 transition-colors duration-200 rounded-sm flex items-center justify-center gap-2"
 
             >
-              {mutation.isLoading ? (
+              {mutation.isPending ? (
                 <>
                   <svg
                     className="animate-spin h-5 w-5 text-white"

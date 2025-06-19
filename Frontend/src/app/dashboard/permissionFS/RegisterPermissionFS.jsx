@@ -228,10 +228,10 @@ export default function RegisterPermissionFS() {
       <div className="pt-4">
         <Button
           type="submit"
-          disabled={mutation.isLoading}
+          disabled={mutation.isPending}
           className="mt-4 bg-[#218EED] text-white hover:bg-[#1A7BD6] transition-colors duration-200 rounded-md mx-auto w-full flex items-center justify-center gap-2"
         >
-          {mutation.isLoading ? (
+          {mutation.isPending ? (
             <>
               <svg
                 className="animate-spin h-5 w-5 text-white"
