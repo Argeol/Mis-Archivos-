@@ -242,6 +242,51 @@ namespace bienesoft.Services
 
             return await _context.SaveChangesAsync();
         }
+
+
+        //este se elimina ya que es de update fichas 
+
+        public async Task<object> UpdateFechasFichasAsync(IFormFile file)
+        {
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+
+            using var workbook = new XLWorkbook(stream);
+            var worksheet = workbook.Worksheet(1); // primera hoja
+            var rows = worksheet.RangeUsed().RowsUsed().Skip(1); // omitimos la cabecera
+
+            var updated = new List<int>();
+            var notFound = new List<int>();
+
+            foreach (var row in rows)
+            {
+                var fichaId = row.Cell(1).GetValue<int>();
+                var fechaInicio = row.Cell(2).GetDateTime();
+                var fechaFin = row.Cell(3).GetDateTime();
+
+                var ficha = await _context.file.FirstOrDefaultAsync(f => f.File_Id == fichaId);
+
+                if (ficha != null)
+                {
+                    ficha.Start_Date = fechaInicio;
+                    ficha.End_Date = fechaFin;
+                    updated.Add(fichaId);
+                }
+                else
+                {
+                    notFound.Add(fichaId);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return new
+            {
+                message = $"Se actualizaron {updated.Count} fichas exitosamente.",
+                fichasNoEncontradas = notFound
+            };
+        }
+
     }
 }
 

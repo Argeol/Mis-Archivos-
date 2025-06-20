@@ -81,7 +81,7 @@ export default function DataTable({
   const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
   const [selectedUpdateId, setSelectedUpdateId] = useState(null);
   // const [isOpenAuthorizationModal, setIsOpenAuthorizationModal] =
-    useState(false); // Estado para el modal de autorización
+  useState(false); // Estado para el modal de autorización
   const [responsibleId, setResponsibleId] = useState(null); // 👈 Agrega esta línea
   const [selectedPermissionId, setSelectedPermissionId] = useState(null);
 
@@ -97,9 +97,8 @@ export default function DataTable({
 
   return (
     <>
-
       {tip === "Administrador" && (
-        <Card className="w-full max-w-5xl mx-auto p-4 my-7">
+        <Card className="w-full max-w-screen-xl mx-auto p-4 my-7">
           <CardHeader>
             <CardTitle className="text-center text-xl font-semibold">
               Lista de {TitlePage}
@@ -128,8 +127,8 @@ export default function DataTable({
             )}
           </CardHeader>
 
-          <CardContent>
-            <Table className="w-full">
+          <CardContent className="overflow-x-auto">
+            <Table className="w-full min-w-[1000px]">
               <TableHeader>
                 <TableRow>
                   {titlesData.map((title, index) => (
@@ -339,7 +338,7 @@ export default function DataTable({
               />
             )
           }
-{/* 
+          {/* 
           <AuthorizePermissionModal
             isOpen={isOpenAuthorizationModal}
             onClose={() => setIsOpenAuthorizationModal(false)}

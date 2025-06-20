@@ -156,7 +156,7 @@ namespace bienesoft.Controllers
 
             try
             {
-                var result = await _FileServices.ImportFilesAsync(file);
+                var result = await _FileServices.UpdateFechasFichasAsync(file);
                 return Ok(result);
             }
             catch (Exception ex)
