@@ -52,6 +52,25 @@ namespace bienesoft.Controllers
             }
         }
 
+        //[Authorize(Roles = "Administrador")]
+        [HttpPost("CreateByAdmin")]
+        public async Task<IActionResult> CreateByAdmin([FromBody] CreatePermissionFSAdmin model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var result = await _service.CreateAsync(model.Permission, model.Apprentice_Id);
+                return CreatedAtAction(nameof(GetById), new { id = result.PermissionFS_Id }, result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

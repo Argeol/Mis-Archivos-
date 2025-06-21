@@ -68,4 +68,11 @@ namespace Bienesoft.Models
     {
         public PermissionFS Permission { get; set; }
     }
+
+    public class CreatePermissionFSAdmin
+    {
+        public int Apprentice_Id { get; set; }
+        public PermissionFS Permission { get; set; }
+    }
+
 }
